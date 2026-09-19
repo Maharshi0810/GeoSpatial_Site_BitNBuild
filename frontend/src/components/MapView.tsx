@@ -1,12 +1,14 @@
 /**
- * MapView Component — Main MapLibre GL map instance with Phase 2B Spatial Analytics Overlays.
+ * MapView Component — Main MapLibre GL map with Phase 2B Spatial Overlays
+ * and Phase 3B Drawing Layers + Micro-Animations.
  *
  * Owner: Daksh [D]
  */
 
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import type { DrawMode } from '@/components/DrawToolbar';
 
 // Gujarat center coordinate & default bounds
 const GUJARAT_CENTER: [number, number] = [72.5714, 23.0225]; // [lng, lat]
@@ -28,10 +30,19 @@ const GUJARAT_OUTLINE_GEOJSON = {
   }
 };
 
+const EMPTY_FC: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] };
+
 export type AnalysisMode = 'points' | 'h3' | 'clusters' | 'hotspots';
+
+export interface MapViewHandle {
+  flyTo: (lng: number, lat: number, zoom?: number) => void;
+  fitBounds: (coords: number[][]) => void;
+  getMap: () => maplibregl.Map | null;
+}
 
 export interface MapViewProps {
   onMapClick?: (coords: { lat: number; lng: number }) => void;
+  onMapDblClick?: (coords: { lat: number; lng: number }) => void;
   selectedLocation?: { lat: number; lng: number } | null;
   analysisMode?: AnalysisMode;
   h3Data?: any;
@@ -41,25 +52,50 @@ export interface MapViewProps {
   activeLayers?: Record<string, boolean>;
   layerData?: Record<string, any>;
   layerOpacity?: Record<string, number>;
+  // Phase 3B drawing props
+  drawMode?: DrawMode;
+  drawVertices?: number[][];
+  drawnPolygonGeoJSON?: GeoJSON.FeatureCollection | null;
 }
 
-export const MapView: React.FC<MapViewProps> = ({
-  onMapClick,
-  selectedLocation,
-  analysisMode = 'points',
-  h3Data,
-  clusterData,
-  hotspotData,
-  isochroneData,
-  activeLayers: _activeLayers = {},
-  layerData: _layerData = {},
-  layerOpacity: _layerOpacity = {},
-}) => {
+export const MapView = forwardRef<MapViewHandle, MapViewProps>((
+  {
+    onMapClick,
+    onMapDblClick,
+    selectedLocation,
+    analysisMode = 'points',
+    h3Data,
+    clusterData,
+    hotspotData,
+    isochroneData,
+    activeLayers: _activeLayers = {},
+    layerData: _layerData = {},
+    layerOpacity: _layerOpacity = {},
+    drawMode = 'none',
+    drawVertices = [],
+    drawnPolygonGeoJSON = null,
+  },
+  ref
+) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markerRef = useRef<maplibregl.Marker | null>(null);
   const popupRef = useRef<maplibregl.Popup | null>(null);
   const [mapLoaded, setMapLoaded] = useState<boolean>(false);
+
+  // Expose imperative handle for flyTo / fitBounds from parent
+  useImperativeHandle(ref, () => ({
+    flyTo: (lng: number, lat: number, zoom = 12) => {
+      mapRef.current?.flyTo({ center: [lng, lat], zoom, speed: 1.2, curve: 1.4, essential: true });
+    },
+    fitBounds: (coords: number[][]) => {
+      if (!mapRef.current || coords.length < 2) return;
+      const bounds = new maplibregl.LngLatBounds();
+      coords.forEach(c => bounds.extend(c as [number, number]));
+      mapRef.current.fitBounds(bounds, { padding: 80, maxZoom: 14, duration: 1200 });
+    },
+    getMap: () => mapRef.current,
+  }));
 
   // Initialize MapLibre GL
   useEffect(() => {
@@ -98,6 +134,46 @@ export const MapView: React.FC<MapViewProps> = ({
           'line-dasharray': [2, 2],
         },
       });
+
+      // --- Phase 3B: Drawing sources & layers ---
+      map.addSource('src-draw-polygon', { type: 'geojson', data: EMPTY_FC });
+      map.addSource('src-draw-vertices', { type: 'geojson', data: EMPTY_FC });
+
+      // Polygon fill
+      map.addLayer({
+        id: 'layer-draw-fill',
+        type: 'fill',
+        source: 'src-draw-polygon',
+        paint: {
+          'fill-color': 'rgba(6, 182, 212, 0.18)',
+          'fill-outline-color': '#06b6d4',
+        },
+      });
+
+      // Polygon stroke
+      map.addLayer({
+        id: 'layer-draw-line',
+        type: 'line',
+        source: 'src-draw-polygon',
+        paint: {
+          'line-color': '#06b6d4',
+          'line-width': 2.5,
+          'line-dasharray': [3, 1.5],
+        },
+      });
+
+      // Vertex points
+      map.addLayer({
+        id: 'layer-draw-points',
+        type: 'circle',
+        source: 'src-draw-vertices',
+        paint: {
+          'circle-radius': 5,
+          'circle-color': '#ffffff',
+          'circle-stroke-width': 2.5,
+          'circle-stroke-color': '#06b6d4',
+        },
+      });
     });
 
     // Map Click Handler
@@ -105,6 +181,15 @@ export const MapView: React.FC<MapViewProps> = ({
       const { lng, lat } = e.lngLat;
       if (onMapClick) {
         onMapClick({ lat: parseFloat(lat.toFixed(5)), lng: parseFloat(lng.toFixed(5)) });
+      }
+    });
+
+    // Map Double-Click Handler (close polygon)
+    map.on('dblclick', (e) => {
+      if (onMapDblClick) {
+        e.preventDefault();
+        const { lng, lat } = e.lngLat;
+        onMapDblClick({ lat: parseFloat(lat.toFixed(5)), lng: parseFloat(lng.toFixed(5)) });
       }
     });
 
@@ -118,7 +203,7 @@ export const MapView: React.FC<MapViewProps> = ({
     };
   }, []);
 
-  // Update selected site pin with pulse effect
+  // Update selected site pin with pulse animation
   useEffect(() => {
     if (!mapRef.current || !mapLoaded) return;
 
@@ -126,12 +211,12 @@ export const MapView: React.FC<MapViewProps> = ({
       if (!markerRef.current) {
         const el = document.createElement('div');
         el.className = 'site-marker-pin';
-        el.style.width = '24px';
-        el.style.height = '24px';
-        el.style.borderRadius = '50%';
-        el.style.backgroundColor = '#16a34a';
-        el.style.border = '2.5px solid #ffffff';
-        el.style.boxShadow = '0 0 16px rgba(22, 163, 74, 0.8), 0 0 30px rgba(22, 163, 74, 0.4)';
+        el.innerHTML = `
+          <div style="position:relative;width:24px;height:24px;">
+            <div style="position:absolute;inset:0;border-radius:50%;background:rgba(22,163,74,0.35);animation:pulse-ring 2s ease-out infinite;"></div>
+            <div style="position:absolute;inset:0;border-radius:50%;background:#16a34a;border:2.5px solid #fff;box-shadow:0 0 16px rgba(22,163,74,0.8),0 0 30px rgba(22,163,74,0.4);"></div>
+          </div>
+        `;
         el.style.cursor = 'pointer';
 
         markerRef.current = new maplibregl.Marker({ element: el })
@@ -140,8 +225,77 @@ export const MapView: React.FC<MapViewProps> = ({
       } else {
         markerRef.current.setLngLat([selectedLocation.lng, selectedLocation.lat]);
       }
+
+      // Smooth fly-to on new selection
+      mapRef.current.flyTo({
+        center: [selectedLocation.lng, selectedLocation.lat],
+        zoom: Math.max(mapRef.current.getZoom(), 10.5),
+        speed: 1.2,
+        curve: 1.4,
+        essential: true,
+      });
     }
   }, [selectedLocation, mapLoaded]);
+
+  // --- Phase 3B: Sync drawing layers ---
+  const syncDrawLayers = useCallback(() => {
+    const map = mapRef.current;
+    if (!map || !mapLoaded) return;
+
+    // Build vertex features
+    const vertexFeatures: GeoJSON.Feature[] = drawVertices.map(([lng, lat]) => ({
+      type: 'Feature' as const,
+      geometry: { type: 'Point' as const, coordinates: [lng, lat] },
+      properties: {},
+    }));
+
+    // Build polygon preview from vertices (in-progress line) or final polygon
+    let polygonFC: GeoJSON.FeatureCollection = EMPTY_FC;
+    if (drawnPolygonGeoJSON && drawnPolygonGeoJSON.features.length > 0) {
+      polygonFC = drawnPolygonGeoJSON;
+    } else if (drawVertices.length >= 2) {
+      // Show line-in-progress (unclosed polygon preview)
+      polygonFC = {
+        type: 'FeatureCollection',
+        features: [{
+          type: 'Feature',
+          geometry: {
+            type: 'LineString',
+            coordinates: drawVertices,
+          },
+          properties: {},
+        }],
+      };
+    }
+
+    const src = map.getSource('src-draw-polygon') as maplibregl.GeoJSONSource | undefined;
+    const vertSrc = map.getSource('src-draw-vertices') as maplibregl.GeoJSONSource | undefined;
+    if (src) src.setData(polygonFC);
+    if (vertSrc) vertSrc.setData({ type: 'FeatureCollection', features: vertexFeatures });
+
+    // Update line style based on whether polygon is closed or not
+    if (map.getLayer('layer-draw-line')) {
+      map.setPaintProperty('layer-draw-line', 'line-dasharray',
+        drawnPolygonGeoJSON ? [1, 0] : [3, 1.5]
+      );
+    }
+  }, [drawVertices, drawnPolygonGeoJSON, mapLoaded]);
+
+  useEffect(() => {
+    syncDrawLayers();
+  }, [syncDrawLayers]);
+
+  // Change cursor based on draw mode
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const canvas = map.getCanvas();
+    if (drawMode !== 'none') {
+      canvas.style.cursor = 'crosshair';
+    } else {
+      canvas.style.cursor = '';
+    }
+  }, [drawMode]);
 
   // Sync Phase 2B Spatial Analysis Layers
   useEffect(() => {
@@ -409,11 +563,22 @@ export const MapView: React.FC<MapViewProps> = ({
   }, [analysisMode, h3Data, clusterData, hotspotData, isochroneData, mapLoaded]);
 
   return (
-    <div
-      ref={mapContainerRef}
-      className="absolute inset-0 w-full h-full bg-[#0a0f1d] cursor-crosshair select-none"
-    />
+    <>
+      <div
+        ref={mapContainerRef}
+        className="absolute inset-0 w-full h-full bg-[#0a0f1d] cursor-crosshair select-none"
+      />
+      {/* Pulse animation keyframes injected via style tag */}
+      <style>{`
+        @keyframes pulse-ring {
+          0% { transform: scale(1); opacity: 1; }
+          100% { transform: scale(2.8); opacity: 0; }
+        }
+      `}</style>
+    </>
   );
-};
+});
+
+MapView.displayName = 'MapView';
 
 export default MapView;

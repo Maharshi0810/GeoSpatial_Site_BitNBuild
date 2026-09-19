@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Layers,
   Sliders,
@@ -20,6 +20,7 @@ import { mockDataService, ScoreResponse } from '@/mocks/mockDataService';
 import { formatCoordinates, formatPopulation, formatContribution } from '@/utils/format';
 import { LoadingOverlay, ScorePanelSkeleton } from '@/components/LoadingOverlay';
 import { MapView, AnalysisMode } from '@/components/MapView';
+import type { MapViewHandle } from '@/components/MapView';
 import { HotspotLegend } from '@/components/HotspotLegend';
 import { useSpatialAnalytics } from '@/hooks/useSpatialAnalytics';
 import { BreakdownChart } from '@/components/BreakdownChart';
@@ -27,9 +28,14 @@ import { ComparePanel } from '@/components/ComparePanel';
 import { useCompareApi } from '@/hooks/useCompareApi';
 import { useIsochrone } from '@/hooks/useIsochrone';
 import { IsochronePanel } from '@/components/IsochronePanel';
+import { DrawToolbar } from '@/components/DrawToolbar';
+import type { DrawMode, DrawnPolygon } from '@/components/DrawToolbar';
 import { Clock } from 'lucide-react';
+import * as turf from '@turf/turf';
 
 export const MapWorkspace: React.FC = () => {
+  const mapViewRef = useRef<MapViewHandle>(null);
+
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>({
     lat: 23.0378,
     lng: 72.5112,
@@ -64,6 +70,59 @@ export const MapWorkspace: React.FC = () => {
   // Phase 2D Isochrone & Catchment Hook
   const isochroneState = useIsochrone(selectedLocation);
   const [activeRightTab, setActiveRightTab] = useState<'score' | 'catchment'>('score');
+
+  // --- Phase 3B: Drawing state ---
+  const [drawMode, setDrawMode] = useState<DrawMode>('none');
+  const [drawVertices, setDrawVertices] = useState<number[][]>([]);
+  const [drawnPolygon, setDrawnPolygon] = useState<DrawnPolygon | null>(null);
+  const [drawnPolygonGeoJSON, setDrawnPolygonGeoJSON] = useState<GeoJSON.FeatureCollection | null>(null);
+  const [isPolygonScoring, setIsPolygonScoring] = useState(false);
+  const [polygonScore, setPolygonScore] = useState<ScoreResponse | null>(null);
+  const rectCornerRef = useRef<number[] | null>(null);
+
+  // Clear drawing state
+  const clearDraw = useCallback(() => {
+    setDrawMode('none');
+    setDrawVertices([]);
+    setDrawnPolygon(null);
+    setDrawnPolygonGeoJSON(null);
+    setPolygonScore(null);
+    rectCornerRef.current = null;
+  }, []);
+
+  // Finalise a closed polygon from coordinates ring
+  const finalisePolygon = useCallback((ring: number[][]) => {
+    const closed = [...ring, ring[0]];
+    const poly = turf.polygon([closed]);
+    const areaKm2 = turf.area(poly) / 1_000_000;
+    const cent = turf.centroid(poly);
+    const centCoords = cent.geometry.coordinates as [number, number];
+
+    setDrawnPolygon({ coordinates: closed, areaKm2, centroid: centCoords });
+    setDrawnPolygonGeoJSON({
+      type: 'FeatureCollection',
+      features: [{ type: 'Feature', geometry: poly.geometry, properties: {} }],
+    });
+    setDrawMode('none');
+
+    // Fit map to polygon bounds
+    mapViewRef.current?.fitBounds(closed);
+  }, []);
+
+  // Score the drawn polygon catchment
+  const scorePolygonCatchment = useCallback(async () => {
+    if (!drawnPolygon) return;
+    setIsPolygonScoring(true);
+    try {
+      const [lng, lat] = drawnPolygon.centroid;
+      const data = await mockDataService.fetchScoreForLocation(lat, lng);
+      setPolygonScore(data);
+    } catch {
+      // fallback silent
+    } finally {
+      setIsPolygonScoring(false);
+    }
+  }, [drawnPolygon]);
 
   useEffect(() => {
     if (selectedLocation) {
@@ -237,18 +296,91 @@ export const MapWorkspace: React.FC = () => {
           {/* Interactive MapLibre Map View with Spatial Analytics Layers */}
           <div className="absolute inset-0 z-0">
             <MapView
+              ref={mapViewRef}
               selectedLocation={selectedLocation}
               onMapClick={(coords) => {
+                // --- Phase 3B: intercept clicks during draw mode ---
+                if (drawMode === 'polygon') {
+                  const v = [...drawVertices, [coords.lng, coords.lat]];
+                  setDrawVertices(v);
+                  return;
+                }
+                if (drawMode === 'rectangle') {
+                  if (!rectCornerRef.current) {
+                    rectCornerRef.current = [coords.lng, coords.lat];
+                    setDrawVertices([[coords.lng, coords.lat]]);
+                  } else {
+                    const [x1, y1] = rectCornerRef.current;
+                    const [x2, y2] = [coords.lng, coords.lat];
+                    const ring = [[x1, y1], [x2, y1], [x2, y2], [x1, y2]];
+                    finalisePolygon(ring);
+                    rectCornerRef.current = null;
+                  }
+                  return;
+                }
+                // Normal site scoring click
                 setSelectedLocation(coords);
                 loadScore(coords.lat, coords.lng);
+              }}
+              onMapDblClick={(coords) => {
+                // Close polygon on double-click
+                if (drawMode === 'polygon' && drawVertices.length >= 3) {
+                  finalisePolygon([...drawVertices, [coords.lng, coords.lat]]);
+                }
               }}
               analysisMode={analysisMode}
               h3Data={spatialData.h3Data}
               clusterData={spatialData.clusterData}
               hotspotData={spatialData.hotspotData}
               isochroneData={isochroneState.isochroneData}
+              drawMode={drawMode}
+              drawVertices={drawVertices}
+              drawnPolygonGeoJSON={drawnPolygonGeoJSON}
             />
           </div>
+
+          {/* Phase 3B: Draw Toolbar */}
+          <DrawToolbar
+            drawMode={drawMode}
+            onSetDrawMode={(mode) => {
+              clearDraw();
+              setDrawMode(mode);
+            }}
+            drawnPolygon={drawnPolygon}
+            vertexCount={drawVertices.length}
+            onClear={clearDraw}
+            onScorePolygon={scorePolygonCatchment}
+            isScoring={isPolygonScoring}
+          />
+
+          {/* Polygon Score Floating Card */}
+          {polygonScore && drawnPolygon && (
+            <div
+              className="absolute left-4 bottom-[280px] z-30 w-56 p-3 rounded-xl border text-xs flex flex-col gap-2"
+              style={{
+                background: 'rgba(15, 23, 42, 0.92)',
+                borderColor: 'rgba(6, 182, 212, 0.4)',
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-cyan-300 font-semibold uppercase tracking-wider text-[10px]">Polygon Score</span>
+                <span className="font-mono text-lg font-bold text-white">{polygonScore.score}</span>
+              </div>
+              <div className="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                <div className="h-full bg-cyan-400 transition-all" style={{ width: `${polygonScore.score}%` }} />
+              </div>
+              <div className="flex justify-between text-slate-400">
+                <span>Area</span>
+                <span className="font-mono text-slate-200">{drawnPolygon.areaKm2.toFixed(2)} km²</span>
+              </div>
+              <div className="flex justify-between text-slate-400">
+                <span>Grade</span>
+                <span className="font-mono text-cyan-300 font-semibold">
+                  {polygonScore.score >= 85 ? 'A' : polygonScore.score >= 70 ? 'B' : polygonScore.score >= 55 ? 'C' : 'D'}
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Floating Hotspot / H3 Legend */}
           {(analysisMode === 'hotspots' || analysisMode === 'h3') && (
