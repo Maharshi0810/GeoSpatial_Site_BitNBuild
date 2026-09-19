@@ -51,7 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="w-7 h-7 bg-brand-600 rounded-btn flex items-center justify-center text-surface shadow-sm">
             <Compass className="w-4 h-4" strokeWidth={2} />
           </div>
-          <span className="text-sm font-semibold">Site Readiness Analyzer</span>
+          <span className="text-sm font-semibold">GeoVista</span>
         </Link>
 
         <div className="h-4 w-px bg-slate-200 hidden sm:block" />

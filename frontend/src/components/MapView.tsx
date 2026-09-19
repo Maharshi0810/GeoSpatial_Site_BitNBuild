@@ -69,9 +69,9 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>((
     clusterData,
     hotspotData,
     isochroneData,
-    activeLayers: _activeLayers = {},
+    activeLayers = {},
     layerData: _layerData = {},
-    layerOpacity: _layerOpacity = {},
+    layerOpacity = {},
     drawMode = 'none',
     drawVertices = [],
     drawnPolygonGeoJSON = null,
@@ -298,6 +298,38 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>((
       canvas.style.cursor = 'grab';
     }
   }, [drawMode]);
+
+  // Sync layer visibility/opacity when sidebar layer toggles change
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapLoaded) return;
+
+    // Map sidebar layer IDs to map layer IDs (where they exist)
+    const layerMapping: Record<string, string[]> = {
+      demographics: ['layer-h3-fill', 'layer-h3-line'],
+      transportation: ['gujarat-boundary-line'],
+      poi: ['layer-cluster-circles', 'layer-cluster-count'],
+      landuse: ['layer-draw-fill'],
+      environment: ['layer-isochrone-fill', 'layer-isochrone-line'],
+    };
+
+    Object.entries(activeLayers).forEach(([sidebarId, visible]) => {
+      const mapLayerIds = layerMapping[sidebarId] || [];
+      const opacity = layerOpacity[sidebarId] ?? 1;
+      mapLayerIds.forEach((layerId) => {
+        if (!map.getLayer(layerId)) return;
+        const visibility = visible ? 'visible' : 'none';
+        try {
+          map.setLayoutProperty(layerId, 'visibility', visibility);
+          // Apply opacity to fill/line/circle layers
+          const layerType = map.getLayer(layerId)?.type;
+          if (layerType === 'fill') map.setPaintProperty(layerId, 'fill-opacity', opacity * 0.55);
+          else if (layerType === 'line') map.setPaintProperty(layerId, 'line-opacity', opacity * 0.65);
+          else if (layerType === 'circle') map.setPaintProperty(layerId, 'circle-opacity', opacity);
+        } catch { /* layer may not exist yet */ }
+      });
+    });
+  }, [activeLayers, layerOpacity, mapLoaded]);
 
   // Sync Phase 2B Spatial Analysis Layers
   useEffect(() => {

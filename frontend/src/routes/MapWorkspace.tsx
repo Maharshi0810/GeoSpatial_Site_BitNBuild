@@ -71,6 +71,21 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
   // Active filter chip states
   const [activeFilter, setActiveFilter] = useState<string>('fast_dc');
 
+  // Compare site selection state
+  const [isPickingForCompare, setIsPickingForCompare] = useState<boolean>(false);
+  const [compareNotification, setCompareNotification] = useState<string | null>(null);
+
+  // Keyboard shortcut: Esc exits site picking mode
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isPickingForCompare) {
+        setIsPickingForCompare(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPickingForCompare]);
+
   // Spatial Analysis Mode
   const [analysisMode, setAnalysisMode] = useState<AnalysisMode>('points');
   const spatialData = useSpatialAnalytics();
@@ -247,9 +262,18 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
                 setSelectedSiteName(loc.name);
                 mapViewRef.current?.flyTo(loc.lng, loc.lat, 13.5);
                 loadScore(loc.lat, loc.lng, siteType);
-                setActiveSidebarTab('score');
-                if (isSidebarCollapsed) {
-                  setIsSidebarCollapsed(false);
+                if (isPickingForCompare || activeSidebarTab === 'compare') {
+                  mockDataService.fetchScoreForLocation(loc.lat, loc.lng, siteType, activeFilter).then((data) => {
+                    addSiteFromScore(data);
+                    setCompareNotification(`✓ Added "${data.locationName || loc.name}" (${data.score}/100) to comparison!`);
+                    setTimeout(() => setCompareNotification(null), 3500);
+                  });
+                  setIsPickingForCompare(false);
+                } else {
+                  setActiveSidebarTab('score');
+                  if (isSidebarCollapsed) {
+                    setIsSidebarCollapsed(false);
+                  }
                 }
               }}
             />
@@ -283,6 +307,29 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
                 );
               })}
             </div>
+
+            {/* Compare Selection Mode Active Banner */}
+            {isPickingForCompare && (
+              <div className="px-4 py-2 bg-brand-600 text-white shadow-2xl rounded-full flex items-center justify-between gap-3 border border-brand-400 animate-pulse w-full max-w-md mx-auto">
+                <div className="flex items-center gap-2 text-xs font-semibold truncate">
+                  <span className="w-2 h-2 rounded-full bg-white animate-ping shrink-0" />
+                  <span className="truncate">🎯 Click any location on the map to add to comparison</span>
+                </div>
+                <button
+                  onClick={() => setIsPickingForCompare(false)}
+                  className="text-xs bg-black/30 hover:bg-black/50 px-2.5 py-0.5 rounded-full font-medium transition-colors shrink-0"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+
+            {/* Compare Notification Toast */}
+            {compareNotification && (
+              <div className="px-4 py-1.5 bg-emerald-600 text-white shadow-xl rounded-full flex items-center justify-center gap-2 border border-emerald-400 text-xs font-semibold w-full max-w-md mx-auto transition-all">
+                <span>{compareNotification}</span>
+              </div>
+            )}
           </div>
 
           {/* Interactive MapLibre Map View */}
@@ -317,6 +364,30 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
                   }
                   return;
                 }
+
+                // If in picking mode OR active tab is Compare:
+                if (isPickingForCompare || activeSidebarTab === 'compare') {
+                  setSelectedLocation(coords);
+                  const candidateName = `Candidate Site (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})`;
+                  setSelectedSiteName(candidateName);
+                  setIsLoading(true);
+                  mockDataService.fetchScoreForLocation(coords.lat, coords.lng, siteType, activeFilter)
+                    .then((data) => {
+                      setScoreData(data);
+                      addSiteFromScore(data);
+                      setCompareNotification(`✓ Added "${data.locationName || candidateName}" (${data.score}/100) to comparison!`);
+                      setTimeout(() => setCompareNotification(null), 3500);
+                    })
+                    .catch(() => {
+                      setError('Failed to score selected candidate location.');
+                    })
+                    .finally(() => {
+                      setIsLoading(false);
+                      setIsPickingForCompare(false);
+                    });
+                  return;
+                }
+
                 // Normal site selection click
                 setSelectedLocation(coords);
                 setSelectedSiteName(`Candidate Site (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})`);
@@ -496,6 +567,9 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
           onSelectBenchmark={handleSelectBenchmark}
           onQueueAllBenchmarks={handleQueueAllBenchmarks}
           onExportReport={() => setIsReportModalOpen(true)}
+          isPickingForCompare={isPickingForCompare}
+          onStartPickForCompare={() => setIsPickingForCompare(true)}
+          onCancelPickForCompare={() => setIsPickingForCompare(false)}
         />
       </div>
 

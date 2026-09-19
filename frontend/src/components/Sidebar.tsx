@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Target,
   Scale,
@@ -71,6 +71,10 @@ export interface SidebarProps {
   onQueueAllBenchmarks: () => void;
   // Report Export
   onExportReport?: () => void;
+  // Map picking for compare
+  isPickingForCompare?: boolean;
+  onStartPickForCompare?: () => void;
+  onCancelPickForCompare?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -101,9 +105,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSiteTypeChange,
   onSelectBenchmark,
   onQueueAllBenchmarks,
+  isPickingForCompare,
+  onStartPickForCompare,
+  onCancelPickForCompare,
 }) => {
   const [showRadar, setShowRadar] = useState<boolean>(false);
   const [showBenchmarkDropdown, setShowBenchmarkDropdown] = useState<boolean>(false);
+  const [siteAddedFeedback, setSiteAddedFeedback] = useState<boolean>(false);
+
+  // Clear "Added!" feedback after 1.5s
+  useEffect(() => {
+    if (!siteAddedFeedback) return;
+    const t = setTimeout(() => setSiteAddedFeedback(false), 1500);
+    return () => clearTimeout(t);
+  }, [siteAddedFeedback]);
 
   // Helper for score grade
   const getGrade = (score: number) => {
@@ -214,7 +229,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               Analyst Workbench
             </span>
             <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-chip bg-slate-100 text-slate-600">
-              Gujarat GIS
+              GeoVista
             </span>
           </div>
 
@@ -533,11 +548,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {/* Actions Footer */}
                 <div className="flex items-center gap-2 pt-2 border-t border-slate-200 mt-auto">
                   <button
-                    onClick={onAddCurrentSite}
-                    className="flex-1 h-9 bg-brand-600 hover:bg-brand-700 text-surface text-xs font-semibold rounded-btn transition-colors flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
+                    onClick={() => {
+                      onAddCurrentSite();
+                      setSiteAddedFeedback(true);
+                      // Navigate to compare tab after short delay to show result
+                      setTimeout(() => onTabChange('compare'), 800);
+                    }}
+                    className={`flex-1 h-9 text-surface text-xs font-semibold rounded-btn transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95 ${
+                      siteAddedFeedback
+                        ? 'bg-emerald-600 hover:bg-emerald-700'
+                        : 'bg-brand-600 hover:bg-brand-700'
+                    }`}
                   >
-                    <Plus className="w-3.5 h-3.5" strokeWidth={2} />
-                    <span>Queue for comparison</span>
+                    {siteAddedFeedback ? (
+                      <>
+                        <CheckCircle2 className="w-3.5 h-3.5" strokeWidth={2} />
+                        <span>Added to comparison!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-3.5 h-3.5" strokeWidth={2} />
+                        <span>Queue for comparison</span>
+                      </>
+                    )}
                   </button>
                   {onExportReport && (
                     <button
@@ -590,18 +623,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onRemoveSite={onRemoveSite}
               onClearSites={onClearSites}
               onRunCompare={onRunCompare}
+              currentSite={scoreData}
+              onAddCurrentSite={() => {
+                onAddCurrentSite();
+                setSiteAddedFeedback(true);
+              }}
+              onGoToScore={() => onTabChange('score')}
+              isPickingSite={isPickingForCompare}
+              onStartPickSite={onStartPickForCompare}
+              onCancelPickSite={onCancelPickForCompare}
             />
 
-            {candidateSites.length === 0 && (
+            {candidateSites.length === 0 && !scoreData && (
               <div className="p-4 bg-canvas border border-dashed border-slate-300 rounded-btn text-center flex flex-col items-center gap-2">
                 <Scale className="w-6 h-6 text-slate-400" />
                 <p className="text-xs text-slate-600">No candidates queued yet.</p>
-                <button
-                  onClick={onQueueAllBenchmarks}
-                  className="px-3 py-1 bg-brand-50 text-brand-700 border border-brand-200 rounded-chip text-xs font-semibold hover:bg-brand-100 transition-colors"
-                >
-                  Load 5 Gujarat Benchmarks
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={onStartPickForCompare || (() => onTabChange('score'))}
+                    className="px-3 py-1 bg-brand-600 text-white rounded-chip text-xs font-semibold hover:bg-brand-700 transition-colors"
+                  >
+                    Pick site on map
+                  </button>
+                  <button
+                    onClick={onQueueAllBenchmarks}
+                    className="px-3 py-1 bg-brand-50 text-brand-700 border border-brand-200 rounded-chip text-xs font-semibold hover:bg-brand-100 transition-colors"
+                  >
+                    Load Gujarat Benchmarks
+                  </button>
+                </div>
               </div>
             )}
           </div>
