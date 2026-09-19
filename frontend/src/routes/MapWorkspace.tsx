@@ -18,6 +18,9 @@ import {
 import { mockDataService, ScoreResponse } from '@/mocks/mockDataService';
 import { formatCoordinates, formatPopulation, formatContribution } from '@/utils/format';
 import { LoadingOverlay, ScorePanelSkeleton } from '@/components/LoadingOverlay';
+import { MapView, AnalysisMode } from '@/components/MapView';
+import { HotspotLegend } from '@/components/HotspotLegend';
+import { useSpatialAnalytics } from '@/hooks/useSpatialAnalytics';
 
 export const MapWorkspace: React.FC = () => {
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>({
@@ -34,6 +37,10 @@ export const MapWorkspace: React.FC = () => {
 
   // Active filter chip states
   const [activeFilter, setActiveFilter] = useState<string>('fast_dc');
+
+  // Phase 2B Spatial Analysis Mode
+  const [analysisMode, setAnalysisMode] = useState<AnalysisMode>('points');
+  const spatialData = useSpatialAnalytics();
 
   useEffect(() => {
     if (selectedLocation) {
@@ -204,60 +211,46 @@ export const MapWorkspace: React.FC = () => {
             </div>
           </div>
 
-          {/* Visual Map Canvas Simulation Frame */}
-          <div
-            className="absolute inset-0 z-0 flex items-center justify-center cursor-crosshair select-none"
-            onClick={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              const xNorm = (e.clientX - rect.left) / rect.width;
-              const yNorm = (e.clientY - rect.top) / rect.height;
-              const lat = 22.95 + (1 - yNorm) * 0.2;
-              const lng = 72.45 + xNorm * 0.25;
-              setSelectedLocation({ lat, lng });
-              loadScore(lat, lng);
-            }}
-          >
-            {/* Map Grid and Center Marker Representation */}
-            <div className="text-center flex flex-col items-center gap-3">
-              <div className="relative flex items-center justify-center">
-                {/* Pin styled per reference: teardrop brand-600 gradient fill, white 2px stroke */}
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-600 to-brand-700 border-2 border-surface shadow-float flex items-center justify-center text-surface animate-bounce">
-                  <Crosshair className="w-4 h-4" strokeWidth={2} />
-                </div>
-                <div className="absolute -bottom-1 w-3 h-1 bg-slate-700/20 rounded-full blur-[1px]" />
-              </div>
-
-              {selectedLocation && (
-                <div className="bg-surface/90 backdrop-blur-sm border border-slate-200 px-3 py-1.5 rounded-chip text-xs shadow-float">
-                  <p className="font-semibold text-ink">Active pin at crosshair</p>
-                  <p className="font-mono text-slate-500">{formatCoordinates(selectedLocation.lat, selectedLocation.lng)}</p>
-                </div>
-              )}
-            </div>
-
-            {/* Guidance Callout */}
-            <div className="absolute bottom-14 left-4 bg-surface/95 border border-slate-200 rounded-btn px-3 py-2 text-xs text-slate-700 shadow-float max-w-xs">
-              <p className="font-medium text-ink">Interactive canvas active</p>
-              <p className="text-[11px] text-slate-500 mt-0.5">Click anywhere on the map to evaluate site readiness for that coordinate.</p>
-            </div>
+          {/* Interactive MapLibre Map View with Spatial Analytics Layers */}
+          <div className="absolute inset-0 z-0">
+            <MapView
+              selectedLocation={selectedLocation}
+              onMapClick={(coords) => {
+                setSelectedLocation(coords);
+                loadScore(coords.lat, coords.lng);
+              }}
+              analysisMode={analysisMode}
+              h3Data={spatialData.h3Data}
+              clusterData={spatialData.clusterData}
+              hotspotData={spatialData.hotspotData}
+            />
           </div>
+
+          {/* Floating Hotspot / H3 Legend */}
+          {(analysisMode === 'hotspots' || analysisMode === 'h3') && (
+            <HotspotLegend mode={analysisMode} />
+          )}
 
           {/* Right Floating Stacked Map Controls (38px circular controls) */}
           <div className="absolute right-4 top-24 z-20 flex flex-col gap-2">
             <button
               className="w-[38px] h-[38px] rounded-full bg-surface border border-slate-200 shadow-float flex items-center justify-center text-slate-700 hover:text-brand-600 hover:bg-slate-50 transition-colors"
-              title="Recentre to user location"
-              aria-label="Recentre to user location"
+              title="Recentre to Ahmedabad"
+              aria-label="Recentre to Ahmedabad"
+              onClick={() => {
+                setSelectedLocation({ lat: 23.0225, lng: 72.5714 });
+                loadScore(23.0225, 72.5714);
+              }}
             >
               <Compass className="w-4 h-4" strokeWidth={1.75} />
             </button>
             <button
               className="w-[38px] h-[38px] rounded-full bg-surface border border-slate-200 shadow-float flex items-center justify-center text-slate-700 hover:text-brand-600 hover:bg-slate-50 transition-colors"
-              title="Centre on Ahmedabad"
-              aria-label="Centre on Ahmedabad"
+              title="Centre on SG Highway Corridor"
+              aria-label="Centre on SG Highway Corridor"
               onClick={() => {
-                setSelectedLocation({ lat: 23.0225, lng: 72.5714 });
-                loadScore(23.0225, 72.5714);
+                setSelectedLocation({ lat: 23.0378, lng: 72.5112 });
+                loadScore(23.0378, 72.5112);
               }}
             >
               <Crosshair className="w-4 h-4" strokeWidth={1.75} />
@@ -265,15 +258,23 @@ export const MapWorkspace: React.FC = () => {
           </div>
 
           {/* Bottom Analysis Mode Bar (Points / H3 Hexbins / DBSCAN Clusters / Hot Spots) */}
-          <div className="z-20 bg-surface border border-slate-200 rounded-btn shadow-float p-1 flex items-center gap-1 text-xs">
-            {['Points', 'H3 hexbins', 'DBSCAN clusters', 'Getis-Ord hot spots'].map((mode, i) => (
+          <div className="z-20 bg-surface/95 backdrop-blur-sm border border-slate-200 rounded-btn shadow-float p-1 flex items-center gap-1 text-xs">
+            {[
+              { id: 'points' as AnalysisMode, label: 'Points' },
+              { id: 'h3' as AnalysisMode, label: 'H3 hexbins' },
+              { id: 'clusters' as AnalysisMode, label: 'DBSCAN clusters' },
+              { id: 'hotspots' as AnalysisMode, label: 'Getis-Ord hot spots' },
+            ].map((mode) => (
               <button
-                key={mode}
+                key={mode.id}
+                onClick={() => setAnalysisMode(mode.id)}
                 className={`px-3 py-1 font-medium rounded-chip transition-colors ${
-                  i === 0 ? 'bg-brand-600 text-surface' : 'text-slate-700 hover:bg-slate-100'
+                  analysisMode === mode.id
+                    ? 'bg-brand-600 text-surface shadow-sm'
+                    : 'text-slate-700 hover:bg-slate-100'
                 }`}
               >
-                {mode}
+                {mode.label}
               </button>
             ))}
           </div>
