@@ -1,14 +1,11 @@
 FROM python:3.11-slim
 
-# Install system dependencies for GeoPandas, GDAL, Shapely, Proj
-RUN apt-get update && apt-get install -y \
-    gdal-bin \
-    libgdal-dev \
-    libgeos-dev \
-    libproj-dev \
+# Install minimal runtime dependencies (curl for healthcheck)
+RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
-    build-essential \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+
 
 WORKDIR /app
 
