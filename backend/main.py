@@ -72,7 +72,11 @@ try:
     from backend.api.routes_report import router as report_router
     app.include_router(report_router, prefix="/api", tags=["Reports"])
 except ImportError:
-    pass
+    try:
+        from api.routes_report import router as report_router
+        app.include_router(report_router, prefix="/api", tags=["Reports"])
+    except ImportError:
+        pass
 
 try:
     from backend.api.routes_compare import router as compare_router

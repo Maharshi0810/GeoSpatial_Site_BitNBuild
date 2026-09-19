@@ -83,6 +83,50 @@ def list_layers() -> List[Dict[str, Any]]:
     return list(LAYER_REGISTRY.values())
 
 
+def sanitize_layer(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Sanitize and validate a GeoJSON layer: filter null geometries, NaN coords, invalid types."""
+    if not isinstance(data, dict):
+        return {"type": "FeatureCollection", "features": []}
+
+    raw_features = data.get("features", [])
+    if not isinstance(raw_features, list):
+        return {"type": "FeatureCollection", "features": []}
+
+    valid_features = []
+    for f in raw_features:
+        if not isinstance(f, dict):
+            continue
+        geom = f.get("geometry")
+        if not geom or not isinstance(geom, dict):
+            continue
+        coords = geom.get("coordinates")
+        if coords is None or (isinstance(coords, (list, tuple)) and len(coords) == 0):
+            continue
+        
+        # Validate Point coordinates
+        if geom.get("type") == "Point" and isinstance(coords, (list, tuple)) and len(coords) >= 2:
+            try:
+                lng, lat = float(coords[0]), float(coords[1])
+                if math.isnan(lng) or math.isnan(lat) or not (-180 <= lng <= 180 and -90 <= lat <= 90):
+                    continue
+            except (ValueError, TypeError):
+                continue
+
+        # Ensure properties is a dictionary
+        if not isinstance(f.get("properties"), dict):
+            f["properties"] = {}
+
+        valid_features.append(f)
+
+    sanitized = dict(data)
+    sanitized["type"] = "FeatureCollection"
+    sanitized["features"] = valid_features
+    return sanitized
+
+
+import math
+
+
 def load_layer(layer_id: str, use_cache: bool = True) -> Dict[str, Any]:
     """Read a GeoJSON layer from DATA_DIR.
     
@@ -106,11 +150,16 @@ def load_layer(layer_id: str, use_cache: bool = True) -> Dict[str, Any]:
 
     for p in candidate_paths:
         if p.exists():
-            with open(p, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                if use_cache:
-                    _LAYER_CACHE[layer_id] = data
-                return data
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    raw_data = json.load(f)
+                    data = sanitize_layer(raw_data)
+                    if use_cache:
+                        _LAYER_CACHE[layer_id] = data
+                    return data
+            except Exception as err:
+                # If file read or json decode fails, attempt next or return safe empty
+                continue
 
     raise FileNotFoundError(
         f"Could not locate GeoJSON file for layer '{layer_id}' in {base_data_dir}. Expected one of: {[str(p) for p in candidate_paths]}"
@@ -134,5 +183,26 @@ def load_boundary(boundary_name: str = "gujarat_boundary") -> Dict[str, Any]:
     p = base_data_dir / f"{boundary_name}.geojson"
     if p.exists():
         with open(p, "r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
+            return sanitize_layer(data)
     raise FileNotFoundError(f"Boundary file not found at {p}")
+
+
+def validate_gujarat_bounds(lat: float, lng: float) -> bool:
+    """Validate whether coordinate falls within Gujarat's geographical bounding box.
+    
+    Gujarat geographic extent:
+      Latitude: ~20.0 to 24.7 deg N
+      Longitude: ~68.1 to 74.5 deg E
+    """
+    return 20.0 <= lat <= 24.7 and 68.1 <= lng <= 74.5
+
+
+def check_gujarat_bounds(lat: float, lng: float) -> tuple[bool, str | None]:
+    """Validate bounds and return friendly diagnostic reason if outside Gujarat."""
+    if not (20.0 <= lat <= 24.7):
+        return False, f"Latitude {lat:.4f}° is outside Gujarat territory (20.0°N to 24.7°N)"
+    if not (68.1 <= lng <= 74.5):
+        return False, f"Longitude {lng:.4f}° is outside Gujarat territory (68.1°E to 74.5°E)"
+    return True, None
+

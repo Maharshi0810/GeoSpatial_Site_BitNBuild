@@ -18,7 +18,8 @@ import {
   Anchor,
   Store,
   ChevronRight,
-  Radar as RadarIcon
+  Radar as RadarIcon,
+  FileDown
 } from 'lucide-react';
 import { ScoreResponse, CandidateSite } from '@/mocks/mockDataService';
 import { formatCoordinates, formatPopulation } from '@/utils/format';
@@ -26,7 +27,7 @@ import { LoadingOverlay, ScorePanelSkeleton } from '@/components/LoadingOverlay'
 import { BreakdownChart } from '@/components/BreakdownChart';
 import { ComparePanel } from '@/components/ComparePanel';
 import { CompareResult } from '@/hooks/useCompareApi';
-import { IsochronePanel } from '@/components/IsochronePanel';
+import { CatchmentPanel } from '@/components/CatchmentPanel';
 import { IsochroneState } from '@/hooks/useIsochrone';
 import { AnalysisMode } from '@/components/MapView';
 
@@ -132,6 +133,8 @@ export interface SidebarProps {
   // Benchmark selection
   onSelectBenchmark: (benchmark: BenchmarkSite) => void;
   onQueueAllBenchmarks: () => void;
+  // Report Export
+  onExportReport?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -144,6 +147,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isLoadingScore,
   scoreError,
   onRetryScore,
+  onExportReport,
   candidateSites,
   compareResult,
   isComparing,
@@ -599,6 +603,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <Plus className="w-3.5 h-3.5" strokeWidth={2} />
                     <span>Queue for comparison</span>
                   </button>
+                  {onExportReport && (
+                    <button
+                      onClick={onExportReport}
+                      className="h-9 px-3 bg-surface hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-medium rounded-btn transition-colors flex items-center gap-1.5 shadow-sm active:scale-95"
+                      title="Export Comprehensive Site Readiness Dossier"
+                    >
+                      <FileDown className="w-3.5 h-3.5 text-brand-600" strokeWidth={1.75} />
+                      <span>Export</span>
+                    </button>
+                  )}
                 </div>
               </>
             ) : (
@@ -658,7 +672,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* ================= TAB 3: ACCESSIBILITY & CATCHMENT ================= */}
         {activeTab === 'catchment' && (
           <div className="flex flex-col gap-4">
-            <IsochronePanel isochroneState={isochroneState} />
+            <CatchmentPanel isochroneState={isochroneState} onOpenReport={onExportReport} compact />
           </div>
         )}
 

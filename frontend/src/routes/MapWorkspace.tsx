@@ -26,6 +26,7 @@ import {
   LayerItem,
   GUJARAT_BENCHMARKS
 } from '@/components/Sidebar';
+import { ReportExport } from '@/components/ReportExport';
 
 export const MapWorkspace: React.FC = () => {
   const mapViewRef = useRef<MapViewHandle>(null);
@@ -45,6 +46,10 @@ export const MapWorkspace: React.FC = () => {
 
   // Facility Site Type
   const [siteType, setSiteType] = useState<string>('ev_charging');
+
+  // Report Export State
+  const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
+  const [selectedSiteName, setSelectedSiteName] = useState<string>('SG Highway Commercial Corridor');
 
   // Compare API hook
   const {
@@ -165,6 +170,7 @@ export const MapWorkspace: React.FC = () => {
 
   const handleSelectBenchmark = (benchmark: BenchmarkSite) => {
     setSelectedLocation({ lat: benchmark.lat, lng: benchmark.lng });
+    setSelectedSiteName(benchmark.name);
     loadScore(benchmark.lat, benchmark.lng, siteType);
     setActiveSidebarTab('score');
     if (isSidebarCollapsed) {
@@ -280,6 +286,7 @@ export const MapWorkspace: React.FC = () => {
                 }
                 // Normal site selection click
                 setSelectedLocation(coords);
+                setSelectedSiteName(`Candidate Site (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})`);
                 loadScore(coords.lat, coords.lng, siteType);
                 setActiveSidebarTab('score');
                 if (isSidebarCollapsed) {
@@ -444,6 +451,7 @@ export const MapWorkspace: React.FC = () => {
           onSiteTypeChange={setSiteType}
           onSelectBenchmark={handleSelectBenchmark}
           onQueueAllBenchmarks={handleQueueAllBenchmarks}
+          onExportReport={() => setIsReportModalOpen(true)}
         />
       </div>
 
@@ -481,6 +489,19 @@ export const MapWorkspace: React.FC = () => {
           </div>
         )}
       </section>
+
+      {/* Phase 3C Comprehensive Site Evaluation Dossier Modal */}
+      <ReportExport
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        selectedLocation={selectedLocation}
+        scoreData={scoreData}
+        catchmentData={isochroneState.catchmentData}
+        minutes={isochroneState.minutes}
+        mode={isochroneState.mode}
+        locationName={selectedSiteName || scoreData?.locationName}
+        siteType={siteType}
+      />
     </div>
   );
 };
