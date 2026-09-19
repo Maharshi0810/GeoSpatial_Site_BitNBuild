@@ -1,5 +1,5 @@
-import React from 'react';
-import { Compass, MapPin, Database } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Compass, MapPin, Database, Sun, Moon } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 interface HeaderProps {
@@ -16,6 +16,18 @@ export const Header: React.FC<HeaderProps> = ({
   isMockActive = true,
 }) => {
   const location = useLocation();
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    return document.documentElement.classList.contains('dark') ||
+      (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  });
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDark]);
 
   const siteTypes = [
     { id: 'ev_charging', label: 'EV charging' },
@@ -97,6 +109,15 @@ export const Header: React.FC<HeaderProps> = ({
             <span>Sample data</span>
           </div>
         )}
+
+        <button
+          onClick={() => setIsDark(!isDark)}
+          className="p-1.5 text-slate-500 hover:text-ink hover:bg-slate-100 rounded-chip transition-colors"
+          title={isDark ? 'Switch to Light mode' : 'Switch to Dark mode'}
+          aria-label={isDark ? 'Switch to Light mode' : 'Switch to Dark mode'}
+        >
+          {isDark ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4" />}
+        </button>
       </div>
     </header>
   );

@@ -1,37 +1,31 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  Layers,
-  Sliders,
-  Maximize2,
-  Minimize2,
   Search,
   Crosshair,
   Compass,
-  AlertCircle,
-  FileDown,
-  Plus,
-  CheckCircle2,
-  XCircle,
   ChevronUp,
   ChevronDown,
-  Radar as RadarIcon
+  Layers,
+  Sparkles
 } from 'lucide-react';
+import * as turf from '@turf/turf';
 import { mockDataService, ScoreResponse } from '@/mocks/mockDataService';
-import { formatCoordinates, formatPopulation, formatContribution } from '@/utils/format';
-import { LoadingOverlay, ScorePanelSkeleton } from '@/components/LoadingOverlay';
 import { MapView, AnalysisMode } from '@/components/MapView';
 import type { MapViewHandle } from '@/components/MapView';
 import { HotspotLegend } from '@/components/HotspotLegend';
 import { useSpatialAnalytics } from '@/hooks/useSpatialAnalytics';
-import { BreakdownChart } from '@/components/BreakdownChart';
 import { ComparePanel } from '@/components/ComparePanel';
 import { useCompareApi } from '@/hooks/useCompareApi';
 import { useIsochrone } from '@/hooks/useIsochrone';
-import { IsochronePanel } from '@/components/IsochronePanel';
 import { DrawToolbar } from '@/components/DrawToolbar';
 import type { DrawMode, DrawnPolygon } from '@/components/DrawToolbar';
-import { Clock } from 'lucide-react';
-import * as turf from '@turf/turf';
+import {
+  Sidebar,
+  SidebarTab,
+  BenchmarkSite,
+  LayerItem,
+  GUJARAT_BENCHMARKS
+} from '@/components/Sidebar';
 
 export const MapWorkspace: React.FC = () => {
   const mapViewRef = useRef<MapViewHandle>(null);
@@ -44,10 +38,13 @@ export const MapWorkspace: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [isLayersCollapsed, setIsLayersCollapsed] = useState<boolean>(false);
-  const [isScoreCollapsed, setIsScoreCollapsed] = useState<boolean>(false);
-  const [isCompareExpanded, setIsCompareExpanded] = useState<boolean>(false);
-  const [showRadar, setShowRadar] = useState<boolean>(false);
+  // Sidebar Tab & Collapse State
+  const [activeSidebarTab, setActiveSidebarTab] = useState<SidebarTab>('score');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+  const [isCompareTrayExpanded, setIsCompareTrayExpanded] = useState<boolean>(false);
+
+  // Facility Site Type
+  const [siteType, setSiteType] = useState<string>('ev_charging');
 
   // Compare API hook
   const {
@@ -63,15 +60,23 @@ export const MapWorkspace: React.FC = () => {
   // Active filter chip states
   const [activeFilter, setActiveFilter] = useState<string>('fast_dc');
 
-  // Phase 2B Spatial Analysis Mode
+  // Spatial Analysis Mode
   const [analysisMode, setAnalysisMode] = useState<AnalysisMode>('points');
   const spatialData = useSpatialAnalytics();
 
-  // Phase 2D Isochrone & Catchment Hook
+  // Isochrone & Catchment Hook
   const isochroneState = useIsochrone(selectedLocation);
-  const [activeRightTab, setActiveRightTab] = useState<'score' | 'catchment'>('score');
 
-  // --- Phase 3B: Drawing state ---
+  // Geographic Vector Layers State
+  const [layers, setLayers] = useState<LayerItem[]>([
+    { id: 'demographics', name: 'Demographics & population', source: 'Census India', vintage: '2023', visible: true, opacity: 80 },
+    { id: 'transportation', name: 'Transportation & roads', source: 'OSM Overpass', vintage: '2024', visible: true, opacity: 95 },
+    { id: 'poi', name: 'Points of interest & retail', source: 'Commercial Registry', vintage: '2024', visible: true, opacity: 70 },
+    { id: 'landuse', name: 'Land use & zoning', source: 'AUDA Master Plan', vintage: '2021', visible: true, opacity: 85 },
+    { id: 'environment', name: 'Environmental & flood risk', source: 'Central Water Commission', vintage: '2023', visible: true, opacity: 60 },
+  ]);
+
+  // Phase 3B Drawing state
   const [drawMode, setDrawMode] = useState<DrawMode>('none');
   const [drawVertices, setDrawVertices] = useState<number[][]>([]);
   const [drawnPolygon, setDrawnPolygon] = useState<DrawnPolygon | null>(null);
@@ -115,31 +120,82 @@ export const MapWorkspace: React.FC = () => {
     setIsPolygonScoring(true);
     try {
       const [lng, lat] = drawnPolygon.centroid;
-      const data = await mockDataService.fetchScoreForLocation(lat, lng);
+      const data = await mockDataService.fetchScoreForLocation(lat, lng, siteType);
       setPolygonScore(data);
+      setScoreData(data);
+      setActiveSidebarTab('score');
+      if (isSidebarCollapsed) setIsSidebarCollapsed(false);
     } catch {
       // fallback silent
     } finally {
       setIsPolygonScoring(false);
     }
-  }, [drawnPolygon]);
+  }, [drawnPolygon, siteType, isSidebarCollapsed]);
 
   useEffect(() => {
     if (selectedLocation) {
-      loadScore(selectedLocation.lat, selectedLocation.lng);
+      loadScore(selectedLocation.lat, selectedLocation.lng, siteType);
     }
-  }, []);
+  }, [siteType]);
 
-  const loadScore = async (lat: number, lng: number) => {
+  const loadScore = async (lat: number, lng: number, currentType: string = siteType) => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await mockDataService.fetchScoreForLocation(lat, lng);
+      const data = await mockDataService.fetchScoreForLocation(lat, lng, currentType);
       setScoreData(data);
     } catch {
-      setError('Scoring failed. The analytical service returned an unexpected response. Retry, or pick a different location.');
+      setError('Scoring service returned an error. Retry or pick another Gujarat location.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleToggleLayer = (layerId: string) => {
+    setLayers((prev) =>
+      prev.map((l) => (l.id === layerId ? { ...l, visible: !l.visible } : l))
+    );
+  };
+
+  const handleLayerOpacityChange = (layerId: string, opacity: number) => {
+    setLayers((prev) =>
+      prev.map((l) => (l.id === layerId ? { ...l, opacity } : l))
+    );
+  };
+
+  const handleSelectBenchmark = (benchmark: BenchmarkSite) => {
+    setSelectedLocation({ lat: benchmark.lat, lng: benchmark.lng });
+    loadScore(benchmark.lat, benchmark.lng, siteType);
+    setActiveSidebarTab('score');
+    if (isSidebarCollapsed) {
+      setIsSidebarCollapsed(false);
+    }
+  };
+
+  const handleQueueAllBenchmarks = () => {
+    GUJARAT_BENCHMARKS.forEach((bench) => {
+      addSiteFromScore({
+        locationName: bench.name,
+        coordinates: { lat: bench.lat, lng: bench.lng },
+        siteType,
+        score: Math.floor(70 + Math.random() * 22),
+        breakdown: [],
+        constraints: [],
+      } as any);
+    });
+    setActiveSidebarTab('compare');
+    if (isSidebarCollapsed) {
+      setIsSidebarCollapsed(false);
+    }
+  };
+
+  const handleAddCurrentSite = () => {
+    if (scoreData) {
+      addSiteFromScore(scoreData);
+      setActiveSidebarTab('compare');
+      if (isSidebarCollapsed) {
+        setIsSidebarCollapsed(false);
+      }
     }
   };
 
@@ -152,116 +208,9 @@ export const MapWorkspace: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col relative overflow-hidden bg-canvas">
-      {/* Main 3-Column Analyst Workspace */}
+      {/* Main Workspace Layout */}
       <div className="flex-1 flex relative overflow-hidden">
-        {/* Left Panel: Layers & Weights (300px or 48px collapsed rail) */}
-        <aside
-          className={`h-full bg-surface border-r border-slate-200 transition-all duration-150 ease-out z-20 flex flex-col ${
-            isLayersCollapsed ? 'w-12' : 'w-[300px]'
-          }`}
-        >
-          {/* Header */}
-          <div className="h-10 px-3 border-b border-slate-200 flex items-center justify-between text-xs font-semibold text-ink">
-            {!isLayersCollapsed && <span>Layers & Weights</span>}
-            <button
-              onClick={() => setIsLayersCollapsed(!isLayersCollapsed)}
-              className="p-1 text-slate-500 hover:text-ink hover:bg-slate-100 rounded-chip transition-colors ml-auto"
-              title={isLayersCollapsed ? 'Expand layers panel' : 'Collapse layers panel'}
-              aria-label={isLayersCollapsed ? 'Expand layers panel' : 'Collapse layers panel'}
-            >
-              {isLayersCollapsed ? <Maximize2 className="w-3.5 h-3.5" /> : <Minimize2 className="w-3.5 h-3.5" />}
-            </button>
-          </div>
-
-          {/* Collapsed Rail Content */}
-          {isLayersCollapsed ? (
-            <div className="flex flex-col items-center gap-3 pt-3 text-slate-500">
-              <button
-                onClick={() => setIsLayersCollapsed(false)}
-                className="p-2 hover:bg-slate-100 hover:text-brand-600 rounded-chip transition-colors"
-                title="Geospatial Layers"
-              >
-                <Layers className="w-4 h-4" strokeWidth={1.75} />
-              </button>
-              <button
-                onClick={() => setIsLayersCollapsed(false)}
-                className="p-2 hover:bg-slate-100 hover:text-brand-600 rounded-chip transition-colors"
-                title="Scoring Weights"
-              >
-                <Sliders className="w-4 h-4" strokeWidth={1.75} />
-              </button>
-            </div>
-          ) : (
-            /* Expanded Panel Content */
-            <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-4 text-xs">
-              {/* Layer Section */}
-              <section className="flex flex-col gap-2">
-                <div className="flex items-center justify-between font-semibold text-slate-700">
-                  <div className="flex items-center gap-1.5">
-                    <Layers className="w-3.5 h-3.5 text-brand-600" strokeWidth={1.75} />
-                    <span>Geographic layers (5 active)</span>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-1.5 mt-1">
-                  {[
-                    { name: 'Demographics & population', source: 'Census India', vintage: '2023', opacity: 80 },
-                    { name: 'Transportation & roads', source: 'OSM Overpass', vintage: '2024', opacity: 95 },
-                    { name: 'Points of interest & retail', source: 'Commercial Registry', vintage: '2024', opacity: 70 },
-                    { name: 'Land use & zoning', source: 'AUDA Master Plan', vintage: '2021', opacity: 85 },
-                    { name: 'Environmental & flood risk', source: 'Central Water Commission', vintage: '2023', opacity: 60 },
-                  ].map((layer, idx) => (
-                    <div
-                      key={idx}
-                      className="p-2 bg-canvas border border-slate-200 rounded-chip flex flex-col gap-1.5 hover:border-slate-300 transition-colors"
-                    >
-                      <div className="flex items-center justify-between">
-                        <label className="flex items-center gap-2 cursor-pointer select-none">
-                          <input type="checkbox" defaultChecked className="rounded text-brand-600 focus:ring-brand-600" />
-                          <span className="font-medium text-ink">{layer.name}</span>
-                        </label>
-                        <span className="text-[11px] text-slate-500 font-mono">{layer.opacity}%</span>
-                      </div>
-                      <div className="flex items-center justify-between text-[11px] text-slate-500 pl-5">
-                        <span>{layer.source} · {layer.vintage}</span>
-                        <div className="w-2 h-2 rounded-full bg-brand-600" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <div className="h-px bg-slate-200" />
-
-              {/* Weights Section */}
-              <section className="flex flex-col gap-2">
-                <div className="flex items-center justify-between font-semibold text-slate-700">
-                  <div className="flex items-center gap-1.5">
-                    <Sliders className="w-3.5 h-3.5 text-brand-600" strokeWidth={1.75} />
-                    <span>Factor weights (sum: 100%)</span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-1 mt-1">
-                  {['Retail', 'Warehouse', 'EV charging'].map((preset) => (
-                    <button
-                      key={preset}
-                      className={`px-2 py-1 text-[11px] font-medium border rounded-chip transition-colors ${
-                        preset === 'EV charging'
-                          ? 'bg-brand-50 border-brand-600 text-brand-700'
-                          : 'bg-surface border-slate-200 text-slate-700 hover:bg-slate-100'
-                      }`}
-                    >
-                      {preset}
-                    </button>
-                  ))}
-                </div>
-              </section>
-            </div>
-          )}
-        </aside>
-
-        {/* Center: Map Canvas Container */}
+        {/* Center: Interactive Map Canvas (Full viewport utilization) */}
         <main className="flex-1 h-full relative flex flex-col items-center justify-between p-4 bg-[#E5ECF0]">
           {/* Floating Top Search Bar & Profile Filter Chips */}
           <div className="w-full max-w-xl z-20 flex flex-col gap-2">
@@ -269,19 +218,30 @@ export const MapWorkspace: React.FC = () => {
               <Search className="w-4 h-4 text-slate-500" strokeWidth={1.75} />
               <input
                 type="text"
-                placeholder="Search an address, ward, or paste coordinates (e.g. 23.0378, 72.5112)"
+                placeholder="Search Gujarat address, ward, or coordinates (e.g. 23.0378, 72.5112)"
                 defaultValue="SG Highway, Bodakdev, Ahmedabad"
                 className="w-full bg-transparent text-xs text-ink placeholder:text-slate-500 outline-none"
               />
+              <button
+                onClick={() => {
+                  const firstBench = GUJARAT_BENCHMARKS[0];
+                  handleSelectBenchmark(firstBench);
+                }}
+                className="px-2 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 text-[11px] font-medium rounded-chip shrink-0 flex items-center gap-1 transition-colors"
+                title="Quick jump to SG Highway Benchmark"
+              >
+                <Sparkles className="w-3 h-3" />
+                <span>SG Highway</span>
+              </button>
             </div>
 
-            {/* Horizontal Filter Row (4px radius, 28px tall, no pills) */}
+            {/* Horizontal Filter Row */}
             <div className="flex items-center gap-1.5 overflow-x-auto py-0.5">
               {filterChips.map((chip) => (
                 <button
                   key={chip.id}
                   onClick={() => setActiveFilter(chip.id)}
-                  className={`h-7 px-3 text-xs font-medium rounded-chip transition-colors whitespace-nowrap shadow-sm ${
+                  className={`h-7 px-3 text-xs font-medium rounded-chip transition-colors whitespace-nowrap shadow-xs ${
                     activeFilter === chip.id
                       ? 'bg-brand-600 text-surface'
                       : 'bg-surface text-slate-700 border border-slate-200 hover:bg-slate-100'
@@ -293,13 +253,13 @@ export const MapWorkspace: React.FC = () => {
             </div>
           </div>
 
-          {/* Interactive MapLibre Map View with Spatial Analytics Layers */}
+          {/* Interactive MapLibre Map View */}
           <div className="absolute inset-0 z-0">
             <MapView
               ref={mapViewRef}
               selectedLocation={selectedLocation}
               onMapClick={(coords) => {
-                // --- Phase 3B: intercept clicks during draw mode ---
+                // Intercept clicks during draw mode
                 if (drawMode === 'polygon') {
                   const v = [...drawVertices, [coords.lng, coords.lat]];
                   setDrawVertices(v);
@@ -318,12 +278,15 @@ export const MapWorkspace: React.FC = () => {
                   }
                   return;
                 }
-                // Normal site scoring click
+                // Normal site selection click
                 setSelectedLocation(coords);
-                loadScore(coords.lat, coords.lng);
+                loadScore(coords.lat, coords.lng, siteType);
+                setActiveSidebarTab('score');
+                if (isSidebarCollapsed) {
+                  setIsSidebarCollapsed(false);
+                }
               }}
               onMapDblClick={(coords) => {
-                // Close polygon on double-click
                 if (drawMode === 'polygon' && drawVertices.length >= 3) {
                   finalisePolygon([...drawVertices, [coords.lng, coords.lat]]);
                 }
@@ -336,6 +299,8 @@ export const MapWorkspace: React.FC = () => {
               drawMode={drawMode}
               drawVertices={drawVertices}
               drawnPolygonGeoJSON={drawnPolygonGeoJSON}
+              activeLayers={layers.reduce((acc, l) => ({ ...acc, [l.id]: l.visible }), {})}
+              layerOpacity={layers.reduce((acc, l) => ({ ...acc, [l.id]: l.opacity / 100 }), {})}
             />
           </div>
 
@@ -356,7 +321,7 @@ export const MapWorkspace: React.FC = () => {
           {/* Polygon Score Floating Card */}
           {polygonScore && drawnPolygon && (
             <div
-              className="absolute left-4 bottom-[280px] z-30 w-56 p-3 rounded-xl border text-xs flex flex-col gap-2"
+              className="absolute left-4 bottom-[280px] z-30 w-56 p-3 rounded-xl border text-xs flex flex-col gap-2 shadow-float backdrop-blur-md"
               style={{
                 background: 'rgba(15, 23, 42, 0.92)',
                 borderColor: 'rgba(6, 182, 212, 0.4)',
@@ -387,29 +352,44 @@ export const MapWorkspace: React.FC = () => {
             <HotspotLegend mode={analysisMode} />
           )}
 
-          {/* Right Floating Stacked Map Controls (38px circular controls) */}
+          {/* Right Floating Stacked Map Controls */}
           <div className="absolute right-4 top-24 z-20 flex flex-col gap-2">
             <button
               className="w-[38px] h-[38px] rounded-full bg-surface border border-slate-200 shadow-float flex items-center justify-center text-slate-700 hover:text-brand-600 hover:bg-slate-50 transition-colors"
-              title="Recentre to Ahmedabad"
-              aria-label="Recentre to Ahmedabad"
+              title="Recentre to Ahmedabad Center"
+              aria-label="Recentre to Ahmedabad Center"
               onClick={() => {
-                setSelectedLocation({ lat: 23.0225, lng: 72.5714 });
-                loadScore(23.0225, 72.5714);
+                const coords = { lat: 23.0225, lng: 72.5714 };
+                setSelectedLocation(coords);
+                loadScore(coords.lat, coords.lng, siteType);
               }}
             >
               <Compass className="w-4 h-4" strokeWidth={1.75} />
             </button>
+
             <button
               className="w-[38px] h-[38px] rounded-full bg-surface border border-slate-200 shadow-float flex items-center justify-center text-slate-700 hover:text-brand-600 hover:bg-slate-50 transition-colors"
               title="Centre on SG Highway Corridor"
               aria-label="Centre on SG Highway Corridor"
               onClick={() => {
-                setSelectedLocation({ lat: 23.0378, lng: 72.5112 });
-                loadScore(23.0378, 72.5112);
+                const coords = { lat: 23.0378, lng: 72.5112 };
+                setSelectedLocation(coords);
+                loadScore(coords.lat, coords.lng, siteType);
               }}
             >
               <Crosshair className="w-4 h-4" strokeWidth={1.75} />
+            </button>
+
+            <button
+              className="w-[38px] h-[38px] rounded-full bg-surface border border-slate-200 shadow-float flex items-center justify-center text-slate-700 hover:text-brand-600 hover:bg-slate-50 transition-colors"
+              title="Toggle Vector Layers tab"
+              aria-label="Toggle Vector Layers tab"
+              onClick={() => {
+                setActiveSidebarTab('layers');
+                if (isSidebarCollapsed) setIsSidebarCollapsed(false);
+              }}
+            >
+              <Layers className="w-4 h-4" strokeWidth={1.75} />
             </button>
           </div>
 
@@ -426,7 +406,7 @@ export const MapWorkspace: React.FC = () => {
                 onClick={() => setAnalysisMode(mode.id)}
                 className={`px-3 py-1 font-medium rounded-chip transition-colors ${
                   analysisMode === mode.id
-                    ? 'bg-brand-600 text-surface shadow-sm'
+                    ? 'bg-brand-600 text-surface shadow-xs'
                     : 'text-slate-700 hover:bg-slate-100'
                 }`}
               >
@@ -436,285 +416,45 @@ export const MapWorkspace: React.FC = () => {
           </div>
         </main>
 
-        {/* Right Panel: Readiness Score & Breakdown (380px or 48px collapsed rail) */}
-        <aside
-          className={`h-full bg-surface border-l border-slate-200 transition-all duration-150 ease-out z-20 flex flex-col ${
-            isScoreCollapsed ? 'w-12' : 'w-[380px]'
-          }`}
-        >
-          {/* Header */}
-          <div className="h-10 px-3 border-b border-slate-200 flex items-center justify-between text-xs font-semibold text-ink">
-            {!isScoreCollapsed ? (
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => setActiveRightTab('score')}
-                  className={`px-2.5 py-1 text-xs font-medium rounded-chip transition-colors ${
-                    activeRightTab === 'score'
-                      ? 'bg-slate-100 text-ink font-semibold'
-                      : 'text-slate-500 hover:text-ink'
-                  }`}
-                >
-                  Site Score
-                </button>
-                <button
-                  onClick={() => setActiveRightTab('catchment')}
-                  className={`px-2.5 py-1 text-xs font-medium rounded-chip transition-colors flex items-center gap-1 ${
-                    activeRightTab === 'catchment'
-                      ? 'bg-sky-50 text-sky-700 font-semibold border border-sky-200'
-                      : 'text-slate-500 hover:text-ink'
-                  }`}
-                >
-                  <Clock className="w-3.5 h-3.5 text-sky-600" />
-                  <span>Catchment</span>
-                </button>
-              </div>
-            ) : null}
-            <button
-              onClick={() => setIsScoreCollapsed(!isScoreCollapsed)}
-              className="p-1 text-slate-500 hover:text-ink hover:bg-slate-100 rounded-chip transition-colors ml-auto"
-              title={isScoreCollapsed ? 'Expand panel' : 'Collapse panel'}
-              aria-label={isScoreCollapsed ? 'Expand panel' : 'Collapse panel'}
-            >
-              {isScoreCollapsed ? <Maximize2 className="w-3.5 h-3.5" /> : <Minimize2 className="w-3.5 h-3.5" />}
-            </button>
-          </div>
-
-          {/* Collapsed Rail Content */}
-          {isScoreCollapsed ? (
-            <div className="flex flex-col items-center gap-3 pt-3 text-slate-500">
-              <button
-                onClick={() => {
-                  setIsScoreCollapsed(false);
-                  setActiveRightTab('score');
-                }}
-                className="w-8 h-8 rounded-btn bg-brand-50 text-brand-700 font-mono font-semibold flex items-center justify-center text-xs"
-                title="View Score"
-              >
-                {scoreData ? scoreData.score : '--'}
-              </button>
-              <button
-                onClick={() => {
-                  setIsScoreCollapsed(false);
-                  setActiveRightTab('catchment');
-                }}
-                className="w-8 h-8 rounded-btn bg-sky-50 text-sky-700 flex items-center justify-center text-xs hover:bg-sky-100 transition-colors"
-                title="View Catchment Isochrones"
-              >
-                <Clock className="w-4 h-4" />
-              </button>
-            </div>
-          ) : activeRightTab === 'catchment' ? (
-            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 text-xs">
-              <IsochronePanel isochroneState={isochroneState} />
-            </div>
-          ) : (
-            /* Expanded Panel Content */
-            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 text-xs">
-              {isLoading ? (
-                <div className="relative py-4">
-                  <LoadingOverlay message="Evaluating candidate location..." />
-                  <ScorePanelSkeleton />
-                </div>
-              ) : error ? (
-                <div className="p-4 bg-red-700/5 border border-red-700/20 rounded-btn flex flex-col gap-2">
-                  <div className="flex items-center gap-2 text-red-700 font-medium">
-                    <AlertCircle className="w-4 h-4" />
-                    <span>Scoring failed</span>
-                  </div>
-                  <p className="text-slate-700">{error}</p>
-                  <button
-                    onClick={() => selectedLocation && loadScore(selectedLocation.lat, selectedLocation.lng)}
-                    className="self-start px-3 py-1 bg-surface border border-slate-200 rounded-chip text-xs font-medium hover:bg-slate-100 transition-colors"
-                  >
-                    Retry
-                  </button>
-                </div>
-              ) : scoreData ? (
-                <>
-                  {/* Location line */}
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-sm font-semibold text-ink">{scoreData.locationName}</span>
-                    <span className="font-mono text-slate-500 text-[11px]">
-                      {formatCoordinates(scoreData.coordinates.lat, scoreData.coordinates.lng)}
-                    </span>
-                  </div>
-
-                  {/* Score meter horizontal bar */}
-                  <div className="flex flex-col gap-2 p-3 bg-canvas border border-slate-200 rounded-btn">
-                    <div className="flex items-baseline justify-between">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-[32px] font-semibold text-ink font-mono tracking-tight leading-none">
-                          {scoreData.score}
-                        </span>
-                        <span className="text-xs text-slate-500 font-mono">/ 100</span>
-                      </div>
-                      <span className="text-xs font-semibold px-2 py-0.5 rounded-chip bg-brand-50 text-brand-700">
-                        Strong candidate
-                      </span>
-                    </div>
-
-                    <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-brand-600 transition-all duration-300 ease-out"
-                        style={{ width: `${scoreData.score}%` }}
-                      />
-                    </div>
-
-                    {scoreData.percentile && (
-                      <p className="text-[11px] text-slate-500">
-                        Above the {scoreData.percentile}th percentile of scored locations in this city.
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Factor breakdown */}
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-slate-700 uppercase tracking-wider text-[10px]">
-                        Factor breakdown
-                      </span>
-                      <button
-                        onClick={() => setShowRadar(!showRadar)}
-                        className={`px-2 py-0.5 text-[11px] font-medium rounded-chip transition-colors flex items-center gap-1 border ${
-                          showRadar
-                            ? 'bg-brand-50 border-brand-600 text-brand-700'
-                            : 'bg-surface border-slate-200 text-slate-600 hover:bg-slate-100'
-                        }`}
-                        title="Toggle Multi-Criteria Radar Chart"
-                      >
-                        <RadarIcon className="w-3 h-3 text-brand-600" />
-                        <span>{showRadar ? 'Hide Radar' : 'View Radar'}</span>
-                      </button>
-                    </div>
-
-                    {showRadar && (
-                      <BreakdownChart
-                        breakdown={scoreData.breakdown}
-                        score={scoreData.score}
-                        grade={
-                          scoreData.score >= 85
-                            ? 'A'
-                            : scoreData.score >= 70
-                            ? 'B'
-                            : scoreData.score >= 55
-                            ? 'C'
-                            : 'D'
-                        }
-                      />
-                    )}
-
-                    <div className="flex flex-col gap-2">
-                      {scoreData.breakdown.map((factor) => (
-                        <div
-                          key={factor.factorId}
-                          className="p-2.5 bg-surface border border-slate-200 rounded-chip flex flex-col gap-1 hover:border-slate-300 transition-colors cursor-pointer"
-                          title="Click to highlight geometry on map"
-                        >
-                          <div className="flex items-center justify-between font-medium">
-                            <span className="text-ink">{factor.label}</span>
-                            <span
-                              className={`font-mono text-xs ${
-                                factor.contribution >= 0 ? 'text-brand-600 font-semibold' : 'text-red-700'
-                              }`}
-                            >
-                              {formatContribution(factor.contribution)}
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-slate-500 leading-relaxed">{factor.explanation}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Constraints Check */}
-                  <div className="flex flex-col gap-2">
-                    <span className="font-semibold text-slate-700 uppercase tracking-wider text-[10px]">
-                      Threshold constraints
-                    </span>
-
-                    <div className="flex flex-col gap-1.5">
-                      {scoreData.constraints.map((c) => (
-                        <div key={c.id} className="flex items-start gap-2 text-xs py-1">
-                          {c.passed ? (
-                            <CheckCircle2 className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" strokeWidth={1.75} />
-                          ) : (
-                            <XCircle className="w-4 h-4 text-red-700 shrink-0 mt-0.5" strokeWidth={1.75} />
-                          )}
-                          <div className="flex flex-col">
-                            <span className="font-medium text-ink">{c.label}</span>
-                            <span className="text-[11px] text-slate-500">{c.reason}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Accessibility Summary */}
-                  {scoreData.accessibility && (
-                    <div className="flex flex-col gap-2 p-2.5 bg-canvas border border-slate-200 rounded-btn">
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold text-slate-700 text-xs">Drive-time catchment</span>
-                        <button
-                          onClick={() => setActiveRightTab('catchment')}
-                          className="text-[11px] text-sky-600 hover:text-sky-700 font-medium flex items-center gap-1 transition-colors"
-                          title="Open Isochrone Catchment Analysis"
-                        >
-                          <span>Analyze rings</span>
-                          <Clock className="w-3 h-3" />
-                        </button>
-                      </div>
-                      <div className="grid grid-cols-3 gap-2 text-center">
-                        {scoreData.accessibility.map((band) => (
-                          <div key={band.minutes} className="p-1.5 bg-surface rounded-chip border border-slate-200">
-                            <p className="text-[10px] text-slate-500">{band.minutes} min</p>
-                            <p className="font-mono text-xs font-semibold text-ink">
-                              {formatPopulation(band.population)}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Actions (Section 5.2) */}
-                  <div className="flex items-center gap-2 pt-2 mt-auto border-t border-slate-200">
-                    <button
-                      onClick={() => {
-                        if (scoreData) {
-                          addSiteFromScore(scoreData);
-                          setIsCompareExpanded(true);
-                        }
-                      }}
-                      className="flex-1 h-9 bg-brand-600 hover:bg-brand-700 text-surface text-xs font-semibold rounded-btn transition-colors flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
-                    >
-                      <Plus className="w-3.5 h-3.5" strokeWidth={2} />
-                      <span>Add to comparison</span>
-                    </button>
-                    <button className="h-9 px-3 bg-surface hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-medium rounded-btn transition-colors flex items-center gap-1.5">
-                      <FileDown className="w-3.5 h-3.5" strokeWidth={1.75} />
-                      <span>Export</span>
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="py-12 text-center text-slate-500 flex flex-col items-center gap-2">
-                  <Crosshair className="w-6 h-6 text-slate-400" strokeWidth={1.75} />
-                  <p>Click anywhere on the map to score a location.</p>
-                </div>
-              )}
-            </div>
-          )}
-        </aside>
+        {/* Unified Tabbed Sidebar Component */}
+        <Sidebar
+          activeTab={activeSidebarTab}
+          onTabChange={setActiveSidebarTab}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          selectedLocation={selectedLocation}
+          scoreData={scoreData}
+          isLoadingScore={isLoading}
+          scoreError={error}
+          onRetryScore={() => selectedLocation && loadScore(selectedLocation.lat, selectedLocation.lng, siteType)}
+          candidateSites={candidateSites}
+          compareResult={compareResult}
+          isComparing={isComparing}
+          onAddCurrentSite={handleAddCurrentSite}
+          onRemoveSite={removeSite}
+          onClearSites={clearSites}
+          onRunCompare={runCompare}
+          isochroneState={isochroneState}
+          analysisMode={analysisMode}
+          onAnalysisModeChange={setAnalysisMode}
+          layers={layers}
+          onToggleLayer={handleToggleLayer}
+          onLayerOpacityChange={handleLayerOpacityChange}
+          siteType={siteType}
+          onSiteTypeChange={setSiteType}
+          onSelectBenchmark={handleSelectBenchmark}
+          onQueueAllBenchmarks={handleQueueAllBenchmarks}
+        />
       </div>
 
-      {/* Bottom Compare Tray (Section 5.1: collapsed 36px / expanded 240px) */}
+      {/* Bottom Candidate Comparison Tray (Widescreen comparative view) */}
       <section className="bg-surface border-t border-slate-200 transition-all duration-150 ease-out z-30 flex flex-col">
         <div
-          onClick={() => setIsCompareExpanded(!isCompareExpanded)}
+          onClick={() => setIsCompareTrayExpanded(!isCompareTrayExpanded)}
           className="h-9 px-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 select-none text-xs text-slate-700"
         >
           <div className="flex items-center gap-2 font-semibold text-ink">
-            <span>Candidate Comparison Tray</span>
+            <span>Candidate Comparison Matrix</span>
             <span className="text-[11px] font-normal text-slate-500 font-mono">
               ({candidateSites.length} {candidateSites.length === 1 ? 'site' : 'sites'} queued)
             </span>
@@ -722,14 +462,14 @@ export const MapWorkspace: React.FC = () => {
 
           <div className="flex items-center gap-2">
             <span className="text-[11px] text-slate-500">
-              {isCompareExpanded ? 'Collapse' : 'Compare candidates side by side'}
+              {isCompareTrayExpanded ? 'Collapse Matrix' : 'Expand full-width comparison matrix'}
             </span>
-            {isCompareExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
+            {isCompareTrayExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
           </div>
         </div>
 
-        {isCompareExpanded && (
-          <div className="h-[210px] p-4 border-t border-slate-100 bg-canvas overflow-hidden">
+        {isCompareTrayExpanded && (
+          <div className="h-[230px] p-4 border-t border-slate-100 bg-canvas overflow-hidden">
             <ComparePanel
               sites={candidateSites}
               compareResult={compareResult}
