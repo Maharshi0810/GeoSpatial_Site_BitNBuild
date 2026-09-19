@@ -25,6 +25,9 @@ import { useSpatialAnalytics } from '@/hooks/useSpatialAnalytics';
 import { BreakdownChart } from '@/components/BreakdownChart';
 import { ComparePanel } from '@/components/ComparePanel';
 import { useCompareApi } from '@/hooks/useCompareApi';
+import { useIsochrone } from '@/hooks/useIsochrone';
+import { IsochronePanel } from '@/components/IsochronePanel';
+import { Clock } from 'lucide-react';
 
 export const MapWorkspace: React.FC = () => {
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>({
@@ -57,6 +60,10 @@ export const MapWorkspace: React.FC = () => {
   // Phase 2B Spatial Analysis Mode
   const [analysisMode, setAnalysisMode] = useState<AnalysisMode>('points');
   const spatialData = useSpatialAnalytics();
+
+  // Phase 2D Isochrone & Catchment Hook
+  const isochroneState = useIsochrone(selectedLocation);
+  const [activeRightTab, setActiveRightTab] = useState<'score' | 'catchment'>('score');
 
   useEffect(() => {
     if (selectedLocation) {
@@ -239,6 +246,7 @@ export const MapWorkspace: React.FC = () => {
               h3Data={spatialData.h3Data}
               clusterData={spatialData.clusterData}
               hotspotData={spatialData.hotspotData}
+              isochroneData={isochroneState.isochroneData}
             />
           </div>
 
@@ -304,12 +312,36 @@ export const MapWorkspace: React.FC = () => {
         >
           {/* Header */}
           <div className="h-10 px-3 border-b border-slate-200 flex items-center justify-between text-xs font-semibold text-ink">
-            {!isScoreCollapsed && <span>Site Readiness Score</span>}
+            {!isScoreCollapsed ? (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setActiveRightTab('score')}
+                  className={`px-2.5 py-1 text-xs font-medium rounded-chip transition-colors ${
+                    activeRightTab === 'score'
+                      ? 'bg-slate-100 text-ink font-semibold'
+                      : 'text-slate-500 hover:text-ink'
+                  }`}
+                >
+                  Site Score
+                </button>
+                <button
+                  onClick={() => setActiveRightTab('catchment')}
+                  className={`px-2.5 py-1 text-xs font-medium rounded-chip transition-colors flex items-center gap-1 ${
+                    activeRightTab === 'catchment'
+                      ? 'bg-sky-50 text-sky-700 font-semibold border border-sky-200'
+                      : 'text-slate-500 hover:text-ink'
+                  }`}
+                >
+                  <Clock className="w-3.5 h-3.5 text-sky-600" />
+                  <span>Catchment</span>
+                </button>
+              </div>
+            ) : null}
             <button
               onClick={() => setIsScoreCollapsed(!isScoreCollapsed)}
               className="p-1 text-slate-500 hover:text-ink hover:bg-slate-100 rounded-chip transition-colors ml-auto"
-              title={isScoreCollapsed ? 'Expand readiness panel' : 'Collapse readiness panel'}
-              aria-label={isScoreCollapsed ? 'Expand readiness panel' : 'Collapse readiness panel'}
+              title={isScoreCollapsed ? 'Expand panel' : 'Collapse panel'}
+              aria-label={isScoreCollapsed ? 'Expand panel' : 'Collapse panel'}
             >
               {isScoreCollapsed ? <Maximize2 className="w-3.5 h-3.5" /> : <Minimize2 className="w-3.5 h-3.5" />}
             </button>
@@ -319,12 +351,29 @@ export const MapWorkspace: React.FC = () => {
           {isScoreCollapsed ? (
             <div className="flex flex-col items-center gap-3 pt-3 text-slate-500">
               <button
-                onClick={() => setIsScoreCollapsed(false)}
+                onClick={() => {
+                  setIsScoreCollapsed(false);
+                  setActiveRightTab('score');
+                }}
                 className="w-8 h-8 rounded-btn bg-brand-50 text-brand-700 font-mono font-semibold flex items-center justify-center text-xs"
                 title="View Score"
               >
                 {scoreData ? scoreData.score : '--'}
               </button>
+              <button
+                onClick={() => {
+                  setIsScoreCollapsed(false);
+                  setActiveRightTab('catchment');
+                }}
+                className="w-8 h-8 rounded-btn bg-sky-50 text-sky-700 flex items-center justify-center text-xs hover:bg-sky-100 transition-colors"
+                title="View Catchment Isochrones"
+              >
+                <Clock className="w-4 h-4" />
+              </button>
+            </div>
+          ) : activeRightTab === 'catchment' ? (
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 text-xs">
+              <IsochronePanel isochroneState={isochroneState} />
             </div>
           ) : (
             /* Expanded Panel Content */
@@ -471,7 +520,17 @@ export const MapWorkspace: React.FC = () => {
                   {/* Accessibility Summary */}
                   {scoreData.accessibility && (
                     <div className="flex flex-col gap-2 p-2.5 bg-canvas border border-slate-200 rounded-btn">
-                      <span className="font-semibold text-slate-700 text-xs">Drive-time catchment</span>
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-slate-700 text-xs">Drive-time catchment</span>
+                        <button
+                          onClick={() => setActiveRightTab('catchment')}
+                          className="text-[11px] text-sky-600 hover:text-sky-700 font-medium flex items-center gap-1 transition-colors"
+                          title="Open Isochrone Catchment Analysis"
+                        >
+                          <span>Analyze rings</span>
+                          <Clock className="w-3 h-3" />
+                        </button>
+                      </div>
                       <div className="grid grid-cols-3 gap-2 text-center">
                         {scoreData.accessibility.map((band) => (
                           <div key={band.minutes} className="p-1.5 bg-surface rounded-chip border border-slate-200">

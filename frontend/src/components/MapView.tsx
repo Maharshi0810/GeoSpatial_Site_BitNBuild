@@ -37,6 +37,7 @@ export interface MapViewProps {
   h3Data?: any;
   clusterData?: any;
   hotspotData?: any;
+  isochroneData?: any;
   activeLayers?: Record<string, boolean>;
   layerData?: Record<string, any>;
   layerOpacity?: Record<string, number>;
@@ -49,6 +50,7 @@ export const MapView: React.FC<MapViewProps> = ({
   h3Data,
   clusterData,
   hotspotData,
+  isochroneData,
   activeLayers: _activeLayers = {},
   layerData: _layerData = {},
   layerOpacity: _layerOpacity = {},
@@ -331,7 +333,80 @@ export const MapView: React.FC<MapViewProps> = ({
       map.setLayoutProperty('layer-hotspots-glow', 'visibility', isHotspotsVisible ? 'visible' : 'none');
       map.setLayoutProperty('layer-hotspots-core', 'visibility', isHotspotsVisible ? 'visible' : 'none');
     }
-  }, [analysisMode, h3Data, clusterData, hotspotData, mapLoaded]);
+
+    // --- 4. Isochrone Travel-Time Polygon Layer ---
+    if (isochroneData && isochroneData.features && isochroneData.features.length > 0) {
+      if (map.getSource('src-isochrone')) {
+        (map.getSource('src-isochrone') as maplibregl.GeoJSONSource).setData(isochroneData);
+      } else {
+        map.addSource('src-isochrone', { type: 'geojson', data: isochroneData });
+
+        // Fill layer with semi-transparent cyan/sky blue
+        map.addLayer(
+          {
+            id: 'layer-isochrone-fill',
+            type: 'fill',
+            source: 'src-isochrone',
+            paint: {
+              'fill-color': [
+                'case',
+                ['has', 'minutes'],
+                [
+                  'match',
+                  ['get', 'minutes'],
+                  5, 'rgba(56, 189, 248, 0.35)',
+                  10, 'rgba(14, 165, 233, 0.28)',
+                  15, 'rgba(2, 132, 199, 0.22)',
+                  30, 'rgba(3, 105, 161, 0.16)',
+                  'rgba(14, 165, 233, 0.25)'
+                ],
+                'rgba(14, 165, 233, 0.25)'
+              ],
+              'fill-outline-color': '#38bdf8',
+            },
+          },
+          map.getLayer('layer-clusters-points') ? 'layer-clusters-points' : undefined
+        );
+
+        // Stroke line
+        map.addLayer({
+          id: 'layer-isochrone-stroke',
+          type: 'line',
+          source: 'src-isochrone',
+          paint: {
+            'line-color': '#0284c7',
+            'line-width': 2,
+            'line-dasharray': [3, 1.5],
+          },
+        });
+
+        // Click tooltip for isochrone
+        map.on('click', 'layer-isochrone-fill', (e) => {
+          if (!e.features || !e.features[0]) return;
+          const props = e.features[0].properties;
+          if (popupRef.current) popupRef.current.remove();
+
+          popupRef.current = new maplibregl.Popup({ closeButton: true, offset: 10 })
+            .setLngLat(e.lngLat)
+            .setHTML(`
+              <div style="font-family: inherit; font-size: 11px; padding: 6px; color: #0f172a;">
+                <p style="font-weight: 700; margin: 0 0 4px 0; color: #0284c7; text-transform: uppercase;">
+                  ${props?.mode || 'Travel'} Catchment (${props?.minutes || ''} min)
+                </p>
+                <div><strong>Area:</strong> ${props?.area_km2 || '0'} km²</div>
+                <div><strong>Population:</strong> ${props?.population_reached ? Number(props.population_reached).toLocaleString() : 'N/A'}</div>
+              </div>
+            `)
+            .addTo(map);
+        });
+      }
+    } else if (map.getSource('src-isochrone')) {
+      (map.getSource('src-isochrone') as maplibregl.GeoJSONSource).setData({
+        type: 'FeatureCollection',
+        features: []
+      });
+    }
+  }, [analysisMode, h3Data, clusterData, hotspotData, isochroneData, mapLoaded]);
 
   return (
     <div

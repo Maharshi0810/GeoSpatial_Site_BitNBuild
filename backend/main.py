@@ -62,7 +62,11 @@ try:
     from backend.api.routes_isochrone import router as isochrone_router
     app.include_router(isochrone_router, prefix="/api", tags=["Accessibility"])
 except ImportError:
-    pass
+    try:
+        from api.routes_isochrone import router as isochrone_router
+        app.include_router(isochrone_router, prefix="/api", tags=["Accessibility"])
+    except ImportError:
+        pass
 
 try:
     from backend.api.routes_report import router as report_router
