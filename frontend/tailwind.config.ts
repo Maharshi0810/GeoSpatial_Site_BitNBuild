@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 export default {
+  darkMode: 'class',
   content: [
     './index.html',
     './src/**/*.{js,ts,jsx,tsx}',
@@ -8,19 +9,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: '#0F172A',
-        'slate-700': '#334155',
-        'slate-500': '#64748B',
-        'slate-200': '#E2E8F0',
-        'slate-100': '#F1F5F9',
-        surface: '#FFFFFF',
-        canvas: '#F8FAFC',
-        'brand-700': '#047857',
-        'brand-600': '#059669',
-        'brand-50': '#ECFDF5',
-        'amber-600': '#D97706',
-        'red-700': '#B91C1C',
-        'blue-600': '#2563EB',
+        ink: 'var(--color-ink)',
+        'slate-700': 'var(--color-slate-700)',
+        'slate-500': 'var(--color-slate-500)',
+        'slate-200': 'var(--color-slate-200)',
+        'slate-100': 'var(--color-slate-100)',
+        surface: 'var(--color-surface)',
+        canvas: 'var(--color-canvas)',
+        'brand-700': 'var(--color-brand-700)',
+        'brand-600': 'var(--color-brand-600)',
+        'brand-50': 'var(--color-brand-50)',
+        'amber-600': 'var(--color-amber-600)',
+        'red-700': 'var(--color-red-700)',
+        'blue-600': 'var(--color-blue-600)',
         score: {
           '0': '#F1F5F9',
           '20': '#A7F3D0',

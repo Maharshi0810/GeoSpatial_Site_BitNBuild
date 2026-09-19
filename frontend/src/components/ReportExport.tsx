@@ -32,6 +32,7 @@ export interface ReportExportProps {
   mode?: TravelMode;
   locationName?: string;
   siteType?: string;
+  preloadedDossier?: any;
 }
 
 interface DossierData {
@@ -109,6 +110,7 @@ export const ReportExport: React.FC<ReportExportProps> = ({
   mode = 'driving',
   locationName = 'Selected Candidate Site',
   siteType = 'EV charging',
+  preloadedDossier,
 }) => {
   const [dossier, setDossier] = useState<DossierData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -130,6 +132,14 @@ export const ReportExport: React.FC<ReportExportProps> = ({
   // Fetch or compile dossier when opened
   useEffect(() => {
     if (!isOpen || !selectedLocation) return;
+
+    if (preloadedDossier) {
+      setDossier(preloadedDossier);
+      setIsLoading(false);
+      setCopied(false);
+      setSavedToLibrary(false);
+      return;
+    }
 
     const generateDossier = async () => {
       setIsLoading(true);
@@ -269,7 +279,7 @@ export const ReportExport: React.FC<ReportExportProps> = ({
     };
 
     generateDossier();
-  }, [isOpen, selectedLocation, locationName, siteType, minutes, mode, scoreData, catchmentData]);
+  }, [isOpen, selectedLocation, locationName, siteType, minutes, mode, scoreData, catchmentData, preloadedDossier]);
 
   if (!isOpen) return null;
 

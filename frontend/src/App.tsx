@@ -20,6 +20,9 @@ const Terms = lazy(() =>
 const DevTokens = lazy(() =>
   import('@/routes/DevTokens').then((module) => ({ default: module.DevTokens }))
 );
+const NotFound = lazy(() =>
+  import('@/routes/NotFound').then((module) => ({ default: module.NotFound }))
+);
 
 export const App: React.FC = () => {
   const [siteType, setSiteType] = useState<string>('ev_charging');
@@ -48,6 +51,7 @@ export const App: React.FC = () => {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/dev/tokens" element={<DevTokens />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </div>

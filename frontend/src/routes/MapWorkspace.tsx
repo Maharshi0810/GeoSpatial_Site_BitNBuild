@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Crosshair,
   Compass,
-  ChevronUp,
-  ChevronDown,
   Layers
 } from 'lucide-react';
 import * as turf from '@turf/turf';
@@ -12,7 +10,6 @@ import { MapView, AnalysisMode } from '@/components/MapView';
 import type { MapViewHandle } from '@/components/MapView';
 import { HotspotLegend } from '@/components/HotspotLegend';
 import { useSpatialAnalytics } from '@/hooks/useSpatialAnalytics';
-import { ComparePanel } from '@/components/ComparePanel';
 import { useCompareApi } from '@/hooks/useCompareApi';
 import { useIsochrone } from '@/hooks/useIsochrone';
 import { DrawToolbar } from '@/components/DrawToolbar';
@@ -42,7 +39,6 @@ export const MapWorkspace: React.FC = () => {
   // Sidebar Tab & Collapse State
   const [activeSidebarTab, setActiveSidebarTab] = useState<SidebarTab>('score');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
-  const [isCompareTrayExpanded, setIsCompareTrayExpanded] = useState<boolean>(false);
 
   // Facility Site Type
   const [siteType, setSiteType] = useState<string>('ev_charging');
@@ -218,7 +214,7 @@ export const MapWorkspace: React.FC = () => {
       {/* Main Workspace Layout */}
       <div className="flex-1 flex relative overflow-hidden">
         {/* Center: Interactive Map Canvas (Full viewport utilization) */}
-        <main className="flex-1 h-full relative flex flex-col items-center justify-between p-4 bg-[#E5ECF0]">
+        <main className="flex-1 h-full relative flex flex-col items-center justify-between p-4 bg-canvas">
           {/* Floating Top Search Bar & Profile Filter Chips */}
           <div className="w-full max-w-xl z-20 flex flex-col gap-2">
             <SearchBar
@@ -449,39 +445,67 @@ export const MapWorkspace: React.FC = () => {
         />
       </div>
 
-      {/* Bottom Candidate Comparison Tray (Widescreen comparative view) */}
+      {/* Bottom Candidate Comparison Tray (Streamlined candidate status bar) */}
       <section className="bg-surface border-t border-slate-200 transition-all duration-150 ease-out z-30 flex flex-col">
-        <div
-          onClick={() => setIsCompareTrayExpanded(!isCompareTrayExpanded)}
-          className="h-9 px-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 select-none text-xs text-slate-700"
-        >
-          <div className="flex items-center gap-2 font-semibold text-ink">
-            <span>Candidate Comparison Matrix</span>
-            <span className="text-[11px] font-normal text-slate-500 font-mono">
-              ({candidateSites.length} {candidateSites.length === 1 ? 'site' : 'sites'} queued)
-            </span>
+        <div className="h-10 px-4 flex items-center justify-between select-none text-xs text-slate-700">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 font-semibold text-ink">
+              <span>Candidate Comparison</span>
+              <span className="text-[11px] font-normal px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-mono">
+                {candidateSites.length} {candidateSites.length === 1 ? 'site' : 'sites'} queued
+              </span>
+            </div>
+
+            {/* Candidate site pills */}
+            {candidateSites.length > 0 ? (
+              <div className="hidden sm:flex items-center gap-1.5 overflow-x-auto max-w-md py-0.5">
+                {candidateSites.map((site) => (
+                  <span
+                    key={site.id}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-brand-50 border border-brand-500/20 text-brand-700 text-[11px] font-medium whitespace-nowrap"
+                  >
+                    <span className="truncate max-w-[120px]">{site.name}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeSite(site.id);
+                      }}
+                      className="text-brand-700 hover:text-brand-900 ml-0.5 font-bold"
+                      title="Remove site"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <span className="hidden md:inline text-[11px] text-slate-500 italic">
+                (Add locations or benchmarks to compare readiness)
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-slate-500">
-              {isCompareTrayExpanded ? 'Collapse Matrix' : 'Expand full-width comparison matrix'}
-            </span>
-            {isCompareTrayExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
+            {candidateSites.length > 0 && (
+              <button
+                onClick={clearSites}
+                className="text-[11px] text-slate-500 hover:text-slate-700 px-2 py-1 rounded hover:bg-slate-100 transition-colors"
+              >
+                Clear all
+              </button>
+            )}
+            <button
+              onClick={() => {
+                setActiveSidebarTab('compare');
+                setIsSidebarCollapsed(false);
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-btn bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold shadow-sm transition-colors"
+            >
+              <span>Open Compare Panel</span>
+              <span className="text-[11px] font-mono">→</span>
+            </button>
           </div>
         </div>
-
-        {isCompareTrayExpanded && (
-          <div className="h-[230px] p-4 border-t border-slate-100 bg-canvas overflow-hidden">
-            <ComparePanel
-              sites={candidateSites}
-              compareResult={compareResult}
-              isLoading={isComparing}
-              onRemoveSite={removeSite}
-              onClearSites={clearSites}
-              onRunCompare={runCompare}
-            />
-          </div>
-        )}
       </section>
 
       {/* Phase 3C Comprehensive Site Evaluation Dossier Modal */}

@@ -34,6 +34,12 @@
     --color-slate-100: #1E293B;
     --color-surface: #0F172A;
     --color-canvas: #020617;
+    --color-brand-700: #059669;
+    --color-brand-600: #10B981;
+    --color-brand-50: #064E3B;
+    --color-amber-600: #F59E0B;
+    --color-red-700: #EF4444;
+    --color-blue-600: #3B82F6;
   }
 
   html {
