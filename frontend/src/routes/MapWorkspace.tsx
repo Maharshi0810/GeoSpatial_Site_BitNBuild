@@ -17,18 +17,26 @@ import { useCompareApi } from '@/hooks/useCompareApi';
 import { useIsochrone } from '@/hooks/useIsochrone';
 import { DrawToolbar } from '@/components/DrawToolbar';
 import type { DrawMode, DrawnPolygon } from '@/components/DrawToolbar';
+import { Sidebar } from '@/components/Sidebar';
 import {
-  Sidebar,
   SidebarTab,
   BenchmarkSite,
   LayerItem,
   GUJARAT_BENCHMARKS
-} from '@/components/Sidebar';
+} from '@/data/gujaratBenchmarks';
 import { ReportExport } from '@/components/ReportExport';
 import { SearchBar } from '@/components/SearchBar';
 import type { FeatureCollection } from 'geojson';
 
-export const MapWorkspace: React.FC = () => {
+export interface MapWorkspaceProps {
+  siteType?: string;
+  onSiteTypeChange?: (type: string) => void;
+}
+
+export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
+  siteType: propSiteType,
+  onSiteTypeChange: propOnSiteTypeChange,
+}) => {
   const mapViewRef = useRef<MapViewHandle>(null);
 
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>({
@@ -44,8 +52,10 @@ export const MapWorkspace: React.FC = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [isCompareTrayExpanded, setIsCompareTrayExpanded] = useState<boolean>(false);
 
-  // Facility Site Type
-  const [siteType, setSiteType] = useState<string>('ev_charging');
+  // Facility Site Type (synchronized with App.tsx)
+  const [internalSiteType, setInternalSiteType] = useState<string>('ev_charging');
+  const siteType = propSiteType ?? internalSiteType;
+  const setSiteType = propOnSiteTypeChange ?? setInternalSiteType;
 
   // Report Export State
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
@@ -89,9 +99,14 @@ export const MapWorkspace: React.FC = () => {
   const [isPolygonScoring, setIsPolygonScoring] = useState(false);
   const [polygonScore, setPolygonScore] = useState<ScoreResponse | null>(null);
   const rectCornerRef = useRef<number[] | null>(null);
+  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Clear drawing state
   const clearDraw = useCallback(() => {
+    if (clickTimerRef.current) {
+      clearTimeout(clickTimerRef.current);
+      clickTimerRef.current = null;
+    }
     setDrawMode('none');
     setDrawVertices([]);
     setDrawnPolygon(null);
@@ -261,8 +276,15 @@ export const MapWorkspace: React.FC = () => {
               onMapClick={(coords) => {
                 // Intercept clicks during draw mode
                 if (drawMode === 'polygon') {
-                  const v = [...drawVertices, [coords.lng, coords.lat]];
-                  setDrawVertices(v);
+                  if (clickTimerRef.current) {
+                    clearTimeout(clickTimerRef.current);
+                    clickTimerRef.current = null;
+                  }
+                  // Debounce single-click so dblclick can cancel adding an extra closing vertex (BUG-03)
+                  clickTimerRef.current = setTimeout(() => {
+                    setDrawVertices((prev) => [...prev, [coords.lng, coords.lat]]);
+                    clickTimerRef.current = null;
+                  }, 220);
                   return;
                 }
                 if (drawMode === 'rectangle') {
@@ -287,9 +309,19 @@ export const MapWorkspace: React.FC = () => {
                   setIsSidebarCollapsed(false);
                 }
               }}
-              onMapDblClick={(coords) => {
-                if (drawMode === 'polygon' && drawVertices.length >= 3) {
-                  finalisePolygon([...drawVertices, [coords.lng, coords.lat]]);
+              onMapDblClick={() => {
+                // Cancel pending click to prevent duplicate vertex on polygon close (BUG-03)
+                if (clickTimerRef.current) {
+                  clearTimeout(clickTimerRef.current);
+                  clickTimerRef.current = null;
+                }
+                if (drawMode === 'polygon') {
+                  setDrawVertices((prev) => {
+                    if (prev.length >= 3) {
+                      finalisePolygon(prev);
+                    }
+                    return prev;
+                  });
                 }
               }}
               analysisMode={analysisMode}

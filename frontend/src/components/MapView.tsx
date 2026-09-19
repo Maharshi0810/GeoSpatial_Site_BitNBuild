@@ -109,6 +109,7 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>((
       zoom: selectedLocation ? 10.5 : DEFAULT_ZOOM,
       minZoom: 5.5,
       maxZoom: 18,
+      doubleClickZoom: false,
       attributionControl: false,
     });
 

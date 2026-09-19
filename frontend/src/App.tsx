@@ -43,7 +43,7 @@ export const App: React.FC = () => {
             }
           >
             <Routes>
-              <Route path="/" element={<MapWorkspace />} />
+              <Route path="/" element={<MapWorkspace siteType={siteType} onSiteTypeChange={setSiteType} />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
