@@ -1,0 +1,45 @@
+{
+  "city": "Ahmedabad",
+  "state": "Gujarat",
+  "country": "India",
+  "center": {
+    "lat": 23.0225,
+    "lng": 72.5714
+  },
+  "defaultZoom": 11,
+  "bbox": [72.45, 22.95, 72.7, 23.15],
+  "candidateSites": [
+    {
+      "id": "site-sg-highway",
+      "name": "SG Highway Commercial Hub",
+      "lat": 23.0378,
+      "lng": 72.5112,
+      "siteType": "ev_charging",
+      "score": 84
+    },
+    {
+      "id": "site-sanand-gidc",
+      "name": "Sanand Industrial GIDC Access",
+      "lat": 22.9912,
+      "lng": 72.3821,
+      "siteType": "warehouse",
+      "score": 76
+    },
+    {
+      "id": "site-ashram-road",
+      "name": "Ashram Road Urban Node",
+      "lat": 23.0334,
+      "lng": 72.5739,
+      "siteType": "retail",
+      "score": 91
+    },
+    {
+      "id": "site-ring-road-east",
+      "name": "SP Ring Road Odhav Junction",
+      "lat": 23.0189,
+      "lng": 72.6645,
+      "siteType": "telecom",
+      "score": 68
+    }
+  ]
+}

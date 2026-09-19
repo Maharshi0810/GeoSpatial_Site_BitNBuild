@@ -1,0 +1,88 @@
+{
+  "locationName": "SG Highway, Bodakdev, Ahmedabad",
+  "coordinates": {
+    "lat": 23.0378,
+    "lng": 72.5112
+  },
+  "siteType": "ev_charging",
+  "score": 78,
+  "percentile": 82,
+  "cappedBy": null,
+  "breakdown": [
+    {
+      "factorId": "population",
+      "label": "Population density",
+      "rawValue": 18450,
+      "unit": "people/sq km",
+      "normalized": 0.88,
+      "weight": 0.25,
+      "contribution": 16.4,
+      "explanation": "High local population density within 3 km catchment zone provides strong initial user base."
+    },
+    {
+      "factorId": "highway_access",
+      "label": "Road network access",
+      "rawValue": 180,
+      "unit": "m to arterial road",
+      "normalized": 0.94,
+      "weight": 0.25,
+      "contribution": 18.2,
+      "explanation": "Within 200 m of SG Highway on-ramp, which is the primary driver of arterial visibility."
+    },
+    {
+      "factorId": "competitor_density",
+      "label": "Competitor clustering",
+      "rawValue": 6,
+      "unit": "stations within 2 km",
+      "normalized": 0.52,
+      "weight": 0.2,
+      "contribution": -4.2,
+      "explanation": "Moderate saturation from existing operational charging points reduces untapped margin."
+    },
+    {
+      "factorId": "zoning",
+      "label": "Commercial zoning match",
+      "rawValue": 1.0,
+      "unit": "permitted use",
+      "normalized": 1.0,
+      "weight": 0.15,
+      "contribution": 15.0,
+      "explanation": "Designated commercial retail corridor permits rapid EV charging infrastructure without zoning variance."
+    },
+    {
+      "factorId": "flood_risk",
+      "label": "Environmental flood risk",
+      "rawValue": 0.12,
+      "unit": "risk index",
+      "normalized": 0.88,
+      "weight": 0.15,
+      "contribution": 12.6,
+      "explanation": "Located on elevated terrain outside known Sabarmati river spillover zones."
+    }
+  ],
+  "constraints": [
+    {
+      "id": "c-flood",
+      "label": "Flood risk boundary check",
+      "passed": true,
+      "reason": "Outside active Sabarmati flood zone."
+    },
+    {
+      "id": "c-grid",
+      "label": "Grid interconnect capacity",
+      "passed": true,
+      "reason": "UGVCL 11kV feeder line accessible within 250 m."
+    },
+    {
+      "id": "c-road-width",
+      "label": "Minimum access road width (18m)",
+      "passed": true,
+      "reason": "Right of way exceeds 30 m arterial standard."
+    }
+  ],
+  "accessibility": [
+    { "minutes": 10, "population": 94000, "area_km2": 18.5 },
+    { "minutes": 20, "population": 348000, "area_km2": 64.2 },
+    { "minutes": 30, "population": 892000, "area_km2": 142.8 }
+  ]
+}
