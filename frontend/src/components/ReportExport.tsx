@@ -410,13 +410,13 @@ export const ReportExport: React.FC<ReportExportProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn print:static print:p-0 print:bg-transparent">
       {/* Modal Dialog Card */}
-      <div className="bg-surface border border-slate-200 rounded-panel shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden text-ink">
+      <div className="print-dossier-card bg-surface border border-slate-200 rounded-panel shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden text-ink print:border-none print:shadow-none print:max-w-none print:max-h-none print:overflow-visible">
         {/* Header Bar */}
         <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-canvas">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-brand-600 text-white rounded-btn shadow-sm">
+            <div className="p-2 bg-brand-600 text-white rounded-btn shadow-sm print:hidden">
               <FileText className="w-5 h-5" />
             </div>
             <div>
@@ -436,7 +436,7 @@ export const ReportExport: React.FC<ReportExportProps> = ({
 
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-ink hover:bg-slate-200/60 rounded-chip transition-colors"
+            className="p-1.5 text-slate-400 hover:text-ink hover:bg-slate-200/60 rounded-chip transition-colors print:hidden"
             title="Close dialog (Esc)"
           >
             <X className="w-5 h-5" />
@@ -444,7 +444,7 @@ export const ReportExport: React.FC<ReportExportProps> = ({
         </div>
 
         {/* Tab Navigation */}
-        <div className="px-6 border-b border-slate-200 bg-surface flex items-center gap-4 text-xs font-medium">
+        <div className="px-6 border-b border-slate-200 bg-surface flex items-center gap-4 text-xs font-medium print:hidden">
           <button
             onClick={() => setActiveTab('dossier')}
             className={`py-2.5 border-b-2 transition-colors flex items-center gap-1.5 ${
@@ -495,7 +495,7 @@ export const ReportExport: React.FC<ReportExportProps> = ({
         </div>
 
         {/* Modal Body (Scrollable) */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 print:overflow-visible print:p-2">
           {isLoading || !dossier ? (
             <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-500">
               <Loader2 className="w-8 h-8 text-brand-600 animate-spin" />
@@ -787,7 +787,7 @@ export const ReportExport: React.FC<ReportExportProps> = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="px-6 py-3.5 bg-canvas border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+        <div className="px-6 py-3.5 bg-canvas border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 print:hidden">
           <div className="flex items-center gap-2">
             <button
               onClick={handleSaveToLibrary}

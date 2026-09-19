@@ -295,7 +295,7 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>((
     if (drawMode !== 'none') {
       canvas.style.cursor = 'crosshair';
     } else {
-      canvas.style.cursor = '';
+      canvas.style.cursor = 'grab';
     }
   }, [drawMode]);
 
@@ -565,19 +565,10 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>((
   }, [analysisMode, h3Data, clusterData, hotspotData, isochroneData, mapLoaded]);
 
   return (
-    <>
-      <div
-        ref={mapContainerRef}
-        className="absolute inset-0 w-full h-full bg-[#0a0f1d] cursor-crosshair select-none"
-      />
-      {/* Pulse animation keyframes injected via style tag */}
-      <style>{`
-        @keyframes pulse-ring {
-          0% { transform: scale(1); opacity: 1; }
-          100% { transform: scale(2.8); opacity: 0; }
-        }
-      `}</style>
-    </>
+    <div
+      ref={mapContainerRef}
+      className="absolute inset-0 w-full h-full bg-[#0a0f1d] cursor-crosshair select-none"
+    />
   );
 });
 

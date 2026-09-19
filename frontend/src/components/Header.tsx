@@ -17,15 +17,21 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const location = useLocation();
   const [isDark, setIsDark] = useState<boolean>(() => {
-    return document.documentElement.classList.contains('dark') ||
-      (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const saved = localStorage.getItem('theme');
+    if (saved) return saved === 'dark';
+    return (
+      document.documentElement.classList.contains('dark') ||
+      (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    );
   });
 
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
     }
   }, [isDark]);
 

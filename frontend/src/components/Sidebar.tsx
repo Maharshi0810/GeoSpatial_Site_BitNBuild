@@ -576,9 +576,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span className="font-semibold text-slate-700 uppercase tracking-wider text-[10px]">
                 Multi-Site Benchmark Comparison
               </span>
-              <span className="text-[11px] font-mono text-slate-500">
-                {candidateSites.length} of 6 slots
-              </span>
+              {candidateSites.length > 0 && (
+                <span className="text-[11px] font-mono text-slate-500">
+                  {candidateSites.length} of 6 slots
+                </span>
+              )}
             </div>
 
             <ComparePanel

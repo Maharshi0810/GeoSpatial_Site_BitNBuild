@@ -118,3 +118,37 @@
 .pulse-marker {
   animation: pulse-ring 2s infinite ease-in-out;
 }
+
+/* Print Stylesheet for ReportExport Dossier Modal (BUG-23) */
+@media print {
+  @page {
+    margin: 12mm;
+    size: auto;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  /* Hide app chrome, headers, footers, sidebars */
+  header,
+  footer,
+  nav,
+  aside,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Ensure modal card displays clean without borders or shadows */
+  .print-dossier-card {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+}

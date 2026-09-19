@@ -33,6 +33,7 @@ export interface DrawToolbarProps {
   onClear: () => void;
   onScorePolygon: () => void;
   isScoring?: boolean;
+  scoringError?: string | null;
 }
 
 export const DrawToolbar: React.FC<DrawToolbarProps> = ({
@@ -43,11 +44,12 @@ export const DrawToolbar: React.FC<DrawToolbarProps> = ({
   onClear,
   onScorePolygon,
   isScoring = false,
+  scoringError = null,
 }) => {
   const isDrawing = drawMode !== 'none';
 
   return (
-    <div className="absolute left-4 bottom-20 z-30 flex flex-col gap-2">
+    <div className="absolute left-4 bottom-28 z-20 flex flex-col gap-2">
       {/* Main toolbar card */}
       <div
         className="flex flex-col gap-1.5 p-2 rounded-xl border shadow-2xl backdrop-blur-md"
@@ -152,6 +154,12 @@ export const DrawToolbar: React.FC<DrawToolbarProps> = ({
                 <Target className="w-3.5 h-3.5" strokeWidth={2} />
                 <span>{isScoring ? 'Scoring...' : 'Score Polygon Catchment'}</span>
               </button>
+
+              {scoringError && (
+                <div className="mt-1.5 px-2 py-1.5 bg-red-900/70 border border-red-500/50 rounded-lg text-[11px] text-red-200 leading-tight">
+                  {scoringError}
+                </div>
+              )}
             </>
           )}
         </div>

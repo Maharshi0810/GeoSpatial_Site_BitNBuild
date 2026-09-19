@@ -72,13 +72,14 @@ class MockDataService {
   public async fetchScoreForLocation(
     lat: number,
     lng: number,
-    siteType: string = 'ev_charging'
+    siteType: string = 'ev_charging',
+    subFilter?: string
   ): Promise<ScoreResponse> {
     try {
       const response = await fetch('/api/score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lat, lng, site_type: siteType }),
+        body: JSON.stringify({ lat, lng, site_type: siteType, sub_filter: subFilter }),
       });
 
       if (response.ok) {
@@ -142,8 +143,15 @@ class MockDataService {
     await new Promise((resolve) => setTimeout(resolve, 150));
 
     // Deep copy and adjust coordinates to match selected point
+    let adjustedScore = sampleScoreData.score;
+    if (subFilter === 'fast_dc') adjustedScore = Math.min(100, adjustedScore + 3);
+    else if (subFilter === 'power_50kw') adjustedScore = Math.min(100, adjustedScore + 2);
+    else if (subFilter === 'grid_capacity') adjustedScore = Math.min(100, adjustedScore + 4);
+    else if (subFilter === 'highway_access') adjustedScore = Math.min(100, adjustedScore + 5);
+
     const rawData = {
       ...sampleScoreData,
+      score: adjustedScore,
       siteType,
       coordinates: { lat, lng },
       locationName: `Site at ${lat.toFixed(4)}, ${lng.toFixed(4)}`,

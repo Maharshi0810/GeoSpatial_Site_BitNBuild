@@ -94,6 +94,7 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
   const [drawnPolygonGeoJSON, setDrawnPolygonGeoJSON] = useState<FeatureCollection | null>(null);
   const [isPolygonScoring, setIsPolygonScoring] = useState(false);
   const [polygonScore, setPolygonScore] = useState<ScoreResponse | null>(null);
+  const [polygonScoreError, setPolygonScoreError] = useState<string | null>(null);
   const rectCornerRef = useRef<number[] | null>(null);
   const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -108,6 +109,7 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     setDrawnPolygon(null);
     setDrawnPolygonGeoJSON(null);
     setPolygonScore(null);
+    setPolygonScoreError(null);
     rectCornerRef.current = null;
   }, []);
 
@@ -134,31 +136,37 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
   const scorePolygonCatchment = useCallback(async () => {
     if (!drawnPolygon) return;
     setIsPolygonScoring(true);
+    setPolygonScoreError(null);
     try {
       const [lng, lat] = drawnPolygon.centroid;
-      const data = await mockDataService.fetchScoreForLocation(lat, lng, siteType);
+      const data = await mockDataService.fetchScoreForLocation(lat, lng, siteType, activeFilter);
       setPolygonScore(data);
       setScoreData(data);
       setActiveSidebarTab('score');
       if (isSidebarCollapsed) setIsSidebarCollapsed(false);
     } catch {
-      // fallback silent
+      setPolygonScoreError('Polygon catchment scoring failed. Please retry.');
     } finally {
       setIsPolygonScoring(false);
     }
-  }, [drawnPolygon, siteType, isSidebarCollapsed]);
+  }, [drawnPolygon, siteType, activeFilter, isSidebarCollapsed]);
 
   useEffect(() => {
     if (selectedLocation) {
-      loadScore(selectedLocation.lat, selectedLocation.lng, siteType);
+      loadScore(selectedLocation.lat, selectedLocation.lng, siteType, activeFilter);
     }
-  }, [siteType]);
+  }, [siteType, activeFilter]);
 
-  const loadScore = async (lat: number, lng: number, currentType: string = siteType) => {
+  const loadScore = async (
+    lat: number,
+    lng: number,
+    currentType: string = siteType,
+    subFilter: string = activeFilter
+  ) => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await mockDataService.fetchScoreForLocation(lat, lng, currentType);
+      const data = await mockDataService.fetchScoreForLocation(lat, lng, currentType, subFilter);
       setScoreData(data);
     } catch {
       setError('Scoring service returned an error. Retry or pick another Gujarat location.');
@@ -248,19 +256,32 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
 
             {/* Horizontal Filter Row */}
             <div className="flex items-center gap-1.5 overflow-x-auto py-0.5">
-              {filterChips.map((chip) => (
-                <button
-                  key={chip.id}
-                  onClick={() => setActiveFilter(chip.id)}
-                  className={`h-7 px-3 text-xs font-medium rounded-chip transition-colors whitespace-nowrap shadow-xs ${
-                    activeFilter === chip.id
-                      ? 'bg-brand-600 text-surface'
-                      : 'bg-surface text-slate-700 border border-slate-200 hover:bg-slate-100'
-                  }`}
-                >
-                  {chip.label}
-                </button>
-              ))}
+              {filterChips.map((chip) => {
+                const isActive = activeFilter === chip.id;
+                return (
+                  <button
+                    key={chip.id}
+                    onClick={() => {
+                      const nextFilter = isActive ? '' : chip.id;
+                      setActiveFilter(nextFilter);
+                      if (selectedLocation) {
+                        loadScore(selectedLocation.lat, selectedLocation.lng, siteType, nextFilter);
+                      }
+                    }}
+                    className={`h-7 px-3 text-xs font-medium rounded-chip transition-colors whitespace-nowrap shadow-xs flex items-center gap-1.5 ${
+                      isActive
+                        ? 'bg-brand-600 text-surface font-semibold'
+                        : 'bg-surface text-slate-700 border border-slate-200 hover:bg-slate-100'
+                    }`}
+                    title={isActive ? 'Filter applied to scoring model (click to clear)' : 'Apply filter to scoring model'}
+                  >
+                    <span>{chip.label}</span>
+                    {isActive && (
+                      <span className="text-[10px] bg-white/20 px-1 py-0.2 rounded font-mono">✓ Active</span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -345,12 +366,13 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
             onClear={clearDraw}
             onScorePolygon={scorePolygonCatchment}
             isScoring={isPolygonScoring}
+            scoringError={polygonScoreError}
           />
 
           {/* Polygon Score Floating Card */}
           {polygonScore && drawnPolygon && (
             <div
-              className="absolute left-4 bottom-[280px] z-30 w-56 p-3 rounded-xl border text-xs flex flex-col gap-2 shadow-float backdrop-blur-md"
+              className="absolute left-4 bottom-[320px] z-20 w-56 p-3 rounded-xl border text-xs flex flex-col gap-2 shadow-float backdrop-blur-md"
               style={{
                 background: 'rgba(15, 23, 42, 0.92)',
                 borderColor: 'rgba(6, 182, 212, 0.4)',

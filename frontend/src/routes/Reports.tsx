@@ -12,6 +12,7 @@ import {
 import { Link } from 'react-router-dom';
 import { ReportExport } from '@/components/ReportExport';
 import { BENCHMARK_SITES } from '@/data/demoSites';
+import type { ScoreResponse } from '@/mocks/mockDataService';
 
 interface SavedReport {
   id: string;
@@ -349,9 +350,11 @@ export const Reports: React.FC = () => {
                       </div>
                     </td>
 
-                    <td className="py-3.5 px-4 text-slate-500 font-mono flex items-center gap-1.5 pt-4">
-                      <Calendar className="w-3 h-3 text-slate-400" />
-                      <span>{report.createdDate}</span>
+                    <td className="py-3.5 px-4 text-slate-500 font-mono">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="w-3 h-3 text-slate-400" />
+                        <span>{report.createdDate}</span>
+                      </div>
                     </td>
 
                     <td className="py-3.5 px-4 text-right">
@@ -409,7 +412,35 @@ export const Reports: React.FC = () => {
           isOpen={isDossierOpen}
           onClose={() => setIsDossierOpen(false)}
           selectedLocation={selectedReport.coordinates || { lat: 23.0378, lng: 72.5112 }}
-          scoreData={null}
+          scoreData={
+            selectedReport.dossier
+              ? ({
+                  locationName: selectedReport.name,
+                  coordinates: selectedReport.coordinates || { lat: 23.0378, lng: 72.5112 },
+                  siteType: selectedReport.siteType,
+                  score: selectedReport.score,
+                  percentile: selectedReport.dossier.evaluation?.percentile ?? 90,
+                  breakdown:
+                    selectedReport.dossier.evaluation?.factor_breakdown?.map((f: any) => ({
+                      factorId: f.factor_id,
+                      label: f.label,
+                      rawValue: f.score,
+                      unit: 'index',
+                      normalized: f.score / 100,
+                      weight: f.weight,
+                      contribution: f.contribution,
+                      explanation: `${f.label} evaluation score of ${f.score}/100`,
+                    })) ?? [],
+                  constraints:
+                    selectedReport.dossier.evaluation?.constraints?.map((c: any) => ({
+                      id: c.id,
+                      label: c.label,
+                      passed: c.passed,
+                      reason: c.details,
+                    })) ?? [],
+                } as ScoreResponse)
+              : null
+          }
           locationName={selectedReport.name}
           siteType={selectedReport.siteType}
           preloadedDossier={selectedReport.dossier}

@@ -18,10 +18,14 @@ export const Footer: React.FC = () => {
         <Link to="/terms" className="hover:text-ink transition-colors">
           Terms
         </Link>
-        <span className="text-slate-300">·</span>
-        <Link to="/dev/tokens" className="hover:text-brand-600 transition-colors">
-          Design tokens
-        </Link>
+        {import.meta.env.DEV && (
+          <>
+            <span className="text-slate-300">·</span>
+            <Link to="/dev/tokens" className="hover:text-brand-600 transition-colors">
+              Design tokens
+            </Link>
+          </>
+        )}
       </div>
     </footer>
   );

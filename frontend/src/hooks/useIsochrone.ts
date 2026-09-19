@@ -114,8 +114,12 @@ function generateFallbackCatchment(lat: number, lng: number, minutes: number, mo
 export function useIsochrone(location: { lat: number; lng: number } | null): IsochroneState {
   const [minutes, setMinutes] = useState<number>(15);
   const [mode, setMode] = useState<TravelMode>('driving');
-  const [isochroneData, setIsochroneData] = useState<any | null>(null);
-  const [catchmentData, setCatchmentData] = useState<CatchmentData | null>(null);
+  const [isochroneData, setIsochroneData] = useState<any | null>(() =>
+    location ? generateFallbackIsochrone(location.lat, location.lng, 15, 'driving') : null
+  );
+  const [catchmentData, setCatchmentData] = useState<CatchmentData | null>(() =>
+    location ? generateFallbackCatchment(location.lat, location.lng, 15, 'driving') : null
+  );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
