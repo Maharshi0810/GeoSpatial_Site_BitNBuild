@@ -1,0 +1,157 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.57,
+              22.98
+            ],
+            [
+              72.585,
+              22.98
+            ],
+            [
+              72.59,
+              23.04
+            ],
+            [
+              72.575,
+              23.04
+            ],
+            [
+              72.57,
+              22.98
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "hazard": "Sabarmati River Lowland Spillover",
+        "risk_level": "high",
+        "flood_return_years": 25,
+        "river": "Sabarmati",
+        "elevation_m": 48.0,
+        "is_exclusion": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.59,
+              23.08
+            ],
+            [
+              72.62,
+              23.08
+            ],
+            [
+              72.63,
+              23.15
+            ],
+            [
+              72.6,
+              23.15
+            ],
+            [
+              72.59,
+              23.08
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "hazard": "Sabarmati Upstream Basin Buffer",
+        "risk_level": "medium",
+        "flood_return_years": 50,
+        "river": "Sabarmati",
+        "elevation_m": 54.0,
+        "is_exclusion": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.3,
+              21.6
+            ],
+            [
+              72.7,
+              21.6
+            ],
+            [
+              72.8,
+              21.2
+            ],
+            [
+              72.4,
+              21.2
+            ],
+            [
+              72.3,
+              21.6
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "hazard": "Gulf of Khambhat Tidal Inundation Zone",
+        "risk_level": "high",
+        "flood_return_years": 10,
+        "river": "Tidal/Coastal",
+        "elevation_m": 8.5,
+        "is_exclusion": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.74,
+              21.15
+            ],
+            [
+              72.8,
+              21.15
+            ],
+            [
+              72.82,
+              21.19
+            ],
+            [
+              72.76,
+              21.19
+            ],
+            [
+              72.74,
+              21.15
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "hazard": "Tapi River Delta Inundation",
+        "risk_level": "medium",
+        "flood_return_years": 30,
+        "river": "Tapi",
+        "elevation_m": 14.0,
+        "is_exclusion": false
+      }
+    }
+  ]
+}

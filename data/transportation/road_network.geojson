@@ -1,0 +1,215 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            72.5714,
+            23.0225
+          ],
+          [
+            72.6369,
+            23.2156
+          ],
+          [
+            72.9289,
+            22.5645
+          ],
+          [
+            73.1812,
+            22.3072
+          ],
+          [
+            72.9959,
+            21.7051
+          ],
+          [
+            72.8311,
+            21.1702
+          ],
+          [
+            72.85,
+            20.3
+          ]
+        ]
+      },
+      "properties": {
+        "name": "NH-48 Golden Corridor",
+        "road_type": "highway",
+        "surface": "paved",
+        "lanes": 6,
+        "speed_limit_kmh": 100
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            72.65,
+            23.01
+          ],
+          [
+            72.78,
+            22.82
+          ],
+          [
+            72.93,
+            22.57
+          ],
+          [
+            73.1,
+            22.42
+          ],
+          [
+            73.1812,
+            22.3072
+          ]
+        ]
+      },
+      "properties": {
+        "name": "NE-1 Ahmedabad-Vadodara Expressway",
+        "road_type": "highway",
+        "surface": "paved",
+        "lanes": 4,
+        "speed_limit_kmh": 120
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            72.5112,
+            23.0378
+          ],
+          [
+            72.515,
+            23.08
+          ],
+          [
+            72.53,
+            23.13
+          ],
+          [
+            72.55,
+            23.18
+          ]
+        ]
+      },
+      "properties": {
+        "name": "SG Highway (Ahmedabad Arterial)",
+        "road_type": "primary",
+        "surface": "paved",
+        "lanes": 6,
+        "speed_limit_kmh": 80
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            72.46,
+            23.02
+          ],
+          [
+            72.48,
+            23.12
+          ],
+          [
+            72.62,
+            23.14
+          ],
+          [
+            72.69,
+            23.05
+          ],
+          [
+            72.66,
+            22.95
+          ],
+          [
+            72.51,
+            22.94
+          ],
+          [
+            72.46,
+            23.02
+          ]
+        ]
+      },
+      "properties": {
+        "name": "SP Ring Road (Ahmedabad Orbital)",
+        "road_type": "primary",
+        "surface": "paved",
+        "lanes": 4,
+        "speed_limit_kmh": 90
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            72.8311,
+            21.1702
+          ],
+          [
+            72.78,
+            21.14
+          ],
+          [
+            72.72,
+            21.1
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Surat-Dumas Commercial Corridor",
+        "road_type": "primary",
+        "surface": "paved",
+        "lanes": 4,
+        "speed_limit_kmh": 70
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            70.8022,
+            22.3039
+          ],
+          [
+            71.3,
+            22.5
+          ],
+          [
+            71.8,
+            22.7
+          ],
+          [
+            72.5714,
+            23.0225
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Rajkot-Ahmedabad Highway (NH-47)",
+        "road_type": "highway",
+        "surface": "paved",
+        "lanes": 4,
+        "speed_limit_kmh": 100
+      }
+    }
+  ]
+}

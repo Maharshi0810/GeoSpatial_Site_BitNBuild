@@ -74,8 +74,72 @@ class MockDataService {
     lng: number,
     siteType: string = 'ev_charging'
   ): Promise<ScoreResponse> {
-    // Simulate brief network latency
-    await new Promise((resolve) => setTimeout(resolve, 250));
+    try {
+      const response = await fetch('/api/score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lat, lng, site_type: siteType }),
+      });
+
+      if (response.ok) {
+        const json = await response.json();
+        const data = json.data;
+        if (data && typeof data.score === 'number') {
+          this.isMockActive = false;
+
+          const factorKeys = Object.keys(data.breakdown || {});
+          const breakdown = factorKeys.map((key) => {
+            const item = data.breakdown[key];
+            const scoreVal = typeof item.score === 'number' ? item.score : 50;
+            return {
+              factorId: key,
+              label: item.label || key,
+              rawValue: Math.round(scoreVal * 10),
+              unit: 'index',
+              normalized: Number((scoreVal / 100).toFixed(2)),
+              weight: 0.2,
+              contribution: Number((scoreVal * 0.2).toFixed(1)),
+              explanation: `Computed ${item.label || key} readiness score of ${scoreVal}/100 based on Gujarat spatial data layers.`,
+            };
+          });
+
+          const constraints = [
+            {
+              id: 'flood_zone',
+              label: 'Flood plain setback',
+              passed: !data.constraints?.in_flood_zone,
+              reason: data.constraints?.in_flood_zone
+                ? 'Candidate point falls within active flood risk zone.'
+                : 'Outside identified high-risk flood zones.',
+            },
+            {
+              id: 'arterial_proximity',
+              label: 'Arterial road access',
+              passed: (data.constraints?.min_road_distance_m ?? 0) <= 2500,
+              reason: `Distance to nearest mapped highway/road is ${Math.round(data.constraints?.min_road_distance_m ?? 0)} m.`,
+            },
+          ];
+
+          return ScoreResponseSchema.parse({
+            locationName: `Site at ${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+            coordinates: { lat, lng },
+            siteType,
+            score: Math.round(data.score),
+            percentile: Math.min(99, Math.max(1, Math.round(data.score * 0.95))),
+            cappedBy: data.constraints?.in_flood_zone ? 'Flood zone safety penalty' : null,
+            breakdown: breakdown.length > 0 ? breakdown : sampleScoreData.breakdown,
+            constraints,
+            accessibility: sampleScoreData.accessibility,
+          });
+        }
+      }
+    } catch {
+      // Backend not running or call failed; gracefully fall back to mock fixture
+    }
+
+    this.isMockActive = true;
+    // Simulate brief network latency for mock mode
+    await new Promise((resolve) => setTimeout(resolve, 150));
 
     // Deep copy and adjust coordinates to match selected point
     const rawData = {

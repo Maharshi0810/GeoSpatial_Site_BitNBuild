@@ -52,7 +52,11 @@ try:
     from backend.api.routes_hotspot import router as hotspot_router
     app.include_router(hotspot_router, prefix="/api", tags=["Spatial"])
 except ImportError:
-    pass
+    try:
+        from api.routes_hotspot import router as hotspot_router
+        app.include_router(hotspot_router, prefix="/api", tags=["Spatial"])
+    except ImportError:
+        pass
 
 try:
     from backend.api.routes_isochrone import router as isochrone_router

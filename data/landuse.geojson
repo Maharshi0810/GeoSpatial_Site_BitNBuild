@@ -1,0 +1,271 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.5,
+              23.02
+            ],
+            [
+              72.53,
+              23.02
+            ],
+            [
+              72.53,
+              23.08
+            ],
+            [
+              72.5,
+              23.08
+            ],
+            [
+              72.5,
+              23.02
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "zone_name": "SG Highway Commercial Corridor",
+        "zone_type": "commercial",
+        "area_sq_km": 2.16,
+        "building_density": 209,
+        "max_floor_area_ratio": 2.7,
+        "permitted": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.56,
+              23.02
+            ],
+            [
+              72.59,
+              23.02
+            ],
+            [
+              72.59,
+              23.05
+            ],
+            [
+              72.56,
+              23.05
+            ],
+            [
+              72.56,
+              23.02
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "zone_name": "Ashram Road Central Business District",
+        "zone_type": "commercial",
+        "area_sq_km": 5.77,
+        "building_density": 301,
+        "max_floor_area_ratio": 3.0,
+        "permitted": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.35,
+              22.97
+            ],
+            [
+              72.42,
+              22.97
+            ],
+            [
+              72.42,
+              23.01
+            ],
+            [
+              72.35,
+              23.01
+            ],
+            [
+              72.35,
+              22.97
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "zone_name": "Sanand Industrial Cluster GIDC",
+        "zone_type": "industrial",
+        "area_sq_km": 5.26,
+        "building_density": 307,
+        "max_floor_area_ratio": 1.5,
+        "permitted": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.65,
+              23.06
+            ],
+            [
+              72.7,
+              23.06
+            ],
+            [
+              72.7,
+              23.1
+            ],
+            [
+              72.65,
+              23.1
+            ],
+            [
+              72.65,
+              23.06
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "zone_name": "Naroda GIDC Manufacturing Area",
+        "zone_type": "industrial",
+        "area_sq_km": 5.03,
+        "building_density": 158,
+        "max_floor_area_ratio": 1.4,
+        "permitted": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.45,
+              22.99
+            ],
+            [
+              72.5,
+              22.99
+            ],
+            [
+              72.5,
+              23.03
+            ],
+            [
+              72.45,
+              23.03
+            ],
+            [
+              72.45,
+              22.99
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "zone_name": "South Bopal Urban Residential Zone",
+        "zone_type": "residential",
+        "area_sq_km": 4.28,
+        "building_density": 176,
+        "max_floor_area_ratio": 2.0,
+        "permitted": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.81,
+              21.16
+            ],
+            [
+              72.85,
+              21.16
+            ],
+            [
+              72.85,
+              21.2
+            ],
+            [
+              72.81,
+              21.2
+            ],
+            [
+              72.81,
+              21.16
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "zone_name": "Surat Ring Road Commercial Area",
+        "zone_type": "commercial",
+        "area_sq_km": 3.13,
+        "building_density": 272,
+        "max_floor_area_ratio": 2.8,
+        "permitted": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.17,
+              22.25
+            ],
+            [
+              73.22,
+              22.25
+            ],
+            [
+              73.22,
+              22.29
+            ],
+            [
+              73.17,
+              22.29
+            ],
+            [
+              73.17,
+              22.25
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "zone_name": "Makarpura GIDC Industrial Corridor",
+        "zone_type": "industrial",
+        "area_sq_km": 5.28,
+        "building_density": 103,
+        "max_floor_area_ratio": 1.6,
+        "permitted": false
+      }
+    }
+  ]
+}

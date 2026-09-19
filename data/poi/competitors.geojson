@@ -1,0 +1,5005 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.34653,
+          23.60259
+        ]
+      },
+      "properties": {
+        "name": "Grocery #1",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Mehsana",
+        "rating": 4.8,
+        "footfall": 3976,
+        "revenue_index": 0.38,
+        "value": 0.603
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.3839,
+          23.59041
+        ]
+      },
+      "properties": {
+        "name": "Bank #2",
+        "type": "bank",
+        "category": "bank",
+        "city": "Mehsana",
+        "rating": 4.5,
+        "footfall": 2845,
+        "revenue_index": 0.93,
+        "value": 0.256
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.82272,
+          22.31577
+        ]
+      },
+      "properties": {
+        "name": "Grocery #3",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Rajkot",
+        "rating": 3.8,
+        "footfall": 4014,
+        "revenue_index": 0.82,
+        "value": 0.391
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.06169,
+          22.46375
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #4",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Jamnagar",
+        "rating": 3.7,
+        "footfall": 1057,
+        "revenue_index": 0.74,
+        "value": 0.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.12158,
+          21.7478
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #5",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Bhavnagar",
+        "rating": 4.5,
+        "footfall": 2026,
+        "revenue_index": 0.6,
+        "value": 0.524
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.05851,
+          22.48896
+        ]
+      },
+      "properties": {
+        "name": "Grocery #6",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Jamnagar",
+        "rating": 3.4,
+        "footfall": 329,
+        "revenue_index": 0.57,
+        "value": 0.488
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.63207,
+          23.20524
+        ]
+      },
+      "properties": {
+        "name": "Retail #7",
+        "type": "retail",
+        "category": "retail",
+        "city": "Gandhinagar",
+        "rating": 3.9,
+        "footfall": 2425,
+        "revenue_index": 0.39,
+        "value": 0.321
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.13735,
+          21.78225
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #8",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Bhavnagar",
+        "rating": 4.0,
+        "footfall": 4331,
+        "revenue_index": 0.54,
+        "value": 0.896
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.99246,
+          21.70368
+        ]
+      },
+      "properties": {
+        "name": "Retail #9",
+        "type": "retail",
+        "category": "retail",
+        "city": "Bharuch",
+        "rating": 3.3,
+        "footfall": 2982,
+        "revenue_index": 0.67,
+        "value": 0.762
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.92028,
+          22.56945
+        ]
+      },
+      "properties": {
+        "name": "Bank #10",
+        "type": "bank",
+        "category": "bank",
+        "city": "Anand",
+        "rating": 4.2,
+        "footfall": 3923,
+        "revenue_index": 0.83,
+        "value": 0.312
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.17333,
+          22.32136
+        ]
+      },
+      "properties": {
+        "name": "Grocery #11",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Vadodara",
+        "rating": 4.0,
+        "footfall": 1292,
+        "revenue_index": 0.4,
+        "value": 0.32
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.6444,
+          23.21137
+        ]
+      },
+      "properties": {
+        "name": "Grocery #12",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Gandhinagar",
+        "rating": 4.1,
+        "footfall": 3020,
+        "revenue_index": 0.63,
+        "value": 0.354
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.17269,
+          21.79466
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #13",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Bhavnagar",
+        "rating": 4.0,
+        "footfall": 3631,
+        "revenue_index": 0.42,
+        "value": 0.985
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.16878,
+          21.76506
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #14",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Bhavnagar",
+        "rating": 3.2,
+        "footfall": 3389,
+        "revenue_index": 0.86,
+        "value": 0.567
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.37367,
+          23.60197
+        ]
+      },
+      "properties": {
+        "name": "Hotel #15",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Mehsana",
+        "rating": 3.7,
+        "footfall": 1753,
+        "revenue_index": 0.68,
+        "value": 0.628
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.15332,
+          21.77581
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #16",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Bhavnagar",
+        "rating": 4.4,
+        "footfall": 3453,
+        "revenue_index": 0.59,
+        "value": 0.243
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.80046,
+          22.2883
+        ]
+      },
+      "properties": {
+        "name": "Bank #17",
+        "type": "bank",
+        "category": "bank",
+        "city": "Rajkot",
+        "rating": 3.4,
+        "footfall": 2955,
+        "revenue_index": 0.42,
+        "value": 0.219
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.77223,
+          22.29014
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #18",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Rajkot",
+        "rating": 4.1,
+        "footfall": 1861,
+        "revenue_index": 0.43,
+        "value": 0.637
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.16846,
+          21.75948
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #19",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Bhavnagar",
+        "rating": 3.6,
+        "footfall": 3714,
+        "revenue_index": 0.47,
+        "value": 0.979
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.62183,
+          23.02364
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #20",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Ahmedabad",
+        "rating": 4.5,
+        "footfall": 3744,
+        "revenue_index": 0.61,
+        "value": 0.241
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.96764,
+          21.69843
+        ]
+      },
+      "properties": {
+        "name": "Hotel #21",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Bharuch",
+        "rating": 4.7,
+        "footfall": 627,
+        "revenue_index": 0.36,
+        "value": 0.942
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.60221,
+          23.21964
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #22",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Gandhinagar",
+        "rating": 4.5,
+        "footfall": 654,
+        "revenue_index": 0.37,
+        "value": 0.896
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.35231,
+          23.57483
+        ]
+      },
+      "properties": {
+        "name": "Grocery #23",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Mehsana",
+        "rating": 4.6,
+        "footfall": 2926,
+        "revenue_index": 0.66,
+        "value": 0.258
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.91204,
+          22.56088
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #24",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Anand",
+        "rating": 3.2,
+        "footfall": 3074,
+        "revenue_index": 0.48,
+        "value": 0.837
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.82509,
+          21.21792
+        ]
+      },
+      "properties": {
+        "name": "Bank #25",
+        "type": "bank",
+        "category": "bank",
+        "city": "Surat",
+        "rating": 3.5,
+        "footfall": 1722,
+        "revenue_index": 0.62,
+        "value": 0.23
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.77226,
+          22.34017
+        ]
+      },
+      "properties": {
+        "name": "Hotel #26",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Rajkot",
+        "rating": 4.8,
+        "footfall": 4337,
+        "revenue_index": 0.88,
+        "value": 0.284
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.98969,
+          21.71837
+        ]
+      },
+      "properties": {
+        "name": "Grocery #27",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Bharuch",
+        "rating": 4.7,
+        "footfall": 4090,
+        "revenue_index": 0.89,
+        "value": 0.288
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.58728,
+          22.97905
+        ]
+      },
+      "properties": {
+        "name": "Hotel #28",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Ahmedabad",
+        "rating": 4.9,
+        "footfall": 897,
+        "revenue_index": 0.95,
+        "value": 0.522
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.16829,
+          22.30332
+        ]
+      },
+      "properties": {
+        "name": "Bank #29",
+        "type": "bank",
+        "category": "bank",
+        "city": "Vadodara",
+        "rating": 4.1,
+        "footfall": 938,
+        "revenue_index": 0.53,
+        "value": 0.388
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.04272,
+          22.46139
+        ]
+      },
+      "properties": {
+        "name": "Hotel #30",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Jamnagar",
+        "rating": 4.7,
+        "footfall": 2874,
+        "revenue_index": 0.77,
+        "value": 0.392
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.0458,
+          22.48541
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #31",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Jamnagar",
+        "rating": 3.9,
+        "footfall": 1495,
+        "revenue_index": 0.65,
+        "value": 0.59
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.77767,
+          22.32928
+        ]
+      },
+      "properties": {
+        "name": "Hotel #32",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Rajkot",
+        "rating": 4.7,
+        "footfall": 2846,
+        "revenue_index": 0.82,
+        "value": 0.379
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.01909,
+          21.7032
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #33",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Bharuch",
+        "rating": 3.4,
+        "footfall": 3175,
+        "revenue_index": 0.81,
+        "value": 0.921
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.90806,
+          22.54324
+        ]
+      },
+      "properties": {
+        "name": "Hotel #34",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Anand",
+        "rating": 4.9,
+        "footfall": 3863,
+        "revenue_index": 0.75,
+        "value": 0.273
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.62964,
+          22.97132
+        ]
+      },
+      "properties": {
+        "name": "Retail #35",
+        "type": "retail",
+        "category": "retail",
+        "city": "Ahmedabad",
+        "rating": 4.6,
+        "footfall": 3298,
+        "revenue_index": 0.38,
+        "value": 0.245
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.60093,
+          22.9936
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #36",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Ahmedabad",
+        "rating": 4.6,
+        "footfall": 1676,
+        "revenue_index": 0.6,
+        "value": 0.729
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.95911,
+          22.56104
+        ]
+      },
+      "properties": {
+        "name": "Bank #37",
+        "type": "bank",
+        "category": "bank",
+        "city": "Anand",
+        "rating": 3.6,
+        "footfall": 2480,
+        "revenue_index": 0.86,
+        "value": 0.31
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.17838,
+          22.28186
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #38",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Vadodara",
+        "rating": 3.9,
+        "footfall": 4455,
+        "revenue_index": 0.38,
+        "value": 0.624
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.52822,
+          23.02304
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #39",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Ahmedabad",
+        "rating": 4.3,
+        "footfall": 2516,
+        "revenue_index": 0.43,
+        "value": 0.955
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.76515,
+          22.3089
+        ]
+      },
+      "properties": {
+        "name": "Bank #40",
+        "type": "bank",
+        "category": "bank",
+        "city": "Rajkot",
+        "rating": 3.3,
+        "footfall": 979,
+        "revenue_index": 0.72,
+        "value": 0.585
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.00404,
+          21.72377
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #41",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Bharuch",
+        "rating": 4.6,
+        "footfall": 3281,
+        "revenue_index": 0.45,
+        "value": 0.261
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.77077,
+          22.32998
+        ]
+      },
+      "properties": {
+        "name": "Bank #42",
+        "type": "bank",
+        "category": "bank",
+        "city": "Rajkot",
+        "rating": 4.1,
+        "footfall": 3568,
+        "revenue_index": 0.79,
+        "value": 0.81
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.62642,
+          22.97197
+        ]
+      },
+      "properties": {
+        "name": "Retail #43",
+        "type": "retail",
+        "category": "retail",
+        "city": "Ahmedabad",
+        "rating": 3.2,
+        "footfall": 2241,
+        "revenue_index": 0.84,
+        "value": 0.327
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.17347,
+          22.28991
+        ]
+      },
+      "properties": {
+        "name": "Grocery #44",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Vadodara",
+        "rating": 4.2,
+        "footfall": 2169,
+        "revenue_index": 0.68,
+        "value": 0.785
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.84141,
+          21.1738
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #45",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Surat",
+        "rating": 4.6,
+        "footfall": 1127,
+        "revenue_index": 0.71,
+        "value": 0.586
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.64906,
+          23.22053
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #46",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Gandhinagar",
+        "rating": 3.9,
+        "footfall": 637,
+        "revenue_index": 0.45,
+        "value": 0.845
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.8231,
+          21.1542
+        ]
+      },
+      "properties": {
+        "name": "Retail #47",
+        "type": "retail",
+        "category": "retail",
+        "city": "Surat",
+        "rating": 3.2,
+        "footfall": 2788,
+        "revenue_index": 0.37,
+        "value": 0.414
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.17951,
+          22.35083
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #48",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Vadodara",
+        "rating": 3.6,
+        "footfall": 1775,
+        "revenue_index": 0.54,
+        "value": 0.818
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.39435,
+          23.57453
+        ]
+      },
+      "properties": {
+        "name": "Hotel #49",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Mehsana",
+        "rating": 4.4,
+        "footfall": 2764,
+        "revenue_index": 0.49,
+        "value": 0.441
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.63495,
+          23.19818
+        ]
+      },
+      "properties": {
+        "name": "Hotel #50",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Gandhinagar",
+        "rating": 3.5,
+        "footfall": 1342,
+        "revenue_index": 0.78,
+        "value": 0.209
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.82076,
+          21.11548
+        ]
+      },
+      "properties": {
+        "name": "Hotel #51",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Surat",
+        "rating": 4.7,
+        "footfall": 2204,
+        "revenue_index": 0.48,
+        "value": 0.595
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.37871,
+          23.59023
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #52",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Mehsana",
+        "rating": 4.7,
+        "footfall": 3397,
+        "revenue_index": 0.88,
+        "value": 0.209
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.16222,
+          22.28806
+        ]
+      },
+      "properties": {
+        "name": "Bank #53",
+        "type": "bank",
+        "category": "bank",
+        "city": "Vadodara",
+        "rating": 3.9,
+        "footfall": 3051,
+        "revenue_index": 0.72,
+        "value": 0.75
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.77491,
+          22.31018
+        ]
+      },
+      "properties": {
+        "name": "Bank #54",
+        "type": "bank",
+        "category": "bank",
+        "city": "Rajkot",
+        "rating": 4.6,
+        "footfall": 153,
+        "revenue_index": 0.45,
+        "value": 0.243
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.15177,
+          21.78522
+        ]
+      },
+      "properties": {
+        "name": "Hotel #55",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Bhavnagar",
+        "rating": 4.7,
+        "footfall": 4478,
+        "revenue_index": 0.64,
+        "value": 0.32
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.17145,
+          21.77409
+        ]
+      },
+      "properties": {
+        "name": "Hotel #56",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Bhavnagar",
+        "rating": 4.7,
+        "footfall": 2082,
+        "revenue_index": 0.54,
+        "value": 0.553
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.84649,
+          21.144
+        ]
+      },
+      "properties": {
+        "name": "Bank #57",
+        "type": "bank",
+        "category": "bank",
+        "city": "Surat",
+        "rating": 4.8,
+        "footfall": 2999,
+        "revenue_index": 0.64,
+        "value": 0.841
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.16669,
+          21.75483
+        ]
+      },
+      "properties": {
+        "name": "Retail #58",
+        "type": "retail",
+        "category": "retail",
+        "city": "Bhavnagar",
+        "rating": 3.3,
+        "footfall": 3986,
+        "revenue_index": 0.58,
+        "value": 0.378
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.82656,
+          22.31551
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #59",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Rajkot",
+        "rating": 4.1,
+        "footfall": 2486,
+        "revenue_index": 0.51,
+        "value": 0.892
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.81969,
+          21.18218
+        ]
+      },
+      "properties": {
+        "name": "Bank #60",
+        "type": "bank",
+        "category": "bank",
+        "city": "Surat",
+        "rating": 4.2,
+        "footfall": 1653,
+        "revenue_index": 0.72,
+        "value": 0.736
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.38893,
+          23.58426
+        ]
+      },
+      "properties": {
+        "name": "Bank #61",
+        "type": "bank",
+        "category": "bank",
+        "city": "Mehsana",
+        "rating": 3.4,
+        "footfall": 4316,
+        "revenue_index": 0.66,
+        "value": 0.914
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.05762,
+          22.47622
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #62",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Jamnagar",
+        "rating": 4.9,
+        "footfall": 1752,
+        "revenue_index": 0.49,
+        "value": 0.465
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.1975,
+          22.33704
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #63",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Vadodara",
+        "rating": 3.3,
+        "footfall": 2389,
+        "revenue_index": 0.44,
+        "value": 0.214
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.81008,
+          22.3043
+        ]
+      },
+      "properties": {
+        "name": "Retail #64",
+        "type": "retail",
+        "category": "retail",
+        "city": "Rajkot",
+        "rating": 3.7,
+        "footfall": 3417,
+        "revenue_index": 0.4,
+        "value": 0.474
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.87057,
+          21.11897
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #65",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Surat",
+        "rating": 4.4,
+        "footfall": 2898,
+        "revenue_index": 0.79,
+        "value": 0.256
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.86946,
+          21.16813
+        ]
+      },
+      "properties": {
+        "name": "Hotel #66",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Surat",
+        "rating": 4.4,
+        "footfall": 3580,
+        "revenue_index": 0.47,
+        "value": 0.216
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.93639,
+          22.56892
+        ]
+      },
+      "properties": {
+        "name": "Hotel #67",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Anand",
+        "rating": 3.5,
+        "footfall": 4457,
+        "revenue_index": 0.71,
+        "value": 0.351
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.02551,
+          22.48367
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #68",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Jamnagar",
+        "rating": 3.3,
+        "footfall": 1463,
+        "revenue_index": 0.87,
+        "value": 0.469
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.19003,
+          22.32082
+        ]
+      },
+      "properties": {
+        "name": "Bank #69",
+        "type": "bank",
+        "category": "bank",
+        "city": "Vadodara",
+        "rating": 4.2,
+        "footfall": 2429,
+        "revenue_index": 0.37,
+        "value": 0.949
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.20762,
+          22.28956
+        ]
+      },
+      "properties": {
+        "name": "Bank #70",
+        "type": "bank",
+        "category": "bank",
+        "city": "Vadodara",
+        "rating": 3.3,
+        "footfall": 414,
+        "revenue_index": 0.75,
+        "value": 0.537
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.96804,
+          21.70058
+        ]
+      },
+      "properties": {
+        "name": "Grocery #71",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Bharuch",
+        "rating": 3.5,
+        "footfall": 1741,
+        "revenue_index": 0.64,
+        "value": 0.784
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.19206,
+          22.28796
+        ]
+      },
+      "properties": {
+        "name": "Hotel #72",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Vadodara",
+        "rating": 4.1,
+        "footfall": 2859,
+        "revenue_index": 0.83,
+        "value": 0.89
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.82847,
+          21.14194
+        ]
+      },
+      "properties": {
+        "name": "Grocery #73",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Surat",
+        "rating": 4.3,
+        "footfall": 1443,
+        "revenue_index": 0.76,
+        "value": 0.403
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.36232,
+          23.5683
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #74",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Mehsana",
+        "rating": 3.4,
+        "footfall": 3843,
+        "revenue_index": 0.46,
+        "value": 0.36
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.81835,
+          22.34469
+        ]
+      },
+      "properties": {
+        "name": "Bank #75",
+        "type": "bank",
+        "category": "bank",
+        "city": "Rajkot",
+        "rating": 4.3,
+        "footfall": 201,
+        "revenue_index": 0.43,
+        "value": 0.363
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.80365,
+          22.29171
+        ]
+      },
+      "properties": {
+        "name": "Bank #76",
+        "type": "bank",
+        "category": "bank",
+        "city": "Rajkot",
+        "rating": 3.6,
+        "footfall": 2186,
+        "revenue_index": 0.65,
+        "value": 0.646
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.80031,
+          21.24799
+        ]
+      },
+      "properties": {
+        "name": "Bank #77",
+        "type": "bank",
+        "category": "bank",
+        "city": "Surat",
+        "rating": 4.6,
+        "footfall": 684,
+        "revenue_index": 0.5,
+        "value": 0.435
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.54685,
+          22.99377
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #78",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Ahmedabad",
+        "rating": 4.8,
+        "footfall": 758,
+        "revenue_index": 0.83,
+        "value": 0.876
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.81869,
+          21.1673
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #79",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Surat",
+        "rating": 4.8,
+        "footfall": 3394,
+        "revenue_index": 0.9,
+        "value": 0.865
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.52165,
+          22.97779
+        ]
+      },
+      "properties": {
+        "name": "Bank #80",
+        "type": "bank",
+        "category": "bank",
+        "city": "Ahmedabad",
+        "rating": 3.4,
+        "footfall": 1053,
+        "revenue_index": 0.65,
+        "value": 0.714
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.80528,
+          21.17436
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #81",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Surat",
+        "rating": 4.4,
+        "footfall": 3751,
+        "revenue_index": 0.7,
+        "value": 0.779
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.81516,
+          22.29817
+        ]
+      },
+      "properties": {
+        "name": "Bank #82",
+        "type": "bank",
+        "category": "bank",
+        "city": "Rajkot",
+        "rating": 4.0,
+        "footfall": 2207,
+        "revenue_index": 0.75,
+        "value": 0.638
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.83812,
+          22.31568
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #83",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Rajkot",
+        "rating": 4.0,
+        "footfall": 2830,
+        "revenue_index": 0.68,
+        "value": 0.635
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.75676,
+          21.1985
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #84",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Surat",
+        "rating": 3.7,
+        "footfall": 3602,
+        "revenue_index": 0.5,
+        "value": 0.473
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.34294,
+          23.57766
+        ]
+      },
+      "properties": {
+        "name": "Grocery #85",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Mehsana",
+        "rating": 3.5,
+        "footfall": 2049,
+        "revenue_index": 0.41,
+        "value": 0.804
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.97707,
+          21.69854
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #86",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Bharuch",
+        "rating": 3.5,
+        "footfall": 2893,
+        "revenue_index": 0.5,
+        "value": 0.814
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.58114,
+          23.094
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #87",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Ahmedabad",
+        "rating": 4.8,
+        "footfall": 3621,
+        "revenue_index": 0.66,
+        "value": 0.287
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.19038,
+          22.27237
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #88",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Vadodara",
+        "rating": 4.3,
+        "footfall": 3384,
+        "revenue_index": 0.83,
+        "value": 0.747
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.63381,
+          23.22311
+        ]
+      },
+      "properties": {
+        "name": "Retail #89",
+        "type": "retail",
+        "category": "retail",
+        "city": "Gandhinagar",
+        "rating": 4.6,
+        "footfall": 1244,
+        "revenue_index": 0.69,
+        "value": 0.982
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.61112,
+          23.03925
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #90",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Ahmedabad",
+        "rating": 4.9,
+        "footfall": 3117,
+        "revenue_index": 0.51,
+        "value": 0.412
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.93655,
+          22.58016
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #91",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Anand",
+        "rating": 4.8,
+        "footfall": 3523,
+        "revenue_index": 0.44,
+        "value": 0.965
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.62636,
+          23.18251
+        ]
+      },
+      "properties": {
+        "name": "Bank #92",
+        "type": "bank",
+        "category": "bank",
+        "city": "Gandhinagar",
+        "rating": 4.2,
+        "footfall": 2943,
+        "revenue_index": 0.76,
+        "value": 0.988
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.0515,
+          22.49253
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #93",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Jamnagar",
+        "rating": 4.7,
+        "footfall": 3152,
+        "revenue_index": 0.87,
+        "value": 0.607
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.83631,
+          21.19936
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #94",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Surat",
+        "rating": 4.8,
+        "footfall": 3176,
+        "revenue_index": 0.77,
+        "value": 0.684
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.90538,
+          22.56009
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #95",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Anand",
+        "rating": 4.4,
+        "footfall": 1151,
+        "revenue_index": 0.53,
+        "value": 0.691
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.98821,
+          21.68673
+        ]
+      },
+      "properties": {
+        "name": "Grocery #96",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Bharuch",
+        "rating": 4.1,
+        "footfall": 4045,
+        "revenue_index": 0.94,
+        "value": 0.445
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.97987,
+          21.7152
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #97",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Bharuch",
+        "rating": 3.3,
+        "footfall": 3218,
+        "revenue_index": 0.54,
+        "value": 0.786
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.75033,
+          22.30393
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #98",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Rajkot",
+        "rating": 4.7,
+        "footfall": 2344,
+        "revenue_index": 0.54,
+        "value": 0.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.99031,
+          21.7279
+        ]
+      },
+      "properties": {
+        "name": "Hotel #99",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Bharuch",
+        "rating": 3.3,
+        "footfall": 3150,
+        "revenue_index": 0.67,
+        "value": 0.501
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.1919,
+          22.28838
+        ]
+      },
+      "properties": {
+        "name": "Grocery #100",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Vadodara",
+        "rating": 4.1,
+        "footfall": 3372,
+        "revenue_index": 0.65,
+        "value": 0.587
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.3503,
+          23.58427
+        ]
+      },
+      "properties": {
+        "name": "Retail #101",
+        "type": "retail",
+        "category": "retail",
+        "city": "Mehsana",
+        "rating": 4.8,
+        "footfall": 1106,
+        "revenue_index": 0.35,
+        "value": 0.929
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.80468,
+          22.2852
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #102",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Rajkot",
+        "rating": 3.3,
+        "footfall": 1972,
+        "revenue_index": 0.38,
+        "value": 0.705
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.94913,
+          22.56425
+        ]
+      },
+      "properties": {
+        "name": "Hotel #103",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Anand",
+        "rating": 3.9,
+        "footfall": 3098,
+        "revenue_index": 0.37,
+        "value": 0.658
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.57444,
+          22.95172
+        ]
+      },
+      "properties": {
+        "name": "Retail #104",
+        "type": "retail",
+        "category": "retail",
+        "city": "Ahmedabad",
+        "rating": 4.6,
+        "footfall": 4070,
+        "revenue_index": 0.59,
+        "value": 0.809
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.17471,
+          22.30106
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #105",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Vadodara",
+        "rating": 4.9,
+        "footfall": 1543,
+        "revenue_index": 0.42,
+        "value": 0.327
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.63643,
+          23.18059
+        ]
+      },
+      "properties": {
+        "name": "Hotel #106",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Gandhinagar",
+        "rating": 4.6,
+        "footfall": 2579,
+        "revenue_index": 0.6,
+        "value": 0.387
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.85385,
+          21.1365
+        ]
+      },
+      "properties": {
+        "name": "Grocery #107",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Surat",
+        "rating": 4.3,
+        "footfall": 4072,
+        "revenue_index": 0.62,
+        "value": 0.495
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.63302,
+          23.20448
+        ]
+      },
+      "properties": {
+        "name": "Bank #108",
+        "type": "bank",
+        "category": "bank",
+        "city": "Gandhinagar",
+        "rating": 4.8,
+        "footfall": 2439,
+        "revenue_index": 0.56,
+        "value": 0.704
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.01618,
+          21.70383
+        ]
+      },
+      "properties": {
+        "name": "Hotel #109",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Bharuch",
+        "rating": 4.1,
+        "footfall": 1731,
+        "revenue_index": 0.6,
+        "value": 0.528
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.83302,
+          21.16506
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #110",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Surat",
+        "rating": 4.6,
+        "footfall": 3801,
+        "revenue_index": 0.55,
+        "value": 0.968
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.63934,
+          23.22874
+        ]
+      },
+      "properties": {
+        "name": "Grocery #111",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Gandhinagar",
+        "rating": 4.9,
+        "footfall": 1801,
+        "revenue_index": 0.48,
+        "value": 0.843
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.91586,
+          22.54691
+        ]
+      },
+      "properties": {
+        "name": "Bank #112",
+        "type": "bank",
+        "category": "bank",
+        "city": "Anand",
+        "rating": 3.6,
+        "footfall": 713,
+        "revenue_index": 0.89,
+        "value": 0.601
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.90585,
+          22.56089
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #113",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Anand",
+        "rating": 4.3,
+        "footfall": 1462,
+        "revenue_index": 0.45,
+        "value": 0.238
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.57103,
+          22.99369
+        ]
+      },
+      "properties": {
+        "name": "Hotel #114",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Ahmedabad",
+        "rating": 3.4,
+        "footfall": 1328,
+        "revenue_index": 0.57,
+        "value": 0.667
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.21877,
+          22.31388
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #115",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Vadodara",
+        "rating": 3.9,
+        "footfall": 1058,
+        "revenue_index": 0.91,
+        "value": 0.967
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.63047,
+          23.23935
+        ]
+      },
+      "properties": {
+        "name": "Hotel #116",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Gandhinagar",
+        "rating": 4.1,
+        "footfall": 3637,
+        "revenue_index": 0.62,
+        "value": 0.866
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.91512,
+          22.58649
+        ]
+      },
+      "properties": {
+        "name": "Bank #117",
+        "type": "bank",
+        "category": "bank",
+        "city": "Anand",
+        "rating": 4.5,
+        "footfall": 925,
+        "revenue_index": 0.69,
+        "value": 0.558
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.14532,
+          21.77612
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #118",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Bhavnagar",
+        "rating": 3.4,
+        "footfall": 3320,
+        "revenue_index": 0.52,
+        "value": 0.677
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.38343,
+          23.60473
+        ]
+      },
+      "properties": {
+        "name": "Retail #119",
+        "type": "retail",
+        "category": "retail",
+        "city": "Mehsana",
+        "rating": 4.4,
+        "footfall": 908,
+        "revenue_index": 0.8,
+        "value": 0.818
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.03346,
+          22.48131
+        ]
+      },
+      "properties": {
+        "name": "Bank #120",
+        "type": "bank",
+        "category": "bank",
+        "city": "Jamnagar",
+        "rating": 3.3,
+        "footfall": 801,
+        "revenue_index": 0.94,
+        "value": 0.864
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.13286,
+          21.77061
+        ]
+      },
+      "properties": {
+        "name": "Hotel #121",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Bhavnagar",
+        "rating": 3.4,
+        "footfall": 2891,
+        "revenue_index": 0.68,
+        "value": 0.775
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.07111,
+          22.47648
+        ]
+      },
+      "properties": {
+        "name": "Hotel #122",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Jamnagar",
+        "rating": 3.3,
+        "footfall": 4319,
+        "revenue_index": 0.77,
+        "value": 0.61
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.14674,
+          22.30822
+        ]
+      },
+      "properties": {
+        "name": "Grocery #123",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Vadodara",
+        "rating": 4.3,
+        "footfall": 2178,
+        "revenue_index": 0.52,
+        "value": 0.483
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.81008,
+          21.17357
+        ]
+      },
+      "properties": {
+        "name": "Retail #124",
+        "type": "retail",
+        "category": "retail",
+        "city": "Surat",
+        "rating": 4.2,
+        "footfall": 3330,
+        "revenue_index": 0.36,
+        "value": 0.409
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.81112,
+          22.31075
+        ]
+      },
+      "properties": {
+        "name": "Bank #125",
+        "type": "bank",
+        "category": "bank",
+        "city": "Rajkot",
+        "rating": 4.0,
+        "footfall": 4286,
+        "revenue_index": 0.58,
+        "value": 0.648
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.65502,
+          23.21832
+        ]
+      },
+      "properties": {
+        "name": "Hotel #126",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Gandhinagar",
+        "rating": 3.3,
+        "footfall": 2891,
+        "revenue_index": 0.91,
+        "value": 0.561
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.38312,
+          23.57117
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #127",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Mehsana",
+        "rating": 3.8,
+        "footfall": 4321,
+        "revenue_index": 0.8,
+        "value": 0.249
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.85648,
+          21.11646
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #128",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Surat",
+        "rating": 3.2,
+        "footfall": 2556,
+        "revenue_index": 0.51,
+        "value": 0.686
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.13876,
+          21.7697
+        ]
+      },
+      "properties": {
+        "name": "Grocery #129",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Bhavnagar",
+        "rating": 4.5,
+        "footfall": 2739,
+        "revenue_index": 0.55,
+        "value": 0.887
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.62886,
+          22.98344
+        ]
+      },
+      "properties": {
+        "name": "Bank #130",
+        "type": "bank",
+        "category": "bank",
+        "city": "Ahmedabad",
+        "rating": 4.8,
+        "footfall": 3620,
+        "revenue_index": 0.75,
+        "value": 0.383
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.15392,
+          21.78064
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #131",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Bhavnagar",
+        "rating": 4.0,
+        "footfall": 1276,
+        "revenue_index": 0.42,
+        "value": 0.513
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.07973,
+          22.46476
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #132",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Jamnagar",
+        "rating": 4.0,
+        "footfall": 4087,
+        "revenue_index": 0.42,
+        "value": 0.27
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.999,
+          21.71116
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #133",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Bharuch",
+        "rating": 3.6,
+        "footfall": 295,
+        "revenue_index": 0.46,
+        "value": 0.62
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.80484,
+          21.15771
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #134",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Surat",
+        "rating": 4.0,
+        "footfall": 1815,
+        "revenue_index": 0.81,
+        "value": 0.751
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.64654,
+          23.21048
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #135",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Gandhinagar",
+        "rating": 4.6,
+        "footfall": 4399,
+        "revenue_index": 0.53,
+        "value": 0.773
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.04224,
+          22.48939
+        ]
+      },
+      "properties": {
+        "name": "Retail #136",
+        "type": "retail",
+        "category": "retail",
+        "city": "Jamnagar",
+        "rating": 4.6,
+        "footfall": 1279,
+        "revenue_index": 0.52,
+        "value": 0.839
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.17123,
+          21.73772
+        ]
+      },
+      "properties": {
+        "name": "Hotel #137",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Bhavnagar",
+        "rating": 3.5,
+        "footfall": 3533,
+        "revenue_index": 0.55,
+        "value": 0.714
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.01579,
+          21.70185
+        ]
+      },
+      "properties": {
+        "name": "Bank #138",
+        "type": "bank",
+        "category": "bank",
+        "city": "Bharuch",
+        "rating": 4.8,
+        "footfall": 4334,
+        "revenue_index": 0.66,
+        "value": 0.961
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.15561,
+          21.76717
+        ]
+      },
+      "properties": {
+        "name": "Retail #139",
+        "type": "retail",
+        "category": "retail",
+        "city": "Bhavnagar",
+        "rating": 3.6,
+        "footfall": 2470,
+        "revenue_index": 0.65,
+        "value": 0.824
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.98992,
+          21.72033
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #140",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Bharuch",
+        "rating": 4.4,
+        "footfall": 3064,
+        "revenue_index": 0.8,
+        "value": 0.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.7875,
+          22.27717
+        ]
+      },
+      "properties": {
+        "name": "Bank #141",
+        "type": "bank",
+        "category": "bank",
+        "city": "Rajkot",
+        "rating": 4.5,
+        "footfall": 4077,
+        "revenue_index": 0.37,
+        "value": 0.894
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.20386,
+          22.29667
+        ]
+      },
+      "properties": {
+        "name": "Retail #142",
+        "type": "retail",
+        "category": "retail",
+        "city": "Vadodara",
+        "rating": 3.8,
+        "footfall": 746,
+        "revenue_index": 0.4,
+        "value": 0.546
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.56121,
+          22.99949
+        ]
+      },
+      "properties": {
+        "name": "Hotel #143",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Ahmedabad",
+        "rating": 4.4,
+        "footfall": 3461,
+        "revenue_index": 0.76,
+        "value": 0.924
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.81349,
+          21.17006
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #144",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Surat",
+        "rating": 4.0,
+        "footfall": 743,
+        "revenue_index": 0.47,
+        "value": 0.781
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.90422,
+          22.56008
+        ]
+      },
+      "properties": {
+        "name": "Retail #145",
+        "type": "retail",
+        "category": "retail",
+        "city": "Anand",
+        "rating": 3.8,
+        "footfall": 3105,
+        "revenue_index": 0.62,
+        "value": 0.616
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.16237,
+          21.78102
+        ]
+      },
+      "properties": {
+        "name": "Retail #146",
+        "type": "retail",
+        "category": "retail",
+        "city": "Bhavnagar",
+        "rating": 4.0,
+        "footfall": 3013,
+        "revenue_index": 0.79,
+        "value": 0.912
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.15745,
+          22.30351
+        ]
+      },
+      "properties": {
+        "name": "Retail #147",
+        "type": "retail",
+        "category": "retail",
+        "city": "Vadodara",
+        "rating": 4.2,
+        "footfall": 1684,
+        "revenue_index": 0.47,
+        "value": 0.682
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.80864,
+          22.28171
+        ]
+      },
+      "properties": {
+        "name": "Hotel #148",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Rajkot",
+        "rating": 4.8,
+        "footfall": 651,
+        "revenue_index": 0.85,
+        "value": 0.932
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.07411,
+          22.46109
+        ]
+      },
+      "properties": {
+        "name": "Grocery #149",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Jamnagar",
+        "rating": 4.5,
+        "footfall": 903,
+        "revenue_index": 0.56,
+        "value": 0.526
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.14863,
+          21.77613
+        ]
+      },
+      "properties": {
+        "name": "Hotel #150",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Bhavnagar",
+        "rating": 4.1,
+        "footfall": 4380,
+        "revenue_index": 0.78,
+        "value": 0.519
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.36172,
+          23.60077
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #151",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Mehsana",
+        "rating": 4.3,
+        "footfall": 173,
+        "revenue_index": 0.87,
+        "value": 0.294
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.15001,
+          21.77207
+        ]
+      },
+      "properties": {
+        "name": "Hotel #152",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Bhavnagar",
+        "rating": 4.3,
+        "footfall": 2702,
+        "revenue_index": 0.44,
+        "value": 0.41
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.37316,
+          23.5929
+        ]
+      },
+      "properties": {
+        "name": "Hotel #153",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Mehsana",
+        "rating": 4.4,
+        "footfall": 3229,
+        "revenue_index": 0.75,
+        "value": 0.901
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.63669,
+          23.22558
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #154",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Gandhinagar",
+        "rating": 4.8,
+        "footfall": 537,
+        "revenue_index": 0.57,
+        "value": 0.807
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.01656,
+          21.71811
+        ]
+      },
+      "properties": {
+        "name": "Grocery #155",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Bharuch",
+        "rating": 3.9,
+        "footfall": 1032,
+        "revenue_index": 0.81,
+        "value": 0.522
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.98084,
+          21.69569
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #156",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Bharuch",
+        "rating": 3.7,
+        "footfall": 2018,
+        "revenue_index": 0.65,
+        "value": 0.665
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.38166,
+          23.58719
+        ]
+      },
+      "properties": {
+        "name": "Bank #157",
+        "type": "bank",
+        "category": "bank",
+        "city": "Mehsana",
+        "rating": 3.9,
+        "footfall": 469,
+        "revenue_index": 0.66,
+        "value": 0.465
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.65181,
+          23.23594
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #158",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Gandhinagar",
+        "rating": 4.7,
+        "footfall": 4264,
+        "revenue_index": 0.38,
+        "value": 0.84
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.15993,
+          22.29781
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #159",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Vadodara",
+        "rating": 4.4,
+        "footfall": 3330,
+        "revenue_index": 0.51,
+        "value": 0.501
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.79743,
+          22.34263
+        ]
+      },
+      "properties": {
+        "name": "Hotel #160",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Rajkot",
+        "rating": 3.6,
+        "footfall": 2644,
+        "revenue_index": 0.63,
+        "value": 0.38
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.78261,
+          22.31737
+        ]
+      },
+      "properties": {
+        "name": "Hotel #161",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Rajkot",
+        "rating": 4.0,
+        "footfall": 2976,
+        "revenue_index": 0.92,
+        "value": 0.588
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.14468,
+          22.34057
+        ]
+      },
+      "properties": {
+        "name": "Bank #162",
+        "type": "bank",
+        "category": "bank",
+        "city": "Vadodara",
+        "rating": 3.9,
+        "footfall": 1088,
+        "revenue_index": 0.95,
+        "value": 0.974
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.8384,
+          21.14689
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #163",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Surat",
+        "rating": 4.8,
+        "footfall": 3493,
+        "revenue_index": 0.52,
+        "value": 0.329
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.59263,
+          23.00134
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #164",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Ahmedabad",
+        "rating": 4.5,
+        "footfall": 3480,
+        "revenue_index": 0.83,
+        "value": 0.392
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.87914,
+          21.17158
+        ]
+      },
+      "properties": {
+        "name": "Grocery #165",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Surat",
+        "rating": 3.4,
+        "footfall": 4241,
+        "revenue_index": 0.51,
+        "value": 0.341
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.05458,
+          22.45606
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #166",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Jamnagar",
+        "rating": 4.6,
+        "footfall": 2626,
+        "revenue_index": 0.5,
+        "value": 0.962
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.81695,
+          21.15866
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #167",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Surat",
+        "rating": 4.2,
+        "footfall": 2300,
+        "revenue_index": 0.7,
+        "value": 0.658
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.5809,
+          23.00975
+        ]
+      },
+      "properties": {
+        "name": "Retail #168",
+        "type": "retail",
+        "category": "retail",
+        "city": "Ahmedabad",
+        "rating": 4.8,
+        "footfall": 2020,
+        "revenue_index": 0.72,
+        "value": 0.872
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.36422,
+          23.58431
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #169",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Mehsana",
+        "rating": 4.1,
+        "footfall": 2569,
+        "revenue_index": 0.49,
+        "value": 0.263
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.18734,
+          22.29581
+        ]
+      },
+      "properties": {
+        "name": "Grocery #170",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Vadodara",
+        "rating": 3.8,
+        "footfall": 252,
+        "revenue_index": 0.76,
+        "value": 0.865
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.16669,
+          21.78006
+        ]
+      },
+      "properties": {
+        "name": "Bank #171",
+        "type": "bank",
+        "category": "bank",
+        "city": "Bhavnagar",
+        "rating": 4.2,
+        "footfall": 4229,
+        "revenue_index": 0.38,
+        "value": 0.806
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.9784,
+          21.70533
+        ]
+      },
+      "properties": {
+        "name": "Retail #172",
+        "type": "retail",
+        "category": "retail",
+        "city": "Bharuch",
+        "rating": 3.9,
+        "footfall": 3951,
+        "revenue_index": 0.63,
+        "value": 0.603
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.15044,
+          21.78996
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #173",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Bhavnagar",
+        "rating": 3.7,
+        "footfall": 3246,
+        "revenue_index": 0.56,
+        "value": 0.52
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.17625,
+          22.29639
+        ]
+      },
+      "properties": {
+        "name": "Hotel #174",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Vadodara",
+        "rating": 3.5,
+        "footfall": 2304,
+        "revenue_index": 0.53,
+        "value": 0.274
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.36584,
+          23.60322
+        ]
+      },
+      "properties": {
+        "name": "Bank #175",
+        "type": "bank",
+        "category": "bank",
+        "city": "Mehsana",
+        "rating": 4.1,
+        "footfall": 953,
+        "revenue_index": 0.45,
+        "value": 0.826
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.3845,
+          23.58861
+        ]
+      },
+      "properties": {
+        "name": "Bank #176",
+        "type": "bank",
+        "category": "bank",
+        "city": "Mehsana",
+        "rating": 3.3,
+        "footfall": 3554,
+        "revenue_index": 0.47,
+        "value": 0.593
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.08653,
+          22.48198
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #177",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Jamnagar",
+        "rating": 3.7,
+        "footfall": 3470,
+        "revenue_index": 0.78,
+        "value": 0.53
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.37609,
+          23.57257
+        ]
+      },
+      "properties": {
+        "name": "Bank #178",
+        "type": "bank",
+        "category": "bank",
+        "city": "Mehsana",
+        "rating": 4.8,
+        "footfall": 3677,
+        "revenue_index": 0.62,
+        "value": 0.371
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.17637,
+          22.32153
+        ]
+      },
+      "properties": {
+        "name": "Retail #179",
+        "type": "retail",
+        "category": "retail",
+        "city": "Vadodara",
+        "rating": 3.3,
+        "footfall": 1020,
+        "revenue_index": 0.42,
+        "value": 0.718
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.03623,
+          22.46927
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #180",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Jamnagar",
+        "rating": 4.3,
+        "footfall": 4462,
+        "revenue_index": 0.35,
+        "value": 0.306
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.13617,
+          21.76371
+        ]
+      },
+      "properties": {
+        "name": "Retail #181",
+        "type": "retail",
+        "category": "retail",
+        "city": "Bhavnagar",
+        "rating": 3.9,
+        "footfall": 2951,
+        "revenue_index": 0.5,
+        "value": 0.437
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.94252,
+          22.57457
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #182",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Anand",
+        "rating": 3.3,
+        "footfall": 2035,
+        "revenue_index": 0.83,
+        "value": 0.845
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.91371,
+          22.5535
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #183",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Anand",
+        "rating": 4.4,
+        "footfall": 443,
+        "revenue_index": 0.94,
+        "value": 0.496
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.1613,
+          22.30447
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #184",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Vadodara",
+        "rating": 4.1,
+        "footfall": 813,
+        "revenue_index": 0.64,
+        "value": 0.38
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.55472,
+          22.99464
+        ]
+      },
+      "properties": {
+        "name": "Hotel #185",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Ahmedabad",
+        "rating": 4.0,
+        "footfall": 2524,
+        "revenue_index": 0.61,
+        "value": 0.468
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.78876,
+          22.31422
+        ]
+      },
+      "properties": {
+        "name": "Hotel #186",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Rajkot",
+        "rating": 3.5,
+        "footfall": 281,
+        "revenue_index": 0.5,
+        "value": 0.716
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.85683,
+          21.15303
+        ]
+      },
+      "properties": {
+        "name": "Hotel #187",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Surat",
+        "rating": 3.9,
+        "footfall": 1443,
+        "revenue_index": 0.44,
+        "value": 0.819
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.84474,
+          21.15303
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #188",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Surat",
+        "rating": 3.7,
+        "footfall": 424,
+        "revenue_index": 0.44,
+        "value": 0.523
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.15635,
+          22.31386
+        ]
+      },
+      "properties": {
+        "name": "Hotel #189",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Vadodara",
+        "rating": 4.0,
+        "footfall": 596,
+        "revenue_index": 0.61,
+        "value": 0.521
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.15475,
+          21.78443
+        ]
+      },
+      "properties": {
+        "name": "Bank #190",
+        "type": "bank",
+        "category": "bank",
+        "city": "Bhavnagar",
+        "rating": 4.8,
+        "footfall": 2464,
+        "revenue_index": 0.58,
+        "value": 0.544
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.97276,
+          21.69752
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #191",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Bharuch",
+        "rating": 3.3,
+        "footfall": 1442,
+        "revenue_index": 0.68,
+        "value": 0.818
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.93277,
+          22.55528
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #192",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Anand",
+        "rating": 3.6,
+        "footfall": 1179,
+        "revenue_index": 0.85,
+        "value": 0.725
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.91789,
+          22.57732
+        ]
+      },
+      "properties": {
+        "name": "Hotel #193",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Anand",
+        "rating": 4.7,
+        "footfall": 3527,
+        "revenue_index": 0.54,
+        "value": 0.351
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.04994,
+          22.44628
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #194",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Jamnagar",
+        "rating": 4.8,
+        "footfall": 3629,
+        "revenue_index": 0.75,
+        "value": 0.209
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.81779,
+          22.31119
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #195",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Rajkot",
+        "rating": 3.4,
+        "footfall": 3072,
+        "revenue_index": 0.4,
+        "value": 0.826
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.53979,
+          23.04442
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #196",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Ahmedabad",
+        "rating": 4.8,
+        "footfall": 1395,
+        "revenue_index": 0.87,
+        "value": 0.307
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.78821,
+          21.17698
+        ]
+      },
+      "properties": {
+        "name": "Grocery #197",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Surat",
+        "rating": 3.9,
+        "footfall": 3431,
+        "revenue_index": 0.76,
+        "value": 0.635
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.93954,
+          22.5644
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #198",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Anand",
+        "rating": 3.9,
+        "footfall": 3543,
+        "revenue_index": 0.76,
+        "value": 0.949
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.15892,
+          21.76244
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #199",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Bhavnagar",
+        "rating": 4.6,
+        "footfall": 3675,
+        "revenue_index": 0.56,
+        "value": 0.707
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.35433,
+          23.57759
+        ]
+      },
+      "properties": {
+        "name": "Bank #200",
+        "type": "bank",
+        "category": "bank",
+        "city": "Mehsana",
+        "rating": 3.9,
+        "footfall": 1767,
+        "revenue_index": 0.57,
+        "value": 0.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.58696,
+          23.02056
+        ]
+      },
+      "properties": {
+        "name": "Grocery #201",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Ahmedabad",
+        "rating": 3.5,
+        "footfall": 1716,
+        "revenue_index": 0.56,
+        "value": 0.912
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.14099,
+          21.73597
+        ]
+      },
+      "properties": {
+        "name": "Bank #202",
+        "type": "bank",
+        "category": "bank",
+        "city": "Bhavnagar",
+        "rating": 4.6,
+        "footfall": 2307,
+        "revenue_index": 0.36,
+        "value": 0.282
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.34529,
+          23.59051
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #203",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Mehsana",
+        "rating": 4.2,
+        "footfall": 2082,
+        "revenue_index": 0.89,
+        "value": 0.825
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.1569,
+          21.78938
+        ]
+      },
+      "properties": {
+        "name": "Bank #204",
+        "type": "bank",
+        "category": "bank",
+        "city": "Bhavnagar",
+        "rating": 4.5,
+        "footfall": 2489,
+        "revenue_index": 0.93,
+        "value": 0.866
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.82086,
+          21.13321
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #205",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Surat",
+        "rating": 3.6,
+        "footfall": 987,
+        "revenue_index": 0.36,
+        "value": 0.983
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.79791,
+          22.31997
+        ]
+      },
+      "properties": {
+        "name": "Retail #206",
+        "type": "retail",
+        "category": "retail",
+        "city": "Rajkot",
+        "rating": 4.2,
+        "footfall": 1135,
+        "revenue_index": 0.43,
+        "value": 0.903
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.04768,
+          22.47815
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #207",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Jamnagar",
+        "rating": 4.6,
+        "footfall": 3781,
+        "revenue_index": 0.56,
+        "value": 0.264
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.93395,
+          22.5869
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #208",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Anand",
+        "rating": 3.8,
+        "footfall": 1633,
+        "revenue_index": 0.9,
+        "value": 0.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.08404,
+          22.45598
+        ]
+      },
+      "properties": {
+        "name": "Hotel #209",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Jamnagar",
+        "rating": 3.6,
+        "footfall": 2532,
+        "revenue_index": 0.36,
+        "value": 0.37
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.97155,
+          21.7095
+        ]
+      },
+      "properties": {
+        "name": "Retail #210",
+        "type": "retail",
+        "category": "retail",
+        "city": "Bharuch",
+        "rating": 4.2,
+        "footfall": 1836,
+        "revenue_index": 0.87,
+        "value": 0.597
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.51424,
+          23.00676
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #211",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Ahmedabad",
+        "rating": 4.2,
+        "footfall": 2182,
+        "revenue_index": 0.43,
+        "value": 0.39
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.16336,
+          21.78646
+        ]
+      },
+      "properties": {
+        "name": "Retail #212",
+        "type": "retail",
+        "category": "retail",
+        "city": "Bhavnagar",
+        "rating": 4.3,
+        "footfall": 2825,
+        "revenue_index": 0.75,
+        "value": 0.592
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.01741,
+          21.69676
+        ]
+      },
+      "properties": {
+        "name": "Bank #213",
+        "type": "bank",
+        "category": "bank",
+        "city": "Bharuch",
+        "rating": 3.8,
+        "footfall": 371,
+        "revenue_index": 0.59,
+        "value": 0.972
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.20481,
+          22.25661
+        ]
+      },
+      "properties": {
+        "name": "Grocery #214",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Vadodara",
+        "rating": 4.7,
+        "footfall": 820,
+        "revenue_index": 0.59,
+        "value": 0.534
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.64553,
+          23.20235
+        ]
+      },
+      "properties": {
+        "name": "Retail #215",
+        "type": "retail",
+        "category": "retail",
+        "city": "Gandhinagar",
+        "rating": 4.4,
+        "footfall": 307,
+        "revenue_index": 0.61,
+        "value": 0.465
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.59427,
+          23.01777
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #216",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Ahmedabad",
+        "rating": 4.5,
+        "footfall": 3227,
+        "revenue_index": 0.47,
+        "value": 0.954
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.51284,
+          22.99788
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #217",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Ahmedabad",
+        "rating": 4.6,
+        "footfall": 1291,
+        "revenue_index": 0.75,
+        "value": 0.394
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.60535,
+          23.22589
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #218",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Gandhinagar",
+        "rating": 4.4,
+        "footfall": 2666,
+        "revenue_index": 0.61,
+        "value": 0.217
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.96596,
+          21.70995
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #219",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Bharuch",
+        "rating": 4.4,
+        "footfall": 4427,
+        "revenue_index": 0.83,
+        "value": 0.562
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.1759,
+          21.76139
+        ]
+      },
+      "properties": {
+        "name": "Hotel #220",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Bhavnagar",
+        "rating": 4.1,
+        "footfall": 2481,
+        "revenue_index": 0.48,
+        "value": 0.968
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.94002,
+          22.552
+        ]
+      },
+      "properties": {
+        "name": "Hotel #221",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Anand",
+        "rating": 4.7,
+        "footfall": 1391,
+        "revenue_index": 0.78,
+        "value": 0.869
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.17483,
+          22.28841
+        ]
+      },
+      "properties": {
+        "name": "Hotel #222",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Vadodara",
+        "rating": 3.2,
+        "footfall": 2889,
+        "revenue_index": 0.71,
+        "value": 0.445
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.19379,
+          22.29305
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #223",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Vadodara",
+        "rating": 4.7,
+        "footfall": 3991,
+        "revenue_index": 0.79,
+        "value": 0.444
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.17235,
+          21.76739
+        ]
+      },
+      "properties": {
+        "name": "Bank #224",
+        "type": "bank",
+        "category": "bank",
+        "city": "Bhavnagar",
+        "rating": 4.1,
+        "footfall": 4175,
+        "revenue_index": 0.63,
+        "value": 0.649
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.55981,
+          23.04011
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #225",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Ahmedabad",
+        "rating": 3.8,
+        "footfall": 330,
+        "revenue_index": 0.49,
+        "value": 0.249
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.39114,
+          23.59808
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #226",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Mehsana",
+        "rating": 4.8,
+        "footfall": 3300,
+        "revenue_index": 0.59,
+        "value": 0.891
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.00744,
+          21.69052
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #227",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Bharuch",
+        "rating": 4.2,
+        "footfall": 678,
+        "revenue_index": 0.59,
+        "value": 0.836
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.77809,
+          22.29744
+        ]
+      },
+      "properties": {
+        "name": "Grocery #228",
+        "type": "grocery",
+        "category": "grocery",
+        "city": "Rajkot",
+        "rating": 4.4,
+        "footfall": 2375,
+        "revenue_index": 0.39,
+        "value": 0.741
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.56939,
+          23.04562
+        ]
+      },
+      "properties": {
+        "name": "Hotel #229",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Ahmedabad",
+        "rating": 3.9,
+        "footfall": 3324,
+        "revenue_index": 0.62,
+        "value": 0.615
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.37797,
+          23.59197
+        ]
+      },
+      "properties": {
+        "name": "Hotel #230",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Mehsana",
+        "rating": 3.8,
+        "footfall": 3089,
+        "revenue_index": 0.55,
+        "value": 0.926
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.13474,
+          21.73398
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #231",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Bhavnagar",
+        "rating": 4.7,
+        "footfall": 1971,
+        "revenue_index": 0.64,
+        "value": 0.549
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.34604,
+          23.589
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #232",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Mehsana",
+        "rating": 3.9,
+        "footfall": 2763,
+        "revenue_index": 0.78,
+        "value": 0.24
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.80002,
+          21.18338
+        ]
+      },
+      "properties": {
+        "name": "Bank #233",
+        "type": "bank",
+        "category": "bank",
+        "city": "Surat",
+        "rating": 3.9,
+        "footfall": 3864,
+        "revenue_index": 0.76,
+        "value": 0.464
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.06388,
+          22.46062
+        ]
+      },
+      "properties": {
+        "name": "Hotel #234",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Jamnagar",
+        "rating": 3.8,
+        "footfall": 529,
+        "revenue_index": 0.49,
+        "value": 0.762
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.05732,
+          22.4506
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #235",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Jamnagar",
+        "rating": 3.3,
+        "footfall": 2369,
+        "revenue_index": 0.48,
+        "value": 0.208
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.90131,
+          22.57553
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #236",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Anand",
+        "rating": 3.3,
+        "footfall": 3499,
+        "revenue_index": 0.93,
+        "value": 0.709
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.00418,
+          21.68727
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #237",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Bharuch",
+        "rating": 3.5,
+        "footfall": 3249,
+        "revenue_index": 0.42,
+        "value": 0.923
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.38022,
+          23.56677
+        ]
+      },
+      "properties": {
+        "name": "Hotel #238",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Mehsana",
+        "rating": 4.4,
+        "footfall": 1448,
+        "revenue_index": 0.93,
+        "value": 0.331
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.65771,
+          23.21172
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #239",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Gandhinagar",
+        "rating": 3.4,
+        "footfall": 395,
+        "revenue_index": 0.77,
+        "value": 0.397
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.78658,
+          22.3134
+        ]
+      },
+      "properties": {
+        "name": "Retail #240",
+        "type": "retail",
+        "category": "retail",
+        "city": "Rajkot",
+        "rating": 3.4,
+        "footfall": 3665,
+        "revenue_index": 0.86,
+        "value": 0.635
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.82073,
+          22.33803
+        ]
+      },
+      "properties": {
+        "name": "Bank #241",
+        "type": "bank",
+        "category": "bank",
+        "city": "Rajkot",
+        "rating": 3.2,
+        "footfall": 1443,
+        "revenue_index": 0.61,
+        "value": 0.825
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.05389,
+          22.4677
+        ]
+      },
+      "properties": {
+        "name": "Ev Charging #242",
+        "type": "ev_charging",
+        "category": "ev_charging",
+        "city": "Jamnagar",
+        "rating": 3.8,
+        "footfall": 851,
+        "revenue_index": 0.56,
+        "value": 0.908
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.36371,
+          23.60014
+        ]
+      },
+      "properties": {
+        "name": "Hotel #243",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Mehsana",
+        "rating": 4.3,
+        "footfall": 2328,
+        "revenue_index": 0.55,
+        "value": 0.958
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.92887,
+          22.55104
+        ]
+      },
+      "properties": {
+        "name": "Hotel #244",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Anand",
+        "rating": 4.1,
+        "footfall": 1585,
+        "revenue_index": 0.7,
+        "value": 0.666
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.7894,
+          22.28638
+        ]
+      },
+      "properties": {
+        "name": "Bank #245",
+        "type": "bank",
+        "category": "bank",
+        "city": "Rajkot",
+        "rating": 3.8,
+        "footfall": 2632,
+        "revenue_index": 0.83,
+        "value": 0.529
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.36229,
+          23.57739
+        ]
+      },
+      "properties": {
+        "name": "Restaurant #246",
+        "type": "restaurant",
+        "category": "restaurant",
+        "city": "Mehsana",
+        "rating": 3.6,
+        "footfall": 1069,
+        "revenue_index": 0.42,
+        "value": 0.273
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.62426,
+          23.19242
+        ]
+      },
+      "properties": {
+        "name": "Retail #247",
+        "type": "retail",
+        "category": "retail",
+        "city": "Gandhinagar",
+        "rating": 4.4,
+        "footfall": 3301,
+        "revenue_index": 0.44,
+        "value": 0.979
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.00836,
+          21.71934
+        ]
+      },
+      "properties": {
+        "name": "Gas Station #248",
+        "type": "gas_station",
+        "category": "gas_station",
+        "city": "Bharuch",
+        "rating": 4.6,
+        "footfall": 2109,
+        "revenue_index": 0.55,
+        "value": 0.236
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.34853,
+          23.58423
+        ]
+      },
+      "properties": {
+        "name": "Bank #249",
+        "type": "bank",
+        "category": "bank",
+        "city": "Mehsana",
+        "rating": 4.5,
+        "footfall": 365,
+        "revenue_index": 0.66,
+        "value": 0.963
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.91177,
+          22.55973
+        ]
+      },
+      "properties": {
+        "name": "Hotel #250",
+        "type": "hotel",
+        "category": "hotel",
+        "city": "Anand",
+        "rating": 4.0,
+        "footfall": 2129,
+        "revenue_index": 0.57,
+        "value": 0.216
+      }
+    }
+  ]
+}
