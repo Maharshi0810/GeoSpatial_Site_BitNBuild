@@ -8,6 +8,7 @@
 import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import type { FeatureCollection, Feature } from 'geojson';
 import type { DrawMode } from '@/components/DrawToolbar';
 
 // Gujarat center coordinate & default bounds
@@ -30,7 +31,7 @@ const GUJARAT_OUTLINE_GEOJSON = {
   }
 };
 
-const EMPTY_FC: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] };
+const EMPTY_FC: FeatureCollection = { type: 'FeatureCollection', features: [] };
 
 export type AnalysisMode = 'points' | 'h3' | 'clusters' | 'hotspots';
 
@@ -55,7 +56,7 @@ export interface MapViewProps {
   // Phase 3B drawing props
   drawMode?: DrawMode;
   drawVertices?: number[][];
-  drawnPolygonGeoJSON?: GeoJSON.FeatureCollection | null;
+  drawnPolygonGeoJSON?: FeatureCollection | null;
 }
 
 export const MapView = forwardRef<MapViewHandle, MapViewProps>((
@@ -243,14 +244,14 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>((
     if (!map || !mapLoaded) return;
 
     // Build vertex features
-    const vertexFeatures: GeoJSON.Feature[] = drawVertices.map(([lng, lat]) => ({
+    const vertexFeatures: Feature[] = drawVertices.map(([lng, lat]) => ({
       type: 'Feature' as const,
       geometry: { type: 'Point' as const, coordinates: [lng, lat] },
       properties: {},
     }));
 
     // Build polygon preview from vertices (in-progress line) or final polygon
-    let polygonFC: GeoJSON.FeatureCollection = EMPTY_FC;
+    let polygonFC: FeatureCollection = EMPTY_FC;
     if (drawnPolygonGeoJSON && drawnPolygonGeoJSON.features.length > 0) {
       polygonFC = drawnPolygonGeoJSON;
     } else if (drawVertices.length >= 2) {

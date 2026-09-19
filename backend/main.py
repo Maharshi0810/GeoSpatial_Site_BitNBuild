@@ -84,6 +84,16 @@ try:
 except ImportError:
     pass
 
+try:
+    from backend.api.routes_search import router as search_router
+    app.include_router(search_router, prefix="/api", tags=["Search"])
+except ImportError:
+    try:
+        from api.routes_search import router as search_router
+        app.include_router(search_router, prefix="/api", tags=["Search"])
+    except ImportError:
+        pass
+
 
 @app.get("/api/health", tags=["Health"])
 def health_check():

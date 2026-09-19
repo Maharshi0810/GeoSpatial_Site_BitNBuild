@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  Search,
   Crosshair,
   Compass,
   ChevronUp,
   ChevronDown,
-  Layers,
-  Sparkles
+  Layers
 } from 'lucide-react';
 import * as turf from '@turf/turf';
 import { mockDataService, ScoreResponse } from '@/mocks/mockDataService';
@@ -27,6 +25,8 @@ import {
   GUJARAT_BENCHMARKS
 } from '@/components/Sidebar';
 import { ReportExport } from '@/components/ReportExport';
+import { SearchBar } from '@/components/SearchBar';
+import type { FeatureCollection } from 'geojson';
 
 export const MapWorkspace: React.FC = () => {
   const mapViewRef = useRef<MapViewHandle>(null);
@@ -85,7 +85,7 @@ export const MapWorkspace: React.FC = () => {
   const [drawMode, setDrawMode] = useState<DrawMode>('none');
   const [drawVertices, setDrawVertices] = useState<number[][]>([]);
   const [drawnPolygon, setDrawnPolygon] = useState<DrawnPolygon | null>(null);
-  const [drawnPolygonGeoJSON, setDrawnPolygonGeoJSON] = useState<GeoJSON.FeatureCollection | null>(null);
+  const [drawnPolygonGeoJSON, setDrawnPolygonGeoJSON] = useState<FeatureCollection | null>(null);
   const [isPolygonScoring, setIsPolygonScoring] = useState(false);
   const [polygonScore, setPolygonScore] = useState<ScoreResponse | null>(null);
   const rectCornerRef = useRef<number[] | null>(null);
@@ -171,6 +171,7 @@ export const MapWorkspace: React.FC = () => {
   const handleSelectBenchmark = (benchmark: BenchmarkSite) => {
     setSelectedLocation({ lat: benchmark.lat, lng: benchmark.lng });
     setSelectedSiteName(benchmark.name);
+    mapViewRef.current?.flyTo(benchmark.lng, benchmark.lat, 13.5);
     loadScore(benchmark.lat, benchmark.lng, siteType);
     setActiveSidebarTab('score');
     if (isSidebarCollapsed) {
@@ -220,26 +221,19 @@ export const MapWorkspace: React.FC = () => {
         <main className="flex-1 h-full relative flex flex-col items-center justify-between p-4 bg-[#E5ECF0]">
           {/* Floating Top Search Bar & Profile Filter Chips */}
           <div className="w-full max-w-xl z-20 flex flex-col gap-2">
-            <div className="h-10 bg-surface border border-slate-200 rounded-panel shadow-float px-3 flex items-center gap-2">
-              <Search className="w-4 h-4 text-slate-500" strokeWidth={1.75} />
-              <input
-                type="text"
-                placeholder="Search Gujarat address, ward, or coordinates (e.g. 23.0378, 72.5112)"
-                defaultValue="SG Highway, Bodakdev, Ahmedabad"
-                className="w-full bg-transparent text-xs text-ink placeholder:text-slate-500 outline-none"
-              />
-              <button
-                onClick={() => {
-                  const firstBench = GUJARAT_BENCHMARKS[0];
-                  handleSelectBenchmark(firstBench);
-                }}
-                className="px-2 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 text-[11px] font-medium rounded-chip shrink-0 flex items-center gap-1 transition-colors"
-                title="Quick jump to SG Highway Benchmark"
-              >
-                <Sparkles className="w-3 h-3" />
-                <span>SG Highway</span>
-              </button>
-            </div>
+            <SearchBar
+              currentAddress={selectedSiteName}
+              onSelectLocation={(loc) => {
+                setSelectedLocation({ lat: loc.lat, lng: loc.lng });
+                setSelectedSiteName(loc.name);
+                mapViewRef.current?.flyTo(loc.lng, loc.lat, 13.5);
+                loadScore(loc.lat, loc.lng, siteType);
+                setActiveSidebarTab('score');
+                if (isSidebarCollapsed) {
+                  setIsSidebarCollapsed(false);
+                }
+              }}
+            />
 
             {/* Horizontal Filter Row */}
             <div className="flex items-center gap-1.5 overflow-x-auto py-0.5">
