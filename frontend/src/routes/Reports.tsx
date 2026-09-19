@@ -36,25 +36,140 @@ export const Reports: React.FC = () => {
     const raw = localStorage.getItem('gsra.reports.v1');
     if (raw) {
       try {
-        setReports(JSON.parse(raw));
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length >= BENCHMARK_SITES.length && parsed[0]?.dossier) {
+          setReports(parsed);
+          return;
+        }
       } catch {
         // fallback
       }
-    } else {
-      seedDefaultReports();
     }
+    seedDefaultReports();
   }, []);
 
+  const buildBenchmarkDossier = (site: (typeof BENCHMARK_SITES)[0], id: string) => {
+    const lat = site.coordinates.lat;
+    const lng = site.coordinates.lng;
+    return {
+      metadata: {
+        report_id: id,
+        created_at: '2026-03-19T09:00:00.000Z',
+        version: '1.0.0',
+        system: 'GeoSpatial Site Readiness Analyzer (BitNBuild PS-2)',
+        data_vintage: '2024.Q1',
+      },
+      site: {
+        location_name: site.name,
+        site_type: site.siteType,
+        coordinates: {
+          lat,
+          lng,
+          formatted: `${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E`,
+        },
+        region: `${site.district}, Gujarat`,
+      },
+      evaluation: {
+        overall_score: site.score,
+        grade: site.grade,
+        percentile: Math.min(99, Math.round(site.score * 1.05)),
+        recommendation_tier:
+          site.score >= 80
+            ? 'Priority Tier 1 — Prime Candidate'
+            : site.score >= 65
+            ? 'Viable Tier 2 — Recommended'
+            : 'Tier 3 — Secondary Candidate',
+        recommendation_color: site.score >= 80 ? 'green' : 'blue',
+        constraints: [
+          {
+            id: 'flood_risk',
+            label: 'Flood Plain Risk Assessment',
+            passed: true,
+            status: 'Clear / Compliant',
+            details: 'Outside 100-year flood zone buffer and high-risk water corridors',
+          },
+          {
+            id: 'road_access',
+            label: 'Primary Arterial Highway Proximity',
+            passed: true,
+            status: 'Direct Frontage (under 250m)',
+            details: 'Immediate ingress/egress access via active Gujarat arterial corridor',
+          },
+        ],
+        factor_breakdown: [
+          {
+            factor_id: 'demographics',
+            label: 'Population Density',
+            score: Math.min(100, site.score + 2),
+            weight: 0.25,
+            contribution: Math.round((site.score + 2) * 0.25 * 10) / 10,
+          },
+          {
+            factor_id: 'transportation',
+            label: 'Road Network Accessibility',
+            score: Math.min(100, site.score + 6),
+            weight: 0.25,
+            contribution: Math.round((site.score + 6) * 0.25 * 10) / 10,
+          },
+          {
+            factor_id: 'poi',
+            label: 'Commercial & Retail Anchors',
+            score: Math.max(50, site.score - 5),
+            weight: 0.2,
+            contribution: Math.round((site.score - 5) * 0.2 * 10) / 10,
+          },
+          {
+            factor_id: 'landuse',
+            label: 'AUDA / Master Plan Zoning',
+            score: Math.min(100, site.score + 1),
+            weight: 0.15,
+            contribution: Math.round((site.score + 1) * 0.15 * 10) / 10,
+          },
+          {
+            factor_id: 'environment',
+            label: 'Environmental & Hazard Buffers',
+            score: Math.min(100, site.score + 3),
+            weight: 0.15,
+            contribution: Math.round((site.score + 3) * 0.15 * 10) / 10,
+          },
+        ],
+      },
+      accessibility: {
+        mode: site.recommendedMode,
+        duration_minutes: site.recommendedMinutes,
+        catchment_area_km2: site.recommendedMinutes === 15 ? 112.5 : site.recommendedMinutes === 20 ? 185.0 : 65.0,
+        population_reached: site.recommendedMinutes === 15 ? 1720000 : site.recommendedMinutes === 20 ? 940000 : 420000,
+        average_density_per_km2: 15200,
+        dominant_income_tier: 'Upper-Middle Income',
+        competitors_in_catchment: 4,
+        time_bands: [
+          { minutes: 5, population: Math.round(180000 * (site.score / 80)), area_km2: 12.5, label: `5 min ${site.recommendedMode}` },
+          { minutes: 10, population: Math.round(620000 * (site.score / 80)), area_km2: 48.0, label: `10 min ${site.recommendedMode}` },
+          { minutes: site.recommendedMinutes, population: Math.round(1450000 * (site.score / 80)), area_km2: 112.5, label: `${site.recommendedMinutes} min ${site.recommendedMode}` },
+        ],
+      },
+      nearby_commercial_anchors: [
+        { name: `${site.shortName} Arterial Fuel & Charging Hub`, category: 'Energy & Fuel', distance_km: 0.35, lat: lat + 0.002, lng: lng + 0.002 },
+        { name: `${site.district} Commercial Retail Galleria`, category: 'Retail Mall', distance_km: 0.85, lat: lat - 0.004, lng: lng + 0.003 },
+        { name: `${site.shortName} Logistics & Innovation Hub`, category: 'Commercial Office', distance_km: 1.25, lat: lat + 0.006, lng: lng - 0.005 },
+      ],
+    };
+  };
+
   const seedDefaultReports = () => {
-    const seeded: SavedReport[] = BENCHMARK_SITES.map((site, idx) => ({
-      id: `GSRA-20260319-DEMO${idx + 1}`,
-      name: site.name,
-      siteType: site.siteType,
-      score: idx === 0 ? 88 : idx === 1 ? 92 : idx === 2 ? 74 : 68,
-      grade: idx === 0 ? 'Grade A' : idx === 1 ? 'Grade A+' : idx === 2 ? 'Grade B+' : 'Grade B',
-      createdDate: '2026-03-19',
-      coordinates: site.coordinates,
-    }));
+    const seeded: SavedReport[] = BENCHMARK_SITES.map((site, idx) => {
+      const id = `GSRA-20260319-DEMO${idx + 1}`;
+      return {
+        id,
+        name: site.name,
+        siteType: site.siteType,
+        score: site.score,
+        grade: site.grade,
+        createdDate: '2026-03-19',
+        coordinates: site.coordinates,
+        dossier: buildBenchmarkDossier(site, id),
+      };
+    });
     setReports(seeded);
     localStorage.setItem('gsra.reports.v1', JSON.stringify(seeded));
   };
@@ -297,6 +412,7 @@ export const Reports: React.FC = () => {
           scoreData={null}
           locationName={selectedReport.name}
           siteType={selectedReport.siteType}
+          preloadedDossier={selectedReport.dossier}
         />
       )}
     </div>
