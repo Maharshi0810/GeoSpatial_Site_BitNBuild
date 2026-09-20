@@ -43,7 +43,8 @@ async def compute_site_score(request: ScoreRequest) -> Dict[str, Any]:
             request.lat,
             request.lng,
             site_type=request.site_type or "ev_charging",
-            weights=weights_dict
+            weights=weights_dict,
+            sub_filter=request.sub_filter
         )
 
         return {
@@ -67,7 +68,8 @@ async def compute_score_breakdown(request: ScoreRequest) -> Dict[str, Any]:
             request.lat,
             request.lng,
             site_type=request.site_type or "ev_charging",
-            weights=weights_dict
+            weights=weights_dict,
+            sub_filter=request.sub_filter
         )
 
         factors = []
@@ -122,7 +124,8 @@ async def compute_site_report(request: ScoreRequest) -> Dict[str, Any]:
             request.lat,
             request.lng,
             site_type=request.site_type or "ev_charging",
-            weights=weights_dict
+            weights=weights_dict,
+            sub_filter=request.sub_filter
         )
         return {
             "status": "ok",

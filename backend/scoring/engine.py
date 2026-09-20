@@ -913,6 +913,46 @@ class SiteReadinessScorer:
 
         return 95.0, "Flood & Environmental Safety", "Dry terrestrial terrain: situated clear of recognized flood basins and water exclusion zones.", True
 
+    # ── SUB-FILTER CRITERIA WEIGHT BOOSTS (BUG-19) ───────────────────────
+
+    SUB_FILTER_BOOSTS: Dict[str, Dict[str, float]] = {
+        # EV Charging
+        "fast_dc": {"poi": 1.35, "transportation": 1.15},
+        "power_50kw": {"poi": 1.25, "transportation": 1.10},
+        "grid_capacity": {"poi": 1.30, "landuse": 1.10},
+        "highway_access": {"transportation": 1.35},
+
+        # Windmill
+        "wind_7ms": {"poi": 1.35},
+        "hub_120m": {"poi": 1.25, "landuse": 1.10},
+        "grid_66kv": {"demographics": 1.30, "poi": 1.15},
+        "low_roughness": {"landuse": 1.30},
+
+        # Solar
+        "ghi_high": {"demographics": 1.35},
+        "wasteland": {"landuse": 1.35},
+        "substation_near": {"poi": 1.35},
+        "low_flood": {"environment": 1.35},
+
+        # Warehouse
+        "freight_corridor": {"transportation": 1.35},
+        "gidc_estate": {"landuse": 1.35, "poi": 1.15},
+        "port_connectivity": {"transportation": 1.30, "poi": 1.15},
+        "wide_road": {"transportation": 1.35},
+
+        # Telecom
+        "pop_density": {"demographics": 1.35},
+        "high_ground": {"environment": 1.35},
+        "fiber_backhaul": {"poi": 1.35},
+        "stable_grid": {"poi": 1.25, "landuse": 1.15},
+
+        # Retail
+        "high_footfall": {"demographics": 1.35},
+        "urban_arterial": {"transportation": 1.35},
+        "transit_proximity": {"transportation": 1.25, "poi": 1.20},
+        "consumer_density": {"demographics": 1.35},
+    }
+
     # ── MAIN COMPUTE METHOD ───────────────────────────────────────────
 
     def compute(
@@ -920,7 +960,8 @@ class SiteReadinessScorer:
         lat: float,
         lng: float,
         site_type: str = "ev_charging",
-        weights: Optional[Dict[str, float]] = None
+        weights: Optional[Dict[str, float]] = None,
+        sub_filter: Optional[str] = None
     ) -> Dict[str, Any]:
         """Compute readiness score, breakdown by dimension, and constraint audit tailored to facility archetype."""
         norm_type = (site_type or "ev_charging").lower().strip()
@@ -950,7 +991,15 @@ class SiteReadinessScorer:
 
         # Select weights
         profile_weights = WEIGHT_PROFILES.get(canonical_type, WEIGHT_PROFILES.get("balanced", DEFAULT_WEIGHTS))
-        active_weights = weights or profile_weights
+        base_weights = (weights.copy() if weights else profile_weights.copy())
+
+        # Wire sub_filter parameter to boost factor weights (BUG-19)
+        norm_sub_filter = (sub_filter or "").lower().strip()
+        if norm_sub_filter and norm_sub_filter in self.SUB_FILTER_BOOSTS:
+            boosts = self.SUB_FILTER_BOOSTS[norm_sub_filter]
+            active_weights = {k: v * boosts.get(k, 1.0) for k, v in base_weights.items()}
+        else:
+            active_weights = base_weights
 
         # Add weight and weighted score to breakdown
         total_w = sum(active_weights.get(k, 0.2) for k in breakdown)
@@ -963,6 +1012,13 @@ class SiteReadinessScorer:
             breakdown[k]["weight"] = round(w, 3)
             breakdown[k]["contribution"] = round(breakdown[k]["score"] * w, 1)
             raw_total += breakdown[k]["score"] * w
+
+        sum_contrib = sum(breakdown[k]["contribution"] for k in breakdown)
+        for k in breakdown:
+            if sum_contrib > 0:
+                breakdown[k]["share_pct"] = round((breakdown[k]["contribution"] / sum_contrib) * 100.0, 1)
+            else:
+                breakdown[k]["share_pct"] = round(breakdown[k]["weight"] * 100.0, 1)
 
         # Execute constraint audit
         constraint_audit = apply_all_constraints(lat, lng, self.layers, site_type=canonical_type)
@@ -1029,6 +1085,7 @@ class SiteReadinessScorer:
             "lat": lat,
             "lng": lng,
             "site_type": canonical_type,
+            "sub_filter": sub_filter,
             "disqualified": is_disqualified,
             "limiting_parameter": constraint_audit.get("limiting_parameter"),
             "disqualification_reason": constraint_audit.get("disqualification_reason"),
@@ -1062,11 +1119,12 @@ class SiteReadinessScorer:
         lat: float,
         lng: float,
         site_type: str = "ev_charging",
-        weights: Optional[Dict[str, float]] = None
+        weights: Optional[Dict[str, float]] = None,
+        sub_filter: Optional[str] = None
     ) -> Dict[str, Any]:
         """Generate an executive-ready site report with transparent factor analysis,
         data coverage indicators, and explicit justification for each dimension."""
-        computed = self.compute(lat, lng, site_type=site_type, weights=weights)
+        computed = self.compute(lat, lng, site_type=site_type, weights=weights, sub_filter=sub_filter)
 
         # Determine overall data coverage status
         breakdown = computed["breakdown"]
@@ -1087,6 +1145,7 @@ class SiteReadinessScorer:
             "site_summary": {
                 "coordinates": {"lat": lat, "lng": lng},
                 "site_type": computed["site_type"],
+                "sub_filter": sub_filter,
                 "score": computed["score"],
                 "grade": computed["grade"],
                 "disqualified": computed["disqualified"],
@@ -1107,8 +1166,9 @@ def generate_site_report(
     lat: float,
     lng: float,
     site_type: str = "ev_charging",
-    weights: Optional[Dict[str, float]] = None
+    weights: Optional[Dict[str, float]] = None,
+    sub_filter: Optional[str] = None
 ) -> Dict[str, Any]:
     """Helper to generate site report using singleton scorer instance."""
     scorer = SiteReadinessScorer()
-    return scorer.generate_site_report(lat, lng, site_type=site_type, weights=weights)
+    return scorer.generate_site_report(lat, lng, site_type=site_type, weights=weights, sub_filter=sub_filter)

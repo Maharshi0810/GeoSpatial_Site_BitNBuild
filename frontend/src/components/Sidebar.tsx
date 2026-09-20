@@ -534,42 +534,56 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                   {/* Factor Cards */}
                   <div className="flex flex-col gap-1.5">
-                    {scoreData.breakdown.map((factor) => (
-                      <div
-                        key={factor.factorId}
-                        className="p-2.5 bg-surface border border-slate-200 rounded-chip flex flex-col gap-1 hover:border-slate-300 transition-colors"
-                      >
-                        <div className="flex items-center justify-between text-xs font-medium">
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            <span className="text-ink font-semibold truncate">{factor.label}</span>
-                            {factor.dataAvailable === false && (
-                              <span
-                                className="text-[9px] px-1.5 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200 shrink-0 font-normal"
-                                title="Localized survey data is not mapped for this coordinate; regional baseline estimate applied"
-                              >
-                                Regional Estimate
-                              </span>
-                            )}
-                          </div>
-                          <span className="font-mono font-bold text-slate-700 shrink-0 ml-1">
-                            +{factor.contribution} pts
-                          </span>
-                        </div>
-                        <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    {(() => {
+                      const totalContrib = scoreData.breakdown.reduce((acc, f) => acc + (f.contribution || 0), 0) || scoreData.score || 1;
+                      return scoreData.breakdown.map((factor) => {
+                        const sharePct = totalContrib > 0 ? Math.round(((factor.contribution || 0) / totalContrib) * 100) : Math.round((factor.weight || 0.2) * 100);
+                        return (
                           <div
-                            className={`h-full rounded-full transition-all duration-300 ${
-                              factor.normalized >= 0.7
-                                ? 'bg-emerald-500'
-                                : factor.normalized >= 0.4
-                                ? 'bg-brand-500'
-                                : 'bg-amber-500'
-                            }`}
-                            style={{ width: `${factor.normalized * 100}%` }}
-                          />
-                        </div>
-                        <p className="text-[11px] text-slate-600 leading-snug">{factor.explanation}</p>
-                      </div>
-                    ))}
+                            key={factor.factorId}
+                            className="p-2.5 bg-surface border border-slate-200 rounded-chip flex flex-col gap-1 hover:border-slate-300 transition-colors"
+                          >
+                            <div className="flex items-center justify-between text-xs font-medium">
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <span className="text-ink font-semibold truncate">{factor.label}</span>
+                                {factor.dataAvailable === false && (
+                                  <span
+                                    className="text-[9px] px-1.5 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200 shrink-0 font-normal"
+                                    title="Localized survey data is not mapped for this coordinate; regional baseline estimate applied"
+                                  >
+                                    Regional Estimate
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-1 shrink-0 ml-1">
+                                <span className="font-mono font-bold text-slate-700">
+                                  +{factor.contribution} pts
+                                </span>
+                                <span
+                                  className="text-[10px] font-mono text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200/60"
+                                  title="Normalized contribution percentage share of composite score"
+                                >
+                                  {sharePct}%
+                                </span>
+                              </div>
+                            </div>
+                            <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all duration-300 ${
+                                  factor.normalized >= 0.7
+                                    ? 'bg-emerald-500'
+                                    : factor.normalized >= 0.4
+                                    ? 'bg-brand-500'
+                                    : 'bg-amber-500'
+                                }`}
+                                style={{ width: `${factor.normalized * 100}%` }}
+                              />
+                            </div>
+                            <p className="text-[11px] text-slate-600 leading-snug">{factor.explanation}</p>
+                          </div>
+                        );
+                      });
+                    })()}
                   </div>
                 </div>
 
@@ -827,20 +841,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
               <div className="grid grid-cols-3 gap-1">
                 {[
-                  { id: 'ev_charging', label: 'EV Station' },
-                  { id: 'retail', label: 'Retail Store' },
-                  { id: 'warehouse', label: 'Warehouse' },
+                  { id: 'ev_charging', label: 'EV Station', icon: '⚡' },
+                  { id: 'retail', label: 'Retail Store', icon: '🛍️' },
+                  { id: 'warehouse', label: 'Warehouse', icon: '🏭' },
+                  { id: 'telecom', label: 'Telecom', icon: '📡' },
+                  { id: 'windmill', label: 'Wind Turbine', icon: '💨' },
+                  { id: 'solar', label: 'Solar Farm', icon: '☀️' },
                 ].map((preset) => (
                   <button
                     key={preset.id}
                     onClick={() => onSiteTypeChange(preset.id)}
-                    className={`py-1.5 px-2 text-[11px] font-medium border rounded-chip transition-colors ${
+                    className={`py-1.5 px-2 text-[11px] font-medium border rounded-chip transition-colors flex items-center gap-1.5 justify-center ${
                       siteType === preset.id
-                        ? 'bg-brand-50 border-brand-600 text-brand-700 font-semibold'
-                        : 'bg-surface border-slate-200 text-slate-700 hover:bg-slate-100'
+                        ? 'bg-brand-50 border-brand-600 text-brand-700 font-semibold shadow-xs'
+                        : 'bg-surface border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
                     }`}
                   >
-                    {preset.label}
+                    <span className="text-xs">{preset.icon}</span>
+                    <span className="truncate">{preset.label}</span>
                   </button>
                 ))}
               </div>
