@@ -6,6 +6,18 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "https://geospatial-site-bitnbuild.onrender.com/api/:path*"
+    },
+    {
+      "source": "/docs",
+      "destination": "https://geospatial-site-bitnbuild.onrender.com/docs"
+    },
+    {
+      "source": "/openapi.json",
+      "destination": "https://geospatial-site-bitnbuild.onrender.com/openapi.json"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
