@@ -104,7 +104,21 @@ class MockDataService {
             };
           });
 
+          const isDisqualified = data.disqualified || data.constraints?.is_water_body;
+          const wbName = data.constraints?.water_body_name;
+          const disqReason = data.constraints?.disqualification_reason || (
+            wbName ? `Site is situated inside ${wbName}. Ground construction is prohibited.` : null
+          );
+
           const constraints = [
+            {
+              id: 'water_body_exclusion',
+              label: 'Water body exclusion',
+              passed: !isDisqualified,
+              reason: isDisqualified
+                ? (disqReason || 'Site is situated within a water body. Ground construction is prohibited.')
+                : 'Site is situated on solid terrestrial terrain outside permanent water bodies.',
+            },
             {
               id: 'flood_zone',
               label: 'Flood plain setback',
@@ -122,12 +136,14 @@ class MockDataService {
           ];
 
           return ScoreResponseSchema.parse({
-            locationName: `Site at ${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+            locationName: wbName ? `${wbName} (${lat.toFixed(4)}, ${lng.toFixed(4)})` : `Site at ${lat.toFixed(4)}, ${lng.toFixed(4)}`,
             coordinates: { lat, lng },
             siteType,
-            score: Math.round(data.score),
-            percentile: Math.min(99, Math.max(1, Math.round(data.score * 0.95))),
-            cappedBy: data.constraints?.in_flood_zone ? 'Flood zone safety penalty' : null,
+            score: isDisqualified ? 0 : Math.round(data.score),
+            percentile: isDisqualified ? 0 : Math.min(99, Math.max(1, Math.round(data.score * 0.95))),
+            cappedBy: isDisqualified
+              ? (disqReason || `${wbName || 'Water Body'} Exclusion`)
+              : (data.constraints?.in_flood_zone ? 'Flood zone safety penalty' : null),
             breakdown: breakdown.length > 0 ? breakdown : sampleScoreData.breakdown,
             constraints,
             accessibility: sampleScoreData.accessibility,
@@ -142,19 +158,29 @@ class MockDataService {
     // Simulate brief network latency for mock mode
     await new Promise((resolve) => setTimeout(resolve, 150));
 
-    // Deep copy and adjust coordinates to match selected point
-    let adjustedScore = sampleScoreData.score;
-    if (subFilter === 'fast_dc') adjustedScore = Math.min(100, adjustedScore + 3);
-    else if (subFilter === 'power_50kw') adjustedScore = Math.min(100, adjustedScore + 2);
-    else if (subFilter === 'grid_capacity') adjustedScore = Math.min(100, adjustedScore + 4);
-    else if (subFilter === 'highway_access') adjustedScore = Math.min(100, adjustedScore + 5);
+    // Fallback water body check for mock mode
+    const isMockWaterLake = (
+      (Math.abs(lat - 23.0063) < 0.004 && Math.abs(lng - 72.601) < 0.004) ||
+      (Math.abs(lat - 23.0355) < 0.003 && Math.abs(lng - 72.529) < 0.003) ||
+      (Math.abs(lat - 22.985) < 0.005 && Math.abs(lng - 72.590) < 0.005)
+    );
+
+    let adjustedScore = isMockWaterLake ? 0 : sampleScoreData.score;
+    if (!isMockWaterLake) {
+      if (subFilter === 'fast_dc') adjustedScore = Math.min(100, adjustedScore + 3);
+      else if (subFilter === 'power_50kw') adjustedScore = Math.min(100, adjustedScore + 2);
+      else if (subFilter === 'grid_capacity') adjustedScore = Math.min(100, adjustedScore + 4);
+      else if (subFilter === 'highway_access') adjustedScore = Math.min(100, adjustedScore + 5);
+    }
 
     const rawData = {
       ...sampleScoreData,
       score: adjustedScore,
+      percentile: isMockWaterLake ? 0 : sampleScoreData.percentile,
+      cappedBy: isMockWaterLake ? 'Water body exclusion: Construction physically prohibited' : sampleScoreData.cappedBy,
       siteType,
       coordinates: { lat, lng },
-      locationName: `Site at ${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+      locationName: isMockWaterLake ? `Water Body at ${lat.toFixed(4)}, ${lng.toFixed(4)}` : `Site at ${lat.toFixed(4)}, ${lng.toFixed(4)}`,
     };
 
     const validated = ScoreResponseSchema.parse(rawData);

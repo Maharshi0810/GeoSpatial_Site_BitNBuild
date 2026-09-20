@@ -125,7 +125,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (score >= 85) return { grade: 'A', label: 'Prime Site', color: 'text-emerald-700 bg-emerald-50 border-emerald-300' };
     if (score >= 70) return { grade: 'B', label: 'Strong Candidate', color: 'text-brand-700 bg-brand-50 border-brand-300' };
     if (score >= 55) return { grade: 'C', label: 'Moderate Fit', color: 'text-amber-700 bg-amber-50 border-amber-300' };
-    return { grade: 'D', label: 'High Risk', color: 'text-red-700 bg-red-50 border-red-300' };
+    if (score > 0) return { grade: 'D', label: 'High Risk', color: 'text-orange-700 bg-orange-50 border-orange-300' };
+    return { grade: 'F', label: 'Disqualified / Unfit', color: 'text-rose-700 bg-rose-50 border-rose-300' };
   };
 
   /* ---------------- Collapsed Analyst Rail (52px) ---------------- */
@@ -431,9 +432,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </div>
 
                   {scoreData.cappedBy && (
-                    <div className="text-[11px] text-amber-700 bg-amber-50 p-1.5 rounded border border-amber-200 flex items-center gap-1.5">
-                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                      <span>Score restricted by {scoreData.cappedBy}</span>
+                    <div
+                      className={`p-2.5 rounded-btn border flex items-start gap-2 ${
+                        scoreData.score === 0
+                          ? 'bg-rose-50 border-rose-200 text-rose-800'
+                          : 'bg-amber-50 border-amber-200 text-amber-800'
+                      }`}
+                    >
+                      <AlertCircle
+                        className={`w-4 h-4 shrink-0 mt-0.5 ${
+                          scoreData.score === 0 ? 'text-rose-600' : 'text-amber-600'
+                        }`}
+                      />
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-semibold text-xs">
+                          {scoreData.score === 0 ? 'Critical Limitation: Site Disqualified' : 'Score Restricted'}
+                        </span>
+                        <span className="text-[11px] leading-tight opacity-95">{scoreData.cappedBy}</span>
+                      </div>
                     </div>
                   )}
                 </div>

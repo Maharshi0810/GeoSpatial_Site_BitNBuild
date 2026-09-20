@@ -65,13 +65,14 @@ class SiteReadinessScorer:
 
     def load_data(self):
         """Load GeoJSON layers from disk, or use realistic fallbacks if files are not yet created."""
-        layer_keys = ["demographics", "transportation", "poi", "landuse", "environment"]
+        layer_keys = ["demographics", "transportation", "poi", "landuse", "environment", "water_bodies"]
         data_dir = Path(DATA_DIR)
 
         for layer_id in layer_keys:
             candidate_paths = [
                 data_dir / f"{layer_id}.geojson",
                 data_dir / layer_id / f"{layer_id}.geojson",
+                data_dir / "environment" / f"{layer_id}.geojson",
                 data_dir / layer_id / "data.geojson",
                 data_dir / f"{layer_id}.json",
             ]
@@ -240,20 +241,41 @@ class SiteReadinessScorer:
             for k in breakdown
         )
 
-        # Apply constraint penalties
+        # Apply constraint penalties & hard limiting parameters
         constraint_audit = apply_all_constraints(lat, lng, self.layers)
-        penalty = constraint_audit.get("total_penalty", 0.0)
-        final_score = max(0.0, min(raw_total - penalty, 100.0))
-        final_score = round(final_score, 1)
+        is_disqualified = constraint_audit.get("disqualified", False) or constraint_audit.get("is_water_body", False)
+
+        if is_disqualified:
+            # Hard limiting parameter triggered: site is strictly unbuildable
+            final_score = 0.0
+            grade = "F"
+            breakdown["environment"]["score"] = 0.0
+            wb_name = constraint_audit.get("water_body_name") or "Water Body"
+            breakdown["environment"]["label"] = f"Environmental Hazard: {wb_name} Exclusion"
+        else:
+            penalty = constraint_audit.get("total_penalty", 0.0)
+            final_score = max(0.0, min(raw_total - penalty, 100.0))
+            final_score = round(final_score, 1)
+            grade = score_to_grade(final_score)
 
         return {
             "score": final_score,
-            "grade": score_to_grade(final_score),
+            "grade": grade,
             "lat": lat,
             "lng": lng,
+            "disqualified": is_disqualified,
+            "limiting_parameter": constraint_audit.get("limiting_parameter"),
+            "disqualification_reason": constraint_audit.get("disqualification_reason"),
             "breakdown": breakdown,
             "constraints": {
+                "disqualified": is_disqualified,
+                "limiting_parameter": constraint_audit.get("limiting_parameter"),
+                "disqualification_reason": constraint_audit.get("disqualification_reason"),
+                "is_water_body": constraint_audit.get("is_water_body", False),
+                "water_body_name": constraint_audit.get("water_body_name"),
+                "water_body_type": constraint_audit.get("water_body_type"),
                 "in_flood_zone": constraint_audit.get("in_flood_zone", False),
+                "flood_risk_level": constraint_audit.get("flood_risk_level", "none"),
                 "min_road_distance_m": constraint_audit.get("min_road_distance_m", 100.0)
             }
         }
