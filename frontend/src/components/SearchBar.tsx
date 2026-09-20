@@ -96,18 +96,34 @@ export const SearchBar: React.FC<SearchBarProps> = ({ currentAddress = "SG Highw
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const lastPropAddressRef = useRef(currentAddress);
 
   useEffect(() => {
-    if (currentAddress && currentAddress !== query) setQuery(currentAddress);
+    if (currentAddress && currentAddress !== lastPropAddressRef.current) {
+      lastPropAddressRef.current = currentAddress;
+      setQuery(currentAddress);
+    }
   }, [currentAddress]);
 
   const coordinateMatch = useMemo(() => {
     const trimmed = query.trim();
-    const m = trimmed.match(/^([-+]?\d{1,2}(?:\.\d+)?)[,\s]+([-+]?\d{1,3}(?:\.\d+)?)$/);
-    if (m) {
-      const lat = parseFloat(m[1]);
-      const lng = parseFloat(m[2]);
-      if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) return { lat, lng };
+    // Support comma-separated format /^\s*(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)\s*$/ as mandated by BUG-23
+    const commaMatch = trimmed.match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);
+    if (commaMatch) {
+      const lat = parseFloat(commaMatch[1]);
+      const lng = parseFloat(commaMatch[2]);
+      if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+        return { lat, lng };
+      }
+    }
+    // Also support space-separated format: "23.03 72.51"
+    const spaceMatch = trimmed.match(/^\s*(-?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)\s*$/);
+    if (spaceMatch) {
+      const lat = parseFloat(spaceMatch[1]);
+      const lng = parseFloat(spaceMatch[2]);
+      if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+        return { lat, lng };
+      }
     }
     return null;
   }, [query]);
@@ -117,11 +133,45 @@ export const SearchBar: React.FC<SearchBarProps> = ({ currentAddress = "SG Highw
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
-    const qLower = searchQuery.toLowerCase().trim();
+    const trimmed = searchQuery.trim();
+    const qLower = trimmed.toLowerCase();
     if (!qLower) {
       setSearchResults(LOCAL_FALLBACK_PRESETS.slice(0, 6));
       setIsSearching(false);
       return;
+    }
+
+    // 0. Direct GPS Coordinate Parsing (BUG-23)
+    const coordDirect = (() => {
+      const cm = trimmed.match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);
+      if (cm) {
+        const lat = parseFloat(cm[1]);
+        const lng = parseFloat(cm[2]);
+        if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) return { lat, lng };
+      }
+      const sm = trimmed.match(/^\s*(-?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)\s*$/);
+      if (sm) {
+        const lat = parseFloat(sm[1]);
+        const lng = parseFloat(sm[2]);
+        if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) return { lat, lng };
+      }
+      return null;
+    })();
+
+    if (coordDirect) {
+      const coordItem: SearchResultItem = {
+        id: `coord-${coordDirect.lat}-${coordDirect.lng}`,
+        name: `Coordinates: ${coordDirect.lat.toFixed(4)}° N, ${coordDirect.lng.toFixed(4)}° E`,
+        subTitle: `Direct GPS Coordinates (${coordDirect.lat.toFixed(4)}, ${coordDirect.lng.toFixed(4)})`,
+        lat: coordDirect.lat,
+        lng: coordDirect.lng,
+        category: "coordinate",
+        icon: Compass,
+      };
+      setSearchResults([coordItem]);
+      setSelectedIndex(0);
+      setIsSearching(false);
+      return [coordItem];
     }
 
     // 1. Instant local match across name, subtitle, and district
@@ -316,7 +366,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({ currentAddress = "SG Highw
             setIsOpen(true);
             setSelectedIndex(-1);
           }}
-          onFocus={() => setIsOpen(true)}
+          onFocus={() => {
+            setIsOpen(true);
+            if (query === currentAddress) {
+              inputRef.current?.select();
+            }
+          }}
           onKeyDown={handleKeyDown}
           placeholder="Search any Gujarat city, ward, or address (e.g. Vadodara, Surat, Bhavnagar, 22.31 73.18)"
           className="w-full bg-transparent text-xs text-ink placeholder:text-slate-500 outline-none"
