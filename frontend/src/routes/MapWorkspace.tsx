@@ -254,7 +254,9 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
         {/* Center: Interactive Map Canvas (Full viewport utilization) */}
         <main className="flex-1 h-full relative flex flex-col items-center justify-between p-4 bg-canvas">
           {/* Floating Top Search Bar & Profile Filter Chips */}
-          <div className="w-full max-w-xl z-20 flex flex-col gap-2">
+          <div className={`w-full max-w-xl z-20 flex flex-col gap-2 transition-all duration-200 ${
+            drawMode !== 'none' ? 'opacity-20 pointer-events-none' : 'opacity-100'
+          }`}>
             <SearchBar
               currentAddress={selectedSiteName}
               onSelectLocation={(loc) => {
@@ -425,17 +427,32 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
             />
           </div>
 
-          {/* Phase 3B: Draw Toolbar */}
+          {/* Phase 3B: Windows Snipping Tool-style Draw Toolbar */}
           <DrawToolbar
             drawMode={drawMode}
             onSetDrawMode={(mode) => {
-              clearDraw();
-              setDrawMode(mode);
+              if (mode === 'none') {
+                setDrawMode('none');
+              } else {
+                if (clickTimerRef.current) {
+                  clearTimeout(clickTimerRef.current);
+                  clickTimerRef.current = null;
+                }
+                setDrawVertices([]);
+                rectCornerRef.current = null;
+                setDrawMode(mode);
+              }
             }}
             drawnPolygon={drawnPolygon}
             vertexCount={drawVertices.length}
             onClear={clearDraw}
             onScorePolygon={scorePolygonCatchment}
+            onFinishPolygon={() => {
+              if (drawMode === 'polygon' && drawVertices.length >= 3) {
+                finalisePolygon(drawVertices);
+              }
+            }}
+            onClose={() => setDrawMode('none')}
             isScoring={isPolygonScoring}
             scoringError={polygonScoreError}
           />
