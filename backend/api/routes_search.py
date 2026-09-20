@@ -1,4 +1,4 @@
-"""Geocoding and Location Search API for Gujarat Sites
+"""Geocoding and Location Search API for Gujarat Sites & Worldwide Geocoding
 
 Endpoints:
   GET /api/search - Query places, wards, benchmarks, coordinates, or live OSM geocoding
@@ -13,8 +13,12 @@ from fastapi import APIRouter, Query
 
 router = APIRouter(prefix="", tags=["Search"])
 
-# Curated benchmark and prominent locations across Gujarat
+# In-memory geocode cache to prevent rate-limiting and accelerate repeated queries
+_GEOCODE_CACHE: Dict[str, List[Dict[str, Any]]] = {}
+
+# Curated benchmark, district headquarters, GIDC industrial estates, and prominent locations across Gujarat
 GUJARAT_PLACES: List[Dict[str, Any]] = [
+    # --- AHMEDABAD & GANDHINAGAR ---
     {
         "id": "loc-sg-highway",
         "name": "SG Highway Commercial Corridor",
@@ -34,6 +38,24 @@ GUJARAT_PLACES: List[Dict[str, Any]] = [
         "district": "Gandhinagar",
     },
     {
+        "id": "loc-gandhinagar-central",
+        "name": "Gandhinagar Central Secretariat (Sector 10-21)",
+        "subTitle": "Capital Administrative & Commercial Sector, Gandhinagar",
+        "lat": 23.2156,
+        "lng": 72.6369,
+        "category": "city",
+        "district": "Gandhinagar",
+    },
+    {
+        "id": "loc-infocity",
+        "name": "Infocity IT & Software Park",
+        "subTitle": "Major IT/ITES Corridor & Innovation Hub, Gandhinagar",
+        "lat": 23.1904,
+        "lng": 72.6288,
+        "category": "industrial",
+        "district": "Gandhinagar",
+    },
+    {
         "id": "loc-sanand-gidc",
         "name": "Sanand GIDC Mega Automotive Corridor",
         "subTitle": "Heavy Industrial & Auto OEM Cluster, Ahmedabad Rural",
@@ -41,24 +63,6 @@ GUJARAT_PLACES: List[Dict[str, Any]] = [
         "lng": 72.3814,
         "category": "benchmark",
         "district": "Ahmedabad Rural",
-    },
-    {
-        "id": "loc-mundra-port",
-        "name": "Mundra Port & SEZ Logistics Hub",
-        "subTitle": "Deep-Water Container Terminal & Freight Corridor, Kutch",
-        "lat": 22.8394,
-        "lng": 69.7214,
-        "category": "benchmark",
-        "district": "Kutch",
-    },
-    {
-        "id": "loc-vadodara-alkapuri",
-        "name": "Alkapuri Central Commercial Hub",
-        "subTitle": "R.C. Dutt Road Premier Business District, Vadodara",
-        "lat": 22.3106,
-        "lng": 73.1812,
-        "category": "benchmark",
-        "district": "Vadodara",
     },
     {
         "id": "loc-sbr",
@@ -159,10 +163,59 @@ GUJARAT_PLACES: List[Dict[str, Any]] = [
         "category": "industrial",
         "district": "Ahmedabad Rural",
     },
+
+    # --- VADODARA ---
+    {
+        "id": "loc-vadodara-central",
+        "name": "Vadodara Central Business District",
+        "subTitle": "Sayajigunj, Station Area & Alkapuri, Vadodara",
+        "lat": 22.3072,
+        "lng": 73.1812,
+        "category": "city",
+        "district": "Vadodara",
+    },
+    {
+        "id": "loc-vadodara-alkapuri",
+        "name": "Alkapuri Central Commercial Hub",
+        "subTitle": "R.C. Dutt Road Premier Business District, Vadodara",
+        "lat": 22.3106,
+        "lng": 73.1812,
+        "category": "benchmark",
+        "district": "Vadodara",
+    },
+    {
+        "id": "loc-vadodara-makarpura",
+        "name": "Makarpura GIDC Industrial Estate",
+        "subTitle": "Major Electrical & Heavy Engineering Hub, Vadodara",
+        "lat": 22.2536,
+        "lng": 73.1950,
+        "category": "industrial",
+        "district": "Vadodara",
+    },
+    {
+        "id": "loc-vadodara-akota",
+        "name": "Akota & Gotri Commercial Corridor",
+        "subTitle": "West Vadodara High-Density Retail & Residential Axis",
+        "lat": 22.3015,
+        "lng": 73.1614,
+        "category": "city",
+        "district": "Vadodara",
+    },
+
+    # --- SURAT ---
+    {
+        "id": "loc-surat-central",
+        "name": "Surat Central & Ring Road Textile Market",
+        "subTitle": "Asia's Premier Textile & Fabric Trading Capital, Surat",
+        "lat": 21.1959,
+        "lng": 72.8302,
+        "category": "city",
+        "district": "Surat",
+    },
     {
         "id": "loc-surat-vesu",
         "name": "Vesu Commercial & Luxury Retail Hub",
-        "subTitle": "South Surat High-Density Premium Corridor",
+        "subTitle": "South Surat High-Density Premium Corridor, Surat",
         "lat": 21.1442,
         "lng": 72.7712,
         "category": "city",
@@ -171,7 +224,7 @@ GUJARAT_PLACES: List[Dict[str, Any]] = [
     {
         "id": "loc-surat-diamond-bourse",
         "name": "Surat Diamond Bourse (DREAM City)",
-        "subTitle": "Khajod Global Gems & Jewelry Trading Capital",
+        "subTitle": "Khajod Global Gems & Jewelry Trading Capital, Surat",
         "lat": 21.1219,
         "lng": 72.7661,
         "category": "city",
@@ -187,14 +240,268 @@ GUJARAT_PLACES: List[Dict[str, Any]] = [
         "district": "Surat",
     },
     {
+        "id": "loc-surat-adajan",
+        "name": "Adajan & Pal Commercial Precinct",
+        "subTitle": "West Surat Tapi Riverfront Expansion, Surat",
+        "lat": 21.1925,
+        "lng": 72.7892,
+        "category": "city",
+        "district": "Surat",
+    },
+
+    # --- RAJKOT ---
+    {
         "id": "loc-rajkot-ringroad",
         "name": "150 Feet Ring Road Commercial Axis",
-        "subTitle": "West Rajkot Retail, Hospitality & Healthcare Corridor",
+        "subTitle": "West Rajkot Retail, Hospitality & Healthcare Corridor, Rajkot",
         "lat": 22.2850,
         "lng": 70.7680,
         "category": "city",
         "district": "Rajkot",
     },
+    {
+        "id": "loc-rajkot-central",
+        "name": "Rajkot Central & Yagnik Road",
+        "subTitle": "Saurashtra Commercial & Financial Epicenter, Rajkot",
+        "lat": 22.3039,
+        "lng": 70.8022,
+        "category": "city",
+        "district": "Rajkot",
+    },
+    {
+        "id": "loc-rajkot-aji",
+        "name": "Aji GIDC & Shapar-Veraval Industrial Zone",
+        "subTitle": "Engineering, Casting & Diesel Engine Capital, Rajkot",
+        "lat": 22.2514,
+        "lng": 70.8142,
+        "category": "industrial",
+        "district": "Rajkot",
+    },
+
+    # --- BHAVNAGAR ---
+    {
+        "id": "loc-bhavnagar-city",
+        "name": "Bhavnagar Central & Waghawadi Road",
+        "subTitle": "Commercial High-Street & Civic Center, Bhavnagar",
+        "lat": 21.7645,
+        "lng": 72.1519,
+        "category": "city",
+        "district": "Bhavnagar",
+    },
+    {
+        "id": "loc-alang-shipyard",
+        "name": "Alang Ship Recycling & Marine Yard",
+        "subTitle": "World's Largest Ship Breaking & Steel Recovery Cluster, Bhavnagar",
+        "lat": 21.4167,
+        "lng": 72.1833,
+        "category": "industrial",
+        "district": "Bhavnagar",
+    },
+    {
+        "id": "loc-bhavnagar-chitra",
+        "name": "Chitra GIDC Industrial Estate",
+        "subTitle": "Plastics, Chemicals & Small-Scale Manufacturing, Bhavnagar",
+        "lat": 21.7856,
+        "lng": 72.1124,
+        "category": "industrial",
+        "district": "Bhavnagar",
+    },
+
+    # --- JAMNAGAR ---
+    {
+        "id": "loc-jamnagar-refinery",
+        "name": "Jamnagar Petrochemical & Refining Belt",
+        "subTitle": "Motikhavdi World-Scale Refinery Complex, Jamnagar",
+        "lat": 22.4707,
+        "lng": 70.0577,
+        "category": "industrial",
+        "district": "Jamnagar",
+    },
+    {
+        "id": "loc-jamnagar-city",
+        "name": "Jamnagar City & Brass Parts Industrial Zone",
+        "subTitle": "National Brass Parts & Precision Hardware Capital, Jamnagar",
+        "lat": 22.4707,
+        "lng": 70.0724,
+        "category": "city",
+        "district": "Jamnagar",
+    },
+
+    # --- JUNAGADH ---
+    {
+        "id": "loc-junagadh-city",
+        "name": "Junagadh Central Heritage & Civic Hub",
+        "subTitle": "Girnar Foothills Commercial & Tourism Center, Junagadh",
+        "lat": 21.5222,
+        "lng": 70.4579,
+        "category": "city",
+        "district": "Junagadh",
+    },
+
+    # --- KUTCH ---
+    {
+        "id": "loc-mundra-port",
+        "name": "Mundra Port & SEZ Logistics Hub",
+        "subTitle": "Deep-Water Container Terminal & Freight Corridor, Kutch",
+        "lat": 22.8394,
+        "lng": 69.7214,
+        "category": "benchmark",
+        "district": "Kutch",
+    },
+    {
+        "id": "loc-gandhidham-kandla",
+        "name": "Gandhidham & Deendayal Port (Kandla)",
+        "subTitle": "Major Dry Cargo Port, Timber & Logistics Node, Kutch",
+        "lat": 23.0753,
+        "lng": 70.1337,
+        "category": "industrial",
+        "district": "Kutch",
+    },
+    {
+        "id": "loc-bhuj-city",
+        "name": "Bhuj Central Heritage & Commercial Hub",
+        "subTitle": "Kutch District Headquarters & Transport Node, Bhuj",
+        "lat": 23.2420,
+        "lng": 69.6669,
+        "category": "city",
+        "district": "Kutch",
+    },
+
+    # --- BHARUCH & ANKLESHWAR ---
+    {
+        "id": "loc-dahej-pcpir",
+        "name": "Dahej PCPIR & Deep-Water Port Terminal",
+        "subTitle": "Petrochemicals, Petroleum & Chemical Investment Zone, Bharuch",
+        "lat": 21.7125,
+        "lng": 72.5855,
+        "category": "industrial",
+        "district": "Bharuch",
+    },
+    {
+        "id": "loc-ankleshwar-gidc",
+        "name": "Ankleshwar GIDC Mega Chemical Estate",
+        "subTitle": "Asia's Foremost Chemical & Pharmaceuticals Cluster, Bharuch",
+        "lat": 21.6264,
+        "lng": 73.0031,
+        "category": "industrial",
+        "district": "Bharuch",
+    },
+    {
+        "id": "loc-bharuch-city",
+        "name": "Bharuch City & Narmada Corridor",
+        "subTitle": "Historical Port & Industrial Highway Junction, Bharuch",
+        "lat": 21.7051,
+        "lng": 72.9959,
+        "category": "city",
+        "district": "Bharuch",
+    },
+
+    # --- ANAND & KHEDA ---
+    {
+        "id": "loc-anand-amul",
+        "name": "Anand Agri & Amul Dairy Corridor",
+        "subTitle": "India's Dairy Capital & Agro-Processing Zone, Anand",
+        "lat": 22.5645,
+        "lng": 72.9289,
+        "category": "city",
+        "district": "Anand",
+    },
+    {
+        "id": "loc-vallabh-vidyanagar",
+        "name": "Vallabh Vidyanagar Educational & Tech Town",
+        "subTitle": "Premier University Campus & Knowledge Town, Anand",
+        "lat": 22.5534,
+        "lng": 72.9234,
+        "category": "city",
+        "district": "Anand",
+    },
+    {
+        "id": "loc-nadiad-city",
+        "name": "Nadiad Commercial & Healthcare Hub",
+        "subTitle": "Central Gujarat Express Highway Node, Kheda",
+        "lat": 22.6916,
+        "lng": 72.8634,
+        "category": "city",
+        "district": "Kheda",
+    },
+
+    # --- SOUTH GUJARAT (VAPI, VALSAD, NAVSARI) ---
+    {
+        "id": "loc-vapi-gidc",
+        "name": "Vapi Mega GIDC Industrial Estate",
+        "subTitle": "Chemicals, Paper, Dyes & Packaging Hub, Valsad",
+        "lat": 20.3893,
+        "lng": 72.9106,
+        "category": "industrial",
+        "district": "Valsad",
+    },
+    {
+        "id": "loc-valsad-city",
+        "name": "Valsad City & Coastal Railway Corridor",
+        "subTitle": "Horticulture, Agro Logistics & Coastal Center, Valsad",
+        "lat": 20.6105,
+        "lng": 72.9257,
+        "category": "city",
+        "district": "Valsad",
+    },
+    {
+        "id": "loc-navsari-city",
+        "name": "Navsari Twin City Commercial Hub",
+        "subTitle": "Diamond Polishing & Agro-Industrial Center, Navsari",
+        "lat": 20.9500,
+        "lng": 72.9300,
+        "category": "city",
+        "district": "Navsari",
+    },
+
+    # --- NORTH GUJARAT (MORBI, MEHSANA, PATAN, BANASKANTHA, SABARKANTHA) ---
+    {
+        "id": "loc-morbi-ceramic",
+        "name": "Morbi Ceramic Industrial Cluster",
+        "subTitle": "National Ceramic Tile & Sanitaryware Capital, Morbi",
+        "lat": 22.8120,
+        "lng": 70.8380,
+        "category": "industrial",
+        "district": "Morbi",
+    },
+    {
+        "id": "loc-mehsana-dudhsagar",
+        "name": "Mehsana Dairy & Engineering Hub",
+        "subTitle": "Dudhsagar Dairy & Oil Exploration Center, Mehsana",
+        "lat": 23.5880,
+        "lng": 72.3693,
+        "category": "industrial",
+        "district": "Mehsana",
+    },
+    {
+        "id": "loc-kadi-gidc",
+        "name": "Kadi & Chhatral Industrial Zone",
+        "subTitle": "Ceramics, Cotton Ginning & Heavy Machinery, Mehsana",
+        "lat": 23.3039,
+        "lng": 72.3333,
+        "category": "industrial",
+        "district": "Mehsana",
+    },
+    {
+        "id": "loc-palanpur-city",
+        "name": "Palanpur Commercial & Transport Junction",
+        "subTitle": "Diamond Trading & Dairy Center, Banaskantha",
+        "lat": 24.1724,
+        "lng": 72.4346,
+        "category": "city",
+        "district": "Banaskantha",
+    },
+    {
+        "id": "loc-himatnagar-city",
+        "name": "Himatnagar Ceramic & Trade Hub",
+        "subTitle": "Sabarkantha District Administrative & Industrial Center",
+        "lat": 23.5977,
+        "lng": 72.9698,
+        "category": "city",
+        "district": "Sabarkantha",
+    },
+
+    # --- SAURASHTRA (DHOLERA, PORBANDAR, VERAVAL, SURENDRANAGAR) ---
     {
         "id": "loc-dholera-sir",
         "name": "Dholera Special Investment Region (SIR)",
@@ -205,40 +512,31 @@ GUJARAT_PLACES: List[Dict[str, Any]] = [
         "district": "Ahmedabad Rural",
     },
     {
-        "id": "loc-dahej-pcpir",
-        "name": "Dahej PCPIR & Port Terminal",
-        "subTitle": "Petrochemicals, Petroleum & Chemical Investment Zone, Bharuch",
-        "lat": 21.7125,
-        "lng": 72.5855,
-        "category": "industrial",
-        "district": "Bharuch",
-    },
-    {
-        "id": "loc-morbi-ceramic",
-        "name": "Morbi Ceramic Industrial Cluster",
-        "subTitle": "National Ceramic Tile & Sanitaryware Capital",
-        "lat": 22.8120,
-        "lng": 70.8380,
-        "category": "industrial",
-        "district": "Morbi",
-    },
-    {
-        "id": "loc-jamnagar-refinery",
-        "name": "Jamnagar Petrochemical & Refining Belt",
-        "subTitle": "Motikhavdi World-Scale Refinery & Port Complex",
-        "lat": 22.4707,
-        "lng": 70.0577,
-        "category": "industrial",
-        "district": "Jamnagar",
-    },
-    {
-        "id": "loc-anand-amul",
-        "name": "Anand Agri & Dairy Corridor",
-        "subTitle": "Amul Dairy Capital & Agro-Processing Zone, Anand",
-        "lat": 22.5645,
-        "lng": 72.9289,
+        "id": "loc-porbandar-port",
+        "name": "Porbandar Coastal Marine & Port Hub",
+        "subTitle": "Commercial Deep-Water Port & Fishery Processing, Porbandar",
+        "lat": 21.6417,
+        "lng": 69.6293,
         "category": "city",
-        "district": "Anand",
+        "district": "Porbandar",
+    },
+    {
+        "id": "loc-veraval-somnath",
+        "name": "Veraval-Somnath Fisheries & Port Belt",
+        "subTitle": "Marine Exports, Port Logistics & Cultural Gateway, Gir Somnath",
+        "lat": 20.9000,
+        "lng": 70.3667,
+        "category": "city",
+        "district": "Gir Somnath",
+    },
+    {
+        "id": "loc-surendranagar-wadhwan",
+        "name": "Surendranagar & Wadhwan Industrial Area",
+        "subTitle": "Engineering, Ginning & Ceramic Hub, Surendranagar",
+        "lat": 22.7275,
+        "lng": 71.6370,
+        "category": "city",
+        "district": "Surendranagar",
     },
 ]
 
@@ -258,54 +556,70 @@ def parse_coordinates(query: str) -> Optional[Dict[str, Any]]:
                     return {
                         "id": "coord-custom",
                         "name": f"Coordinates: {lat:.4f}° N, {lng:.4f}° E",
-                        "subTitle": "Direct GPS Coordinates in Gujarat",
+                        "subTitle": "Direct GPS Coordinates",
                         "lat": lat,
                         "lng": lng,
                         "category": "coordinate",
-                        "district": "Gujarat",
+                        "district": "Custom Point",
                     }
         except Exception:
             return None
     return None
 
 
-def fetch_nominatim_geocoding(query: str, limit: int = 4) -> List[Dict[str, Any]]:
-    """Query OpenStreetMap Nominatim geocoder bounded to Gujarat/India."""
+def fetch_nominatim_geocoding(query: str, limit: int = 6) -> List[Dict[str, Any]]:
+    """Query OpenStreetMap Nominatim geocoder with caching and robust User-Agent."""
+    q_clean = query.strip().lower()
+    if q_clean in _GEOCODE_CACHE:
+        return _GEOCODE_CACHE[q_clean][:limit]
+
     try:
-        # Bounded by Gujarat box: min_lon=68.1, max_lat=24.7, max_lon=74.5, min_lat=20.1
+        # Bias viewbox towards Gujarat, but keep bounded=0 so anywhere in India or the world resolves
         params = urllib.parse.urlencode({
             "format": "json",
             "q": query,
-            "countrycodes": "in",
-            "viewbox": "68.1,24.7,74.5,20.1",
+            "viewbox": "68.0,24.8,74.6,20.0",
             "bounded": "0",
             "limit": limit,
-            "addressdetails": "1"
+            "addressdetails": "1",
         })
         url = f"https://nominatim.openstreetmap.org/search?{params}"
         req = urllib.request.Request(
             url,
-            headers={"User-Agent": "SiteReadinessAnalyzer/1.0 (contact@example.com)"}
+            headers={
+                "User-Agent": "GeoVistaSiteReadiness/2.0 (team@geovista.app; dakshthakkar42@gmail.com)",
+                "Accept-Language": "en",
+            }
         )
-        with urllib.request.urlopen(req, timeout=2.5) as resp:
+        with urllib.request.urlopen(req, timeout=3.5) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             results = []
             for item in data:
                 lat = float(item.get("lat", 0))
                 lng = float(item.get("lon", 0))
                 display_name = item.get("display_name", "")
-                parts = display_name.split(",")
-                primary_name = item.get("name") or (parts[0].strip() if parts else "Location")
+                parts = [p.strip() for p in display_name.split(",") if p.strip()]
+                primary_name = item.get("name") or (parts[0] if parts else "Location")
                 
+                addr = item.get("address", {})
+                city = addr.get("city") or addr.get("town") or addr.get("village") or addr.get("county") or addr.get("state") or ""
+                state = addr.get("state", "")
+                country = addr.get("country", "")
+                sub_parts = [p for p in [city, state, country] if p and p.lower() != primary_name.lower()]
+                subTitle = ", ".join(sub_parts) if sub_parts else display_name
+
                 results.append({
                     "id": f"osm-{item.get('place_id', '')}",
                     "name": primary_name,
-                    "subTitle": display_name,
+                    "subTitle": subTitle,
                     "lat": lat,
                     "lng": lng,
                     "category": "geocoded",
-                    "district": item.get("address", {}).get("state_district", "Gujarat"),
+                    "district": city or state or "Global",
                 })
+            
+            if results:
+                _GEOCODE_CACHE[q_clean] = results
             return results
     except Exception:
         return []
@@ -325,7 +639,7 @@ async def search_locations(
     if coord:
         results.append(coord)
 
-    # 2. Local curated places matching
+    # 2. Local curated places matching (broad substring match on name, subtitle, and district)
     q_lower = query.lower()
     if q_lower:
         matched_presets = [
@@ -339,10 +653,12 @@ async def search_locations(
     else:
         results.extend(GUJARAT_PLACES[:limit])
 
-    # 3. Live OSM Geocoding fallback if few local matches and length >= 3
-    if len(results) < 4 and len(query) >= 3 and not coord:
-        osm_results = fetch_nominatim_geocoding(query, limit=limit - len(results))
+    # 3. Live OSM Geocoding if fewer than 5 local matches and query length >= 3
+    if len(results) < 5 and len(query) >= 3 and not coord:
+        needed = limit - len(results)
+        osm_results = fetch_nominatim_geocoding(query, limit=max(needed, 4))
         for osm in osm_results:
+            # Deduplicate against existing results by coordinate proximity (~500m)
             if not any(abs(r["lat"] - osm["lat"]) < 0.005 and abs(r["lng"] - osm["lng"]) < 0.005 for r in results):
                 results.append(osm)
 
