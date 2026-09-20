@@ -656,6 +656,870 @@
           ]
         ]
       }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sanand GIDC Automotive Cluster",
+        "zone_name": "Sanand GIDC Automotive Cluster",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.33,
+              22.95
+            ],
+            [
+              72.41,
+              22.95
+            ],
+            [
+              72.41,
+              23.02
+            ],
+            [
+              72.33,
+              23.02
+            ],
+            [
+              72.33,
+              22.95
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Dahej PCPIR Heavy Chemical Zone",
+        "zone_name": "Dahej PCPIR Heavy Chemical Zone",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.51,
+              21.66
+            ],
+            [
+              72.62,
+              21.66
+            ],
+            [
+              72.62,
+              21.75
+            ],
+            [
+              72.51,
+              21.75
+            ],
+            [
+              72.51,
+              21.66
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Ankleshwar Chemical Industrial Estate",
+        "zone_name": "Ankleshwar Chemical Industrial Estate",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.98,
+              21.6
+            ],
+            [
+              73.05,
+              21.6
+            ],
+            [
+              73.05,
+              21.66
+            ],
+            [
+              72.98,
+              21.66
+            ],
+            [
+              72.98,
+              21.6
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vapi Heavy Industrial Cluster",
+        "zone_name": "Vapi Heavy Industrial Cluster",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.88,
+              20.34
+            ],
+            [
+              72.95,
+              20.34
+            ],
+            [
+              72.95,
+              20.4
+            ],
+            [
+              72.88,
+              20.4
+            ],
+            [
+              72.88,
+              20.34
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Hazira Heavy Engineering & LNG Complex",
+        "zone_name": "Hazira Heavy Engineering & LNG Complex",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.6,
+              21.08
+            ],
+            [
+              72.7,
+              21.08
+            ],
+            [
+              72.7,
+              21.14
+            ],
+            [
+              72.6,
+              21.14
+            ],
+            [
+              72.6,
+              21.08
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Morbi Ceramic Hub Industrial Belt",
+        "zone_name": "Morbi Ceramic Hub Industrial Belt",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              70.78,
+              22.78
+            ],
+            [
+              70.92,
+              22.78
+            ],
+            [
+              70.92,
+              22.88
+            ],
+            [
+              70.78,
+              22.88
+            ],
+            [
+              70.78,
+              22.78
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Halol Auto & Engineering GIDC",
+        "zone_name": "Halol Auto & Engineering GIDC",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.44,
+              22.47
+            ],
+            [
+              73.52,
+              22.47
+            ],
+            [
+              73.52,
+              22.54
+            ],
+            [
+              73.44,
+              22.54
+            ],
+            [
+              73.44,
+              22.47
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Savli Biotech & Heavy Engineering Park",
+        "zone_name": "Savli Biotech & Heavy Engineering Park",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.2,
+              22.52
+            ],
+            [
+              73.3,
+              22.52
+            ],
+            [
+              73.3,
+              22.6
+            ],
+            [
+              73.2,
+              22.6
+            ],
+            [
+              73.2,
+              22.52
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Changodar-Moraiya Industrial Logistics Hub",
+        "zone_name": "Changodar-Moraiya Industrial Logistics Hub",
+        "zone": "warehouse",
+        "zone_type": "warehouse"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.41,
+              22.88
+            ],
+            [
+              72.49,
+              22.88
+            ],
+            [
+              72.49,
+              22.95
+            ],
+            [
+              72.41,
+              22.95
+            ],
+            [
+              72.41,
+              22.88
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Metoda-Lodhika Engineering GIDC (Rajkot)",
+        "zone_name": "Metoda-Lodhika Engineering GIDC (Rajkot)",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              70.68,
+              22.21
+            ],
+            [
+              70.76,
+              22.21
+            ],
+            [
+              70.76,
+              22.28
+            ],
+            [
+              70.68,
+              22.28
+            ],
+            [
+              70.68,
+              22.21
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Alang Ship Recycling Yard Coastal Belt",
+        "zone_name": "Alang Ship Recycling Yard Coastal Belt",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.18,
+              21.36
+            ],
+            [
+              72.25,
+              21.36
+            ],
+            [
+              72.25,
+              21.43
+            ],
+            [
+              72.18,
+              21.43
+            ],
+            [
+              72.18,
+              21.36
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Khavda Hybrid Renewable Mega Energy Park",
+        "zone_name": "Khavda Hybrid Renewable Mega Energy Park",
+        "zone": "wasteland",
+        "zone_type": "wasteland"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              69.6,
+              23.75
+            ],
+            [
+              70.1,
+              23.75
+            ],
+            [
+              70.1,
+              24.15
+            ],
+            [
+              69.6,
+              24.15
+            ],
+            [
+              69.6,
+              23.75
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Charanka Ultra Mega Solar Park (Patan)",
+        "zone_name": "Charanka Ultra Mega Solar Park (Patan)",
+        "zone": "wasteland",
+        "zone_type": "wasteland"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              71.18,
+              23.88
+            ],
+            [
+              71.28,
+              23.88
+            ],
+            [
+              71.28,
+              23.95
+            ],
+            [
+              71.18,
+              23.95
+            ],
+            [
+              71.18,
+              23.88
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Dholera Solar Park Belt",
+        "zone_name": "Dholera Solar Park Belt",
+        "zone": "wasteland",
+        "zone_type": "wasteland"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.15,
+              22.18
+            ],
+            [
+              72.28,
+              22.18
+            ],
+            [
+              72.28,
+              22.3
+            ],
+            [
+              72.15,
+              22.3
+            ],
+            [
+              72.15,
+              22.18
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Jakhau Wind Corridor (Kutch Coast)",
+        "zone_name": "Jakhau Wind Corridor (Kutch Coast)",
+        "zone": "wasteland",
+        "zone_type": "wasteland"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              68.62,
+              23.18
+            ],
+            [
+              68.75,
+              23.18
+            ],
+            [
+              68.75,
+              23.28
+            ],
+            [
+              68.62,
+              23.28
+            ],
+            [
+              68.62,
+              23.18
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Lamba Wind Energy Belt (Dwarka Coast)",
+        "zone_name": "Lamba Wind Energy Belt (Dwarka Coast)",
+        "zone": "barren",
+        "zone_type": "barren"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              69.35,
+              21.9
+            ],
+            [
+              69.5,
+              21.9
+            ],
+            [
+              69.5,
+              22.02
+            ],
+            [
+              69.35,
+              22.02
+            ],
+            [
+              69.35,
+              21.9
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Raghanesda Solar Park (Banaskantha)",
+        "zone_name": "Raghanesda Solar Park (Banaskantha)",
+        "zone": "wasteland",
+        "zone_type": "wasteland"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              71.05,
+              24.05
+            ],
+            [
+              71.15,
+              24.05
+            ],
+            [
+              71.15,
+              24.15
+            ],
+            [
+              71.05,
+              24.15
+            ],
+            [
+              71.05,
+              24.05
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Surat Ring Road & Textile Commercial District",
+        "zone_name": "Surat Ring Road & Textile Commercial District",
+        "zone": "commercial",
+        "zone_type": "commercial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.8,
+              21.15
+            ],
+            [
+              72.88,
+              21.15
+            ],
+            [
+              72.88,
+              21.22
+            ],
+            [
+              72.8,
+              21.22
+            ],
+            [
+              72.8,
+              21.15
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vadodara Alkapuri CBD Corridor",
+        "zone_name": "Vadodara Alkapuri CBD Corridor",
+        "zone": "commercial",
+        "zone_type": "commercial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.15,
+              22.29
+            ],
+            [
+              73.2,
+              22.29
+            ],
+            [
+              73.2,
+              22.33
+            ],
+            [
+              73.15,
+              22.33
+            ],
+            [
+              73.15,
+              22.29
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Rajkot Yagnik Road Commercial Hub",
+        "zone_name": "Rajkot Yagnik Road Commercial Hub",
+        "zone": "commercial",
+        "zone_type": "commercial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              70.78,
+              22.28
+            ],
+            [
+              70.83,
+              22.28
+            ],
+            [
+              70.83,
+              22.32
+            ],
+            [
+              70.78,
+              22.32
+            ],
+            [
+              70.78,
+              22.28
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Bhavnagar Waghawadi Road Retail Belt",
+        "zone_name": "Bhavnagar Waghawadi Road Retail Belt",
+        "zone": "commercial",
+        "zone_type": "commercial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.12,
+              21.74
+            ],
+            [
+              72.17,
+              21.74
+            ],
+            [
+              72.17,
+              21.78
+            ],
+            [
+              72.12,
+              21.78
+            ],
+            [
+              72.12,
+              21.74
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Jamnagar Grain Market Commercial Center",
+        "zone_name": "Jamnagar Grain Market Commercial Center",
+        "zone": "commercial",
+        "zone_type": "commercial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              70.04,
+              22.45
+            ],
+            [
+              70.08,
+              22.45
+            ],
+            [
+              70.08,
+              22.49
+            ],
+            [
+              70.04,
+              22.49
+            ],
+            [
+              70.04,
+              22.45
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Gandhidham Commercial Port Hub",
+        "zone_name": "Gandhidham Commercial Port Hub",
+        "zone": "commercial",
+        "zone_type": "commercial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              70.11,
+              23.06
+            ],
+            [
+              70.16,
+              23.06
+            ],
+            [
+              70.16,
+              23.1
+            ],
+            [
+              70.11,
+              23.1
+            ],
+            [
+              70.11,
+              23.06
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Junagadh MG Road Commercial Center",
+        "zone_name": "Junagadh MG Road Commercial Center",
+        "zone": "commercial",
+        "zone_type": "commercial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              70.44,
+              21.5
+            ],
+            [
+              70.48,
+              21.5
+            ],
+            [
+              70.48,
+              21.54
+            ],
+            [
+              70.44,
+              21.54
+            ],
+            [
+              70.44,
+              21.5
+            ]
+          ]
+        ]
+      }
     }
   ]
 }
