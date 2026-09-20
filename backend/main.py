@@ -94,6 +94,17 @@ except ImportError:
     except ImportError:
         pass
 
+try:
+    from backend.api.routes_wind import router as wind_router
+    app.include_router(wind_router, prefix="/api", tags=["Wind Resource"])
+except ImportError:
+    try:
+        from api.routes_wind import router as wind_router
+        app.include_router(wind_router, prefix="/api", tags=["Wind Resource"])
+    except ImportError:
+        pass
+
+
 
 @app.get("/api/health", tags=["Health"])
 def health_check():

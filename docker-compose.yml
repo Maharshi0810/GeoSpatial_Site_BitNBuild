@@ -28,6 +28,8 @@ services:
     volumes:
       - ./frontend/src:/app/src        # hot reload React code
       - ./frontend/public:/app/public
+      - ./frontend/vite.config.ts:/app/vite.config.ts
+      - ./frontend/index.html:/app/index.html
     environment:
       - VITE_API_URL=http://localhost:8000
       - BACKEND_URL=http://backend:8000

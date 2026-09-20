@@ -57,6 +57,11 @@ export interface MapViewProps {
   drawMode?: DrawMode;
   drawVertices?: number[][];
   drawnPolygonGeoJSON?: FeatureCollection | null;
+  // Wind Atlas & Prime Spots
+  siteType?: string;
+  windAtlasData?: any | null;
+  primeSpots?: any[] | null;
+  onSelectPrimeSpot?: (spot: any) => void;
 }
 
 export const MapView = forwardRef<MapViewHandle, MapViewProps>((
@@ -75,6 +80,10 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>((
     drawMode = 'none',
     drawVertices = [],
     drawnPolygonGeoJSON = null,
+    siteType = 'ev_charging',
+    windAtlasData = null,
+    primeSpots = [],
+    onSelectPrimeSpot,
   },
   ref
 ) => {
@@ -595,6 +604,139 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>((
       });
     }
   }, [analysisMode, h3Data, clusterData, hotspotData, isochroneData, mapLoaded]);
+
+  // --- Sync Gujarat Wind Atlas & Prime Spots ---
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapLoaded) return;
+
+    const isWindMode = siteType === 'windmill' || siteType === 'renewables';
+
+    // 1. Wind Atlas Surface Layer
+    if (windAtlasData && windAtlasData.features?.length > 0) {
+      if (map.getSource('src-wind-atlas')) {
+        (map.getSource('src-wind-atlas') as maplibregl.GeoJSONSource).setData(windAtlasData);
+      } else {
+        map.addSource('src-wind-atlas', { type: 'geojson', data: windAtlasData });
+
+        // Heatmap / Choropleth fill layer with Vortex palette
+        map.addLayer(
+          {
+            id: 'layer-wind-surface',
+            type: 'fill',
+            source: 'src-wind-atlas',
+            paint: {
+              'fill-color': ['get', 'fill_color'],
+              'fill-opacity': 0.45,
+            },
+          },
+          map.getLayer('gujarat-boundary-line') ? 'gujarat-boundary-line' : undefined
+        );
+
+        // Grid cell subtle borders
+        map.addLayer(
+          {
+            id: 'layer-wind-grid-lines',
+            type: 'line',
+            source: 'src-wind-atlas',
+            paint: {
+              'line-color': 'rgba(255, 255, 255, 0.08)',
+              'line-width': 0.75,
+            },
+          },
+          'layer-wind-surface'
+        );
+
+        // Click popup on wind surface
+        map.on('click', 'layer-wind-surface', (e) => {
+          if (!e.features || !e.features[0]) return;
+          const props = e.features[0].properties;
+          if (popupRef.current) popupRef.current.remove();
+
+          popupRef.current = new maplibregl.Popup({ closeButton: true, offset: 10 })
+            .setLngLat(e.lngLat)
+            .setHTML(`
+              <div style="font-family: inherit; font-size: 11px; padding: 6px; color: #0f172a; min-width: 140px;">
+                <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;">
+                  <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${props?.fill_color || '#06b6d4'};"></span>
+                  <p style="font-weight: 700; margin: 0; color: #0f172a;">${props?.tier || 'Wind Field'}</p>
+                </div>
+                <div><strong>120m Speed:</strong> ${Number(props?.wind_speed_ms).toFixed(1)} m/s</div>
+                <div><strong>Estimated CUF:</strong> ${props?.cuf_pct || 0}%</div>
+                <div style="font-size: 10px; color: #64748b; margin-top: 3px;">Nearest: ${props?.nearest_anchor || 'Gujarat Field'}</div>
+              </div>
+            `)
+            .addTo(map);
+        });
+      }
+    }
+
+    if (map.getLayer('layer-wind-surface')) {
+      map.setLayoutProperty('layer-wind-surface', 'visibility', isWindMode ? 'visible' : 'none');
+    }
+    if (map.getLayer('layer-wind-grid-lines')) {
+      map.setLayoutProperty('layer-wind-grid-lines', 'visibility', isWindMode ? 'visible' : 'none');
+    }
+
+    // 2. Prime Wind Spots Markers / Layer
+    const primeSpotsFC = {
+      type: 'FeatureCollection',
+      features: (primeSpots || []).map((spot: any) => ({
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [spot.lng, spot.lat] },
+        properties: spot,
+      })),
+    };
+
+    if (map.getSource('src-prime-spots')) {
+      (map.getSource('src-prime-spots') as maplibregl.GeoJSONSource).setData(primeSpotsFC as any);
+    } else if (primeSpots && primeSpots.length > 0) {
+      map.addSource('src-prime-spots', { type: 'geojson', data: primeSpotsFC as any });
+
+      // Pulsing outer glow
+      map.addLayer({
+        id: 'layer-prime-spots-glow',
+        type: 'circle',
+        source: 'src-prime-spots',
+        paint: {
+          'circle-radius': 14,
+          'circle-color': '#ef4444',
+          'circle-opacity': 0.25,
+          'circle-stroke-width': 1.5,
+          'circle-stroke-color': '#f87171',
+        },
+      });
+
+      // Solid core
+      map.addLayer({
+        id: 'layer-prime-spots-core',
+        type: 'circle',
+        source: 'src-prime-spots',
+        paint: {
+          'circle-radius': 6.5,
+          'circle-color': '#b91c1c',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#ffffff',
+        },
+      });
+
+      // Click on prime spot
+      map.on('click', 'layer-prime-spots-core', (e) => {
+        if (!e.features || !e.features[0]) return;
+        const props = e.features[0].properties;
+        if (onSelectPrimeSpot) {
+          onSelectPrimeSpot(props);
+        } else if (onMapClick) {
+          onMapClick({ lat: props.lat, lng: props.lng });
+        }
+      });
+    }
+
+    if (map.getLayer('layer-prime-spots-glow')) {
+      map.setLayoutProperty('layer-prime-spots-glow', 'visibility', isWindMode ? 'visible' : 'none');
+      map.setLayoutProperty('layer-prime-spots-core', 'visibility', isWindMode ? 'visible' : 'none');
+    }
+  }, [siteType, windAtlasData, primeSpots, mapLoaded, onSelectPrimeSpot, onMapClick]);
 
   return (
     <div

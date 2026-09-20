@@ -23,6 +23,9 @@ import {
 } from '@/data/gujaratBenchmarks';
 import { ReportExport } from '@/components/ReportExport';
 import { SearchBar } from '@/components/SearchBar';
+import { useWindAtlas } from '@/hooks/useWindAtlas';
+import { WindLegend } from '@/components/WindLegend';
+import { WindPrimeSpotsBar, PrimeSpotItem } from '@/components/WindPrimeSpotsBar';
 import type { FeatureCollection } from 'geojson';
 
 export interface MapWorkspaceProps {
@@ -92,6 +95,11 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
 
   // Isochrone & Catchment Hook
   const isochroneState = useIsochrone(selectedLocation);
+
+  // Gujarat Wind Atlas & Prime Spots Hook (active when siteType is windmill or renewables)
+  const isWindMode = siteType === 'windmill' || siteType === 'renewables';
+  const { windAtlasData, primeSpots } = useWindAtlas(isWindMode);
+  const [selectedPrimeSpotId, setSelectedPrimeSpotId] = useState<string | null>(null);
 
   // Geographic Vector Layers State
   const [layers, setLayers] = useState<LayerItem[]>([
@@ -189,6 +197,15 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
       setIsLoading(false);
     }
   };
+
+  const handleSelectPrimeSpot = useCallback((spot: PrimeSpotItem) => {
+    setSelectedPrimeSpotId(spot.id);
+    const coords = { lat: spot.lat, lng: spot.lng };
+    setSelectedLocation(coords);
+    setSelectedSiteName(spot.name);
+    mapViewRef.current?.flyTo(spot.lng, spot.lat, 10.5);
+    loadScore(spot.lat, spot.lng, siteType, activeFilter);
+  }, [siteType, activeFilter]);
 
   const handleToggleLayer = (layerId: string) => {
     setLayers((prev) =>
@@ -332,6 +349,17 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
                 <span>{compareNotification}</span>
               </div>
             )}
+
+            {/* Wind Prime Spots Quick Nav Bar (VORTEX / NIWE Hotspots) */}
+            {isWindMode && primeSpots.length > 0 && (
+              <div className="w-full flex justify-center px-4 transition-all">
+                <WindPrimeSpotsBar
+                  primeSpots={primeSpots}
+                  onSelectSpot={handleSelectPrimeSpot}
+                  selectedSpotId={selectedPrimeSpotId}
+                />
+              </div>
+            )}
           </div>
 
           {/* Interactive MapLibre Map View */}
@@ -390,25 +418,23 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
                   return;
                 }
 
-                // Normal site selection click
+                // Default behavior: Select location and load readiness score
                 setSelectedLocation(coords);
-                setSelectedSiteName(`Candidate Site (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})`);
-                loadScore(coords.lat, coords.lng, siteType);
-                setActiveSidebarTab('score');
-                if (isSidebarCollapsed) {
-                  setIsSidebarCollapsed(false);
-                }
+                setSelectedSiteName(`Custom Site (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})`);
+                loadScore(coords.lat, coords.lng, siteType, activeFilter);
               }}
-              onMapDblClick={() => {
-                // Cancel pending click to prevent duplicate vertex on polygon close (BUG-03)
-                if (clickTimerRef.current) {
-                  clearTimeout(clickTimerRef.current);
-                  clickTimerRef.current = null;
-                }
+              onMapDblClick={(coords) => {
                 if (drawMode === 'polygon') {
+                  // Cancel pending single-click timer
+                  if (clickTimerRef.current) {
+                    clearTimeout(clickTimerRef.current);
+                    clickTimerRef.current = null;
+                  }
                   setDrawVertices((prev) => {
-                    if (prev.length >= 3) {
-                      finalisePolygon(prev);
+                    const candidate = [...prev, [coords.lng, coords.lat]];
+                    if (candidate.length >= 3) {
+                      finalisePolygon(candidate);
+                      return [];
                     }
                     return prev;
                   });
@@ -424,8 +450,19 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
               drawnPolygonGeoJSON={drawnPolygonGeoJSON}
               activeLayers={layers.reduce((acc, l) => ({ ...acc, [l.id]: l.visible }), {})}
               layerOpacity={layers.reduce((acc, l) => ({ ...acc, [l.id]: l.opacity / 100 }), {})}
+              siteType={siteType}
+              windAtlasData={windAtlasData}
+              primeSpots={primeSpots}
+              onSelectPrimeSpot={handleSelectPrimeSpot}
             />
           </div>
+
+          {/* VORTEX-Style Wind Mean Speed Map Legend */}
+          {isWindMode && (
+            <div className="absolute left-4 bottom-14 z-20">
+              <WindLegend />
+            </div>
+          )}
 
           {/* Phase 3B: Windows Snipping Tool-style Draw Toolbar */}
           <DrawToolbar

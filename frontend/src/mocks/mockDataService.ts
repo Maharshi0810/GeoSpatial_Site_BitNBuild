@@ -129,9 +129,9 @@ class MockDataService {
             },
             {
               id: 'arterial_proximity',
-              label: siteType === 'renewables' ? 'Logistics / grid corridor' : 'Arterial road access',
-              passed: (data.constraints?.min_road_distance_m ?? 0) <= (siteType === 'renewables' ? 30000 : 2500),
-              reason: siteType === 'renewables'
+              label: (siteType === 'renewables' || siteType === 'windmill') ? 'Logistics / grid corridor' : 'Arterial road access',
+              passed: (data.constraints?.min_road_distance_m ?? 0) <= ((siteType === 'renewables' || siteType === 'windmill') ? 30000 : 2500),
+              reason: (siteType === 'renewables' || siteType === 'windmill')
                 ? `Distance to regional transport / grid corridor is ${Math.round((data.constraints?.min_road_distance_m ?? 0) / 1000)} km.`
                 : `Distance to nearest mapped highway/road is ${Math.round(data.constraints?.min_road_distance_m ?? 0)} m.`,
             },

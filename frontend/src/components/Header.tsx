@@ -40,7 +40,8 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'retail', label: 'Retail store' },
     { id: 'warehouse', label: 'Warehouse / Logistics' },
     { id: 'telecom', label: 'Telecom tower' },
-    { id: 'renewables', label: 'Solar / Wind' },
+    { id: 'windmill', label: 'Wind turbine' },
+    { id: 'solar', label: 'Solar farm' },
   ];
 
   return (
