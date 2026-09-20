@@ -38,7 +38,12 @@ async def compute_site_score(request: ScoreRequest) -> Dict[str, Any]:
         if request.weights:
             weights_dict = request.weights.model_dump()
 
-        result = scorer.compute(request.lat, request.lng, weights=weights_dict)
+        result = scorer.compute(
+            request.lat,
+            request.lng,
+            site_type=request.site_type or "ev_charging",
+            weights=weights_dict
+        )
 
         return {
             "status": "ok",
@@ -56,8 +61,13 @@ async def compute_score_breakdown(request: ScoreRequest) -> Dict[str, Any]:
     """Return in-depth breakdown of factors, applied weights, and weighted contributions."""
     try:
         scorer = get_scorer()
-        weights_dict = request.weights.model_dump() if request.weights else scorer.weights
-        result = scorer.compute(request.lat, request.lng, weights=weights_dict)
+        weights_dict = request.weights.model_dump() if request.weights else None
+        result = scorer.compute(
+            request.lat,
+            request.lng,
+            site_type=request.site_type or "ev_charging",
+            weights=weights_dict
+        )
 
         factors = []
         for layer_key, info in result["breakdown"].items():

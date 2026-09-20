@@ -40,7 +40,12 @@ async def compare_sites(request: CompareRequest) -> Dict[str, Any]:
         best_site_strengths = []
 
         for item in request.sites:
-            result = scorer.compute(item.lat, item.lng, weights=weights_dict)
+            result = scorer.compute(
+                item.lat,
+                item.lng,
+                site_type=request.site_type or "ev_charging",
+                weights=weights_dict
+            )
             site_summary = {
                 "label": item.label,
                 "lat": item.lat,

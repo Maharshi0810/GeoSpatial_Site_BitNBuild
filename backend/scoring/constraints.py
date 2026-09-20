@@ -54,7 +54,12 @@ def flood_zone_check(lat: float, lng: float, environment_layer: Dict[str, Any]) 
     return 0.0, "none"
 
 
-def min_road_distance_check(lat: float, lng: float, transportation_layer: Dict[str, Any]) -> Tuple[float, float]:
+def min_road_distance_check(
+    lat: float,
+    lng: float,
+    transportation_layer: Dict[str, Any],
+    site_type: str = "ev_charging"
+) -> Tuple[float, float]:
     """Calculate distance to nearest transport network line string and apply penalty if too isolated."""
     if not transportation_layer or not transportation_layer.get("features"):
         return 0.0, 150.0  # reasonable default if layer not populated
@@ -80,7 +85,13 @@ def min_road_distance_check(lat: float, lng: float, transportation_layer: Dict[s
     if min_dist_m == float("inf"):
         return 0.0, 200.0
 
-    penalty = ROAD_DISTANCE_PENALTY if min_dist_m > MAX_ACCEPTABLE_ROAD_DIST_M else 0.0
+    is_renewables = site_type in ("renewables", "windmill", "wind_farm", "solar_wind")
+    if is_renewables:
+        # Wind farms are distributed across regional plains; highway access is viable up to 30km
+        penalty = 10.0 if min_dist_m > 30000.0 else 0.0
+    else:
+        penalty = ROAD_DISTANCE_PENALTY if min_dist_m > MAX_ACCEPTABLE_ROAD_DIST_M else 0.0
+
     return penalty, min_dist_m
 
 
@@ -168,7 +179,12 @@ def water_body_check(lat: float, lng: float, layers: Dict[str, Any]) -> Tuple[bo
     return False, None, None, None
 
 
-def apply_all_constraints(lat: float, lng: float, layers: Dict[str, Any]) -> Dict[str, Any]:
+def apply_all_constraints(
+    lat: float,
+    lng: float,
+    layers: Dict[str, Any],
+    site_type: str = "ev_charging"
+) -> Dict[str, Any]:
     """Execute all hard constraints and compute cumulative penalty."""
     env_layer = layers.get("environment", {})
     trans_layer = layers.get("transportation", {})
@@ -177,7 +193,7 @@ def apply_all_constraints(lat: float, lng: float, layers: Dict[str, Any]) -> Dic
     is_water, wb_name, wb_type, wb_reason = water_body_check(lat, lng, layers)
 
     flood_penalty, flood_risk = flood_zone_check(lat, lng, env_layer)
-    road_penalty, road_dist_m = min_road_distance_check(lat, lng, trans_layer)
+    road_penalty, road_dist_m = min_road_distance_check(lat, lng, trans_layer, site_type=site_type)
 
     if is_water:
         # Hard limiting parameter: Immediate disqualification & 100 penalty

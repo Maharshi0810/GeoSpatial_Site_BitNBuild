@@ -31,4 +31,25 @@ WEIGHT_PROFILES = {
         "landuse": 0.15,
         "environment": 0.10,
     },
+    "renewables": {
+        "demographics": 0.20,      # Inverted: rewards uninhabited buffer / low density
+        "transportation": 0.15,    # Heavy haul road / logistics corridor
+        "poi": 0.35,               # Wind Resource & Generation Potential Index
+        "landuse": 0.20,           # Open wasteland / non-arable low cost
+        "environment": 0.10,       # Setback from protected forests/sanctuaries
+    },
+    "windmill": {
+        "demographics": 0.20,
+        "transportation": 0.15,
+        "poi": 0.35,
+        "landuse": 0.20,
+        "environment": 0.10,
+    },
+    "telecom": {
+        "demographics": 0.30,
+        "transportation": 0.15,
+        "poi": 0.20,
+        "landuse": 0.15,
+        "environment": 0.20,
+    },
 }

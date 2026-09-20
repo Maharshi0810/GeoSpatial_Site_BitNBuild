@@ -8,22 +8,24 @@ distance decay attenuation, and constraint penalties.
 import json
 import os
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 
 try:
     from backend.config import DATA_DIR
-    from backend.scoring.weights import DEFAULT_WEIGHTS
+    from backend.scoring.weights import DEFAULT_WEIGHTS, WEIGHT_PROFILES
     from backend.scoring.decay import gaussian, inverse_distance
     from backend.scoring.constraints import apply_all_constraints, check_point_in_geojson_geometry
     from backend.utils.geo_helpers import haversine_distance
     from backend.api.routes_layers import _get_fallback_geojson
+    from backend.spatial.wind_resource import get_wind_resource_score
 except ImportError:
     from config import DATA_DIR
-    from scoring.weights import DEFAULT_WEIGHTS
+    from scoring.weights import DEFAULT_WEIGHTS, WEIGHT_PROFILES
     from scoring.decay import gaussian, inverse_distance
     from scoring.constraints import apply_all_constraints, check_point_in_geojson_geometry
     from utils.geo_helpers import haversine_distance
     from api.routes_layers import _get_fallback_geojson
+    from spatial.wind_resource import get_wind_resource_score
 
 
 def score_to_grade(score: float) -> str:
@@ -45,6 +47,18 @@ LANDUSE_SCORES = {
     "residential": 55.0,
     "industrial": 38.0,
     "agricultural": 18.0,
+}
+
+RENEWABLES_LANDUSE_SCORES = {
+    "wasteland": 96.0,
+    "barren": 95.0,
+    "fallow": 88.0,
+    "rural": 86.0,
+    "agricultural": 82.0,
+    "industrial": 65.0,
+    "mixed": 35.0,
+    "commercial": 15.0,
+    "residential": 10.0,
 }
 
 ENVIRONMENT_SCORES = {
@@ -204,30 +218,146 @@ class SiteReadinessScorer:
 
         return ENVIRONMENT_SCORES["none"]
 
-    def compute(self, lat: float, lng: float, weights: Optional[Dict[str, float]] = None) -> Dict[str, Any]:
-        """Compute readiness score, breakdown by dimension, and constraint audit."""
-        active_weights = weights or self.weights
+    def _score_renewables_demographics(self, lat: float, lng: float) -> Tuple[float, str]:
+        """Inverted demographic scoring for wind/solar: rewards sparse/uninhabited land (500m+ buffer),
+        penalizes dense settlements."""
+        layer = self.layers.get("demographics", {})
+        features = layer.get("features", [])
+        if not features:
+            return 88.0, "Settlement Buffer (Low Density Preferred)"
+
+        nearest_pop = 0
+        min_dist_m = float("inf")
+        for feat in features:
+            geom = feat.get("geometry", {})
+            if geom.get("type") == "Point":
+                coords = geom.get("coordinates", [])
+                if len(coords) >= 2:
+                    p_lng, p_lat = coords[0], coords[1]
+                    d_m = haversine_distance(lat, lng, p_lat, p_lng, unit="m")
+                    if d_m < min_dist_m:
+                        min_dist_m = d_m
+                        nearest_pop = feat.get("properties", {}).get("population", 3000)
+
+        # Buffer rule: if within 800m of dense cluster (> 2000 people), high risk / severe penalty
+        if min_dist_m < 800 and nearest_pop > 2000:
+            return 18.0, "Settlement Conflict (< 800m to High-Density Habitation)"
+        elif min_dist_m < 2000 and nearest_pop > 4000:
+            return 35.0, "Close to Urban Settlement Boundary"
+        elif min_dist_m > 4000:
+            return 95.0, "Optimal Habitation Buffer (> 4km from Dense Settlements)"
+        else:
+            return 78.0, "Adequate Settlement Buffer (> 1.5km)"
+
+    def _score_renewables_landuse(self, lat: float, lng: float) -> Tuple[float, str]:
+        """Wasteland / rural land scoring: rewards cheap revenue wasteland / open plains;
+        penalizes expensive downtown commercial plots."""
+        layer = self.layers.get("landuse", {})
+        features = layer.get("features", [])
+        if not features:
+            return 88.0, "Open Rural / Non-Arable Terrain"
+
+        for feat in features:
+            geom = feat.get("geometry", {})
+            if geom.get("type") in ("Polygon", "MultiPolygon"):
+                if check_point_in_geojson_geometry(lat, lng, geom):
+                    zone = feat.get("properties", {}).get("zone", "").lower()
+                    for k, val in RENEWABLES_LANDUSE_SCORES.items():
+                        if k in zone:
+                            return val, f"Zoning: {zone.title()}"
+                    return 75.0, f"Zoning: {zone.title()}"
+
+        return 90.0, "Open Revenue Wasteland / Non-Arable Land"
+
+    def _score_renewables_transportation(self, lat: float, lng: float) -> Tuple[float, str]:
+        """Heavy logistics access: wind turbines need wide turning radius and access roads within 15km."""
+        layer = self.layers.get("transportation", {})
+        features = layer.get("features", [])
+        if not features:
+            return 75.0, "Logistics & Evacuation Access"
+
+        min_dist_m = float("inf")
+        for feat in features:
+            geom = feat.get("geometry", {})
+            coords = geom.get("coordinates", [])
+            if geom.get("type") == "LineString":
+                for pt in coords:
+                    d_m = haversine_distance(lat, lng, pt[1], pt[0], unit="m")
+                    if d_m < min_dist_m:
+                        min_dist_m = d_m
+            elif geom.get("type") == "MultiLineString":
+                for line in coords:
+                    for pt in line:
+                        d_m = haversine_distance(lat, lng, pt[1], pt[0], unit="m")
+                        if d_m < min_dist_m:
+                            min_dist_m = d_m
+
+        if min_dist_m == float("inf"):
+            return 70.0, "Regional Transport Corridor"
+
+        if min_dist_m <= 4000:
+            return 95.0, "Direct Heavy Haulage Access (< 4km to Arterial)"
+        elif min_dist_m <= 12000:
+            return 80.0, "Viable Haulage Corridor (4 - 12km to Arterial)"
+        else:
+            return 55.0, "Remote Access (> 12km to Paved Transport Corridor)"
+
+    def compute(
+        self,
+        lat: float,
+        lng: float,
+        site_type: str = "ev_charging",
+        weights: Optional[Dict[str, float]] = None
+    ) -> Dict[str, Any]:
+        """Compute readiness score, breakdown by dimension, and constraint audit tailored to facility archetype."""
+        norm_type = (site_type or "ev_charging").lower().strip()
+        is_renewables = norm_type in ("renewables", "windmill", "wind_farm", "solar_wind")
+
+        # Select facility-appropriate default weights
+        profile_weights = WEIGHT_PROFILES.get(norm_type, WEIGHT_PROFILES.get("balanced", DEFAULT_WEIGHTS))
+        active_weights = weights or profile_weights
+
+        if is_renewables:
+            demo_score, demo_label = self._score_renewables_demographics(lat, lng)
+            trans_score, trans_label = self._score_renewables_transportation(lat, lng)
+            wind_info = get_wind_resource_score(lat, lng)
+            poi_score = wind_info["score"]
+            poi_label = f"Wind Resource (120m): {wind_info['mean_wind_speed_ms']} m/s"
+            land_score, land_label = self._score_renewables_landuse(lat, lng)
+            env_score = self._score_environment(lat, lng)
+            env_label = "Environmental & Ecological Safety"
+        else:
+            demo_score = self._score_demographics(lat, lng)
+            demo_label = "Population Density"
+            trans_score = self._score_transportation(lat, lng)
+            trans_label = "Road Accessibility"
+            poi_score = self._score_poi(lat, lng)
+            poi_label = "Points of Interest"
+            land_score = self._score_landuse(lat, lng)
+            land_label = "Land Use Compatibility"
+            env_score = self._score_environment(lat, lng)
+            env_label = "Environmental Safety"
 
         breakdown = {
             "demographics": {
-                "score": self._score_demographics(lat, lng),
-                "label": "Population Density"
+                "score": demo_score,
+                "label": demo_label
             },
             "transportation": {
-                "score": self._score_transportation(lat, lng),
-                "label": "Road Accessibility"
+                "score": trans_score,
+                "label": trans_label
             },
             "poi": {
-                "score": self._score_poi(lat, lng),
-                "label": "Points of Interest"
+                "score": poi_score,
+                "label": poi_label
             },
             "landuse": {
-                "score": self._score_landuse(lat, lng),
-                "label": "Land Use Compatibility"
+                "score": land_score,
+                "label": land_label
             },
             "environment": {
-                "score": self._score_environment(lat, lng),
-                "label": "Environmental Safety"
+                "score": env_score,
+                "label": env_label
             }
         }
 
@@ -242,11 +372,10 @@ class SiteReadinessScorer:
         )
 
         # Apply constraint penalties & hard limiting parameters
-        constraint_audit = apply_all_constraints(lat, lng, self.layers)
+        constraint_audit = apply_all_constraints(lat, lng, self.layers, site_type=norm_type)
         is_disqualified = constraint_audit.get("disqualified", False) or constraint_audit.get("is_water_body", False)
 
         if is_disqualified:
-            # Hard limiting parameter triggered: site is strictly unbuildable
             final_score = 0.0
             grade = "F"
             breakdown["environment"]["score"] = 0.0
@@ -258,11 +387,12 @@ class SiteReadinessScorer:
             final_score = round(final_score, 1)
             grade = score_to_grade(final_score)
 
-        return {
+        resp: Dict[str, Any] = {
             "score": final_score,
             "grade": grade,
             "lat": lat,
             "lng": lng,
+            "site_type": norm_type,
             "disqualified": is_disqualified,
             "limiting_parameter": constraint_audit.get("limiting_parameter"),
             "disqualification_reason": constraint_audit.get("disqualification_reason"),
@@ -279,3 +409,15 @@ class SiteReadinessScorer:
                 "min_road_distance_m": constraint_audit.get("min_road_distance_m", 100.0)
             }
         }
+
+        if is_renewables:
+            wind_info = get_wind_resource_score(lat, lng)
+            resp["renewable_resource"] = {
+                "mean_wind_speed_ms": wind_info["mean_wind_speed_ms"],
+                "wind_power_density_wm2": wind_info["wind_power_density_wm2"],
+                "hub_height_m": wind_info["hub_height_m"],
+                "wind_tier": wind_info["tier"],
+                "anchor_proximity": wind_info["anchor_proximity"]
+            }
+
+        return resp
