@@ -240,6 +240,7 @@ def compute_isochrone(
                     "center": {"lat": lat, "lng": lng},
                     "area_km2": area_km2,
                     "nominal_radius_km": nominal_r,
+                    "population_reached": round(area_km2 * 14250 * 0.68),
                     "provider": "network_attenuation_model",
                     "color": BAND_COLORS.get(interval, "#0284c7")
                 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export type TravelMode = 'driving' | 'walking' | 'cycling';
 
@@ -34,15 +34,36 @@ export interface IsochroneState {
   refresh: () => void;
 }
 
+// Visual toast banner for catchment errors / 422 fallback (BUG-22)
+function showCatchmentToast(message: string, isWarning = true) {
+  if (typeof document === 'undefined') return;
+  const existing = document.getElementById('geovista-catchment-toast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.id = 'geovista-catchment-toast';
+  toast.className = `fixed top-20 right-6 z-50 px-4 py-2.5 rounded-lg shadow-2xl text-xs font-semibold flex items-center gap-2 border transition-all pointer-events-auto ${
+    isWarning ? 'bg-amber-500/95 text-slate-950 border-amber-300' : 'bg-rose-600 text-white border-rose-400'
+  }`;
+  toast.innerHTML = `<span>⚠️ ${message}</span>`;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(-6px)';
+    setTimeout(() => toast.remove(), 300);
+  }, 4500);
+}
+
 // Fallback synthetic polygon generator for standalone frontend mode
-function generateFallbackIsochrone(lat: number, lng: number, minutes: number, mode: TravelMode) {
-  const speed = mode === 'walking' ? 4.5 : mode === 'cycling' ? 15.0 : 42.0;
+function generateFallbackIsochrone(lat: number, lng: number, minutes: number, mode: TravelMode, populationReached?: number) {
+  const speed = mode === 'walking' ? 4.5 : mode === 'cycling' ? 15.0 : 36.6;
   const radiusKm = speed * (minutes / 60.0);
   const deltaLat = (radiusKm / 6371.0) * (180.0 / Math.PI);
   const deltaLng = deltaLat / Math.cos((lat * Math.PI) / 180.0);
 
   const coords: [number, number][] = [];
-  const vertices = 36;
+  const vertices = 48;
   for (let i = 0; i < vertices; i++) {
     const theta = (2 * Math.PI * i) / vertices;
     const stretch = 1.0 + (mode === 'driving' ? 0.28 * Math.cos(2 * (theta - 0.6)) : 0.05);
@@ -52,7 +73,9 @@ function generateFallbackIsochrone(lat: number, lng: number, minutes: number, mo
   }
   coords.push(coords[0]);
 
-  const approxArea = Number((Math.PI * radiusKm * radiusKm * 0.9).toFixed(2));
+  const approxArea = Number((Math.PI * radiusKm * radiusKm * (mode === 'driving' ? 0.85 : 0.95)).toFixed(2));
+  const popEst = populationReached ?? Math.round(approxArea * 14250 * 0.68);
+
   return {
     type: 'FeatureCollection',
     features: [
@@ -67,6 +90,7 @@ function generateFallbackIsochrone(lat: number, lng: number, minutes: number, mo
           mode,
           area_km2: approxArea,
           nominal_radius_km: Number(radiusKm.toFixed(2)),
+          population_reached: popEst,
           provider: 'client_fallback',
           color: minutes <= 10 ? '#38bdf8' : minutes <= 20 ? '#0284c7' : '#0369a1',
         },
@@ -76,15 +100,15 @@ function generateFallbackIsochrone(lat: number, lng: number, minutes: number, mo
 }
 
 function generateFallbackCatchment(lat: number, lng: number, minutes: number, mode: TravelMode): CatchmentData {
-  const speed = mode === 'walking' ? 4.5 : mode === 'cycling' ? 15.0 : 42.0;
+  const speed = mode === 'walking' ? 4.5 : mode === 'cycling' ? 15.0 : 36.6;
   const radiusKm = speed * (minutes / 60.0);
-  const area = Number((Math.PI * radiusKm * radiusKm * 0.85).toFixed(2));
+  const area = Number((Math.PI * radiusKm * radiusKm * (mode === 'driving' ? 0.85 : 0.95)).toFixed(2));
   const avgDensity = 14250;
   const pop = Math.round(area * avgDensity * 0.68);
 
   const timeBands: TimeBandStat[] = [5, 10, 15, 30].map((m) => {
     const r = speed * (m / 60.0);
-    const a = Number((Math.PI * r * r * 0.85).toFixed(2));
+    const a = Number((Math.PI * r * r * (mode === 'driving' ? 0.85 : 0.95)).toFixed(2));
     return {
       minutes: m,
       population: Math.round(a * avgDensity * 0.68),
@@ -123,23 +147,43 @@ export function useIsochrone(location: { lat: number; lng: number } | null): Iso
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const activeRequestRef = useRef<AbortController | null>(null);
+
   const fetchIsochrone = useCallback(async () => {
-    if (!location) return;
+    if (!location) {
+      setIsochroneData(null);
+      setCatchmentData(null);
+      setIsLoading(false);
+      return;
+    }
+
+    if (activeRequestRef.current) {
+      activeRequestRef.current.abort();
+    }
+    const controller = new AbortController();
+    activeRequestRef.current = controller;
 
     setIsLoading(true);
     setError(null);
 
-    try {
-      // 1. Fetch Isochrone Polygon
-      const isoUrl = `/api/isochrones?lat=${location.lat}&lng=${location.lng}&minutes=${minutes}&mode=${mode}`;
-      const isoRes = await fetch(isoUrl);
+    // 1. Instantly generate client-side fallback geometry so map polygon resizes immediately on mode/minutes/location switch (BUG-08)
+    const instantFallback = generateFallbackIsochrone(location.lat, location.lng, minutes, mode);
+    setIsochroneData(instantFallback);
 
-      let isoJson = null;
+    try {
+      // 2. Fetch Isochrone Polygon
+      const isoUrl = `/api/isochrones?lat=${location.lat}&lng=${location.lng}&minutes=${minutes}&mode=${mode}`;
+      const isoRes = await fetch(isoUrl, { signal: controller.signal });
+
+      let isoJson: any = null;
       if (isoRes.ok) {
         isoJson = await isoRes.json();
+      } else {
+        const isoErr = `Isochrone API returned status ${isoRes.status}`;
+        setError(isoErr);
       }
 
-      // 2. Fetch Catchment Demographics
+      // 3. Fetch Catchment Demographics
       const catchRes = await fetch('/api/catchment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -149,37 +193,72 @@ export function useIsochrone(location: { lat: number; lng: number } | null): Iso
           minutes,
           mode,
         }),
+        signal: controller.signal,
       });
 
-      let catchJson = null;
+      let catchJson: CatchmentData | null = null;
       if (catchRes.ok) {
         const payload = await catchRes.json();
         if (payload.status === 'ok' && payload.data) {
           catchJson = payload.data;
         }
+      } else {
+        // Handle 422 or other errors (BUG-22)
+        let errorMsg = `Catchment Analysis: Coordinate outside evaluation bounds (${catchRes.status})`;
+        try {
+          const errBody = await catchRes.json();
+          if (errBody.detail) {
+            errorMsg = typeof errBody.detail === 'string' ? errBody.detail : JSON.stringify(errBody.detail);
+          }
+        } catch {}
+        setError(errorMsg);
+        showCatchmentToast(errorMsg, true);
       }
 
-      // If backend returned live results, set state
-      if (isoJson && catchJson) {
-        setIsochroneData(isoJson);
+      // 4. Update catchment data
+      if (catchJson) {
         setCatchmentData(catchJson);
-        setIsLoading(false);
-        return;
+      } else {
+        // Fallback catchment estimation
+        setCatchmentData(generateFallbackCatchment(location.lat, location.lng, minutes, mode));
       }
-    } catch {
-      // Graceful fallback on network/backend offline
-    }
 
-    // Client-side deterministic fallback
-    const fallbackIso = generateFallbackIsochrone(location.lat, location.lng, minutes, mode);
-    const fallbackCatch = generateFallbackCatchment(location.lat, location.lng, minutes, mode);
-    setIsochroneData(fallbackIso);
-    setCatchmentData(fallbackCatch);
-    setIsLoading(false);
+      // 5. Inject population_reached from catchment into each feature's properties (BUG-09)
+      const popValue = catchJson?.population_reached ?? Math.round((instantFallback.features[0].properties.area_km2 || 10) * 14250 * 0.68);
+
+      if (isoJson && isoJson.features && isoJson.features.length > 0) {
+        isoJson.features = isoJson.features.map((f: any) => ({
+          ...f,
+          properties: {
+            ...f.properties,
+            mode: f.properties?.mode || mode,
+            minutes: f.properties?.minutes || minutes,
+            population_reached: f.properties?.population_reached ?? popValue,
+          },
+        }));
+        setIsochroneData(isoJson);
+      } else {
+        // Inject into instant fallback
+        instantFallback.features[0].properties.population_reached = popValue;
+        setIsochroneData({ ...instantFallback });
+      }
+
+      setIsLoading(false);
+    } catch (err: any) {
+      if (err.name !== 'AbortError') {
+        const networkError = err?.message || 'Network error fetching catchment analysis; offline fallback active';
+        setError(networkError);
+        showCatchmentToast(networkError, true);
+        setIsLoading(false);
+      }
+    }
   }, [location?.lat, location?.lng, minutes, mode]);
 
   useEffect(() => {
     fetchIsochrone();
+    return () => {
+      if (activeRequestRef.current) activeRequestRef.current.abort();
+    };
   }, [fetchIsochrone]);
 
   return {
@@ -194,3 +273,4 @@ export function useIsochrone(location: { lat: number; lng: number } | null): Iso
     refresh: fetchIsochrone,
   };
 }
+
