@@ -11,11 +11,14 @@ export function useScoreApi() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchScore = useCallback(async (lat, lng, weights = null) => {
+  const fetchScore = useCallback(async (lat, lng, weights = null, site_type = 'ev_charging', sub_filter = null) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await api.post('/api/score', { lat, lng, weights });
+      const payload = { lat, lng, site_type };
+      if (weights) payload.weights = weights;
+      if (sub_filter) payload.sub_filter = sub_filter;
+      const data = await api.post('/api/score', payload);
       setScoreData(data);
       return data;
     } catch (err) {

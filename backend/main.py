@@ -82,7 +82,11 @@ try:
     from backend.api.routes_compare import router as compare_router
     app.include_router(compare_router, prefix="/api", tags=["Comparison"])
 except ImportError:
-    pass
+    try:
+        from api.routes_compare import router as compare_router
+        app.include_router(compare_router, prefix="/api", tags=["Comparison"])
+    except ImportError:
+        pass
 
 try:
     from backend.api.routes_search import router as search_router

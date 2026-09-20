@@ -19,16 +19,7 @@ export interface CompareResult {
 }
 
 export function useCompareApi() {
-  const [candidateSites, setCandidateSites] = useState<CandidateSite[]>([
-    {
-      id: 'site-default-sg',
-      name: 'SG Highway Commercial Hub',
-      lat: 23.0378,
-      lng: 72.5112,
-      siteType: 'ev_charging',
-      score: 78,
-    },
-  ]);
+  const [candidateSites, setCandidateSites] = useState<CandidateSite[]>([]);
 
   const [compareResult, setCompareResult] = useState<CompareResult | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -77,14 +68,17 @@ export function useCompareApi() {
     setCompareResult(null);
   }, []);
 
-  const runCompare = useCallback(async () => {
+  const runCompare = useCallback(async (siteType?: string) => {
     if (candidateSites.length === 0) return;
 
     setIsLoading(true);
     setError(null);
 
+    const effectiveSiteType = siteType || candidateSites[0]?.siteType || 'ev_charging';
+
     try {
       const payload = {
+        site_type: effectiveSiteType,
         sites: candidateSites.map((site) => ({
           label: site.name,
           lat: site.lat,
