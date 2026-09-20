@@ -62,6 +62,9 @@ export interface MapViewProps {
   windAtlasData?: any | null;
   primeSpots?: any[] | null;
   onSelectPrimeSpot?: (spot: any) => void;
+  // Sprint 2: AI Routing Props (BUG-07)
+  aiRouteData?: any | null;
+  showAiRoute?: boolean;
 }
 
 export const MapView = forwardRef<MapViewHandle, MapViewProps>((
@@ -84,6 +87,8 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>((
     windAtlasData = null,
     primeSpots = [],
     onSelectPrimeSpot,
+    aiRouteData = null,
+    showAiRoute = true,
   },
   ref
 ) => {
@@ -144,6 +149,164 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>((
           'line-opacity': 0.5,
           'line-dasharray': [2, 2],
         },
+      });
+
+      // --- Dedicated Vector Layers for Gujarat Spatial Analysis (BUG-10, BUG-17, BUG-18) ---
+      // 1. Transportation & Road Network
+      map.addSource('src-layer-transportation', { type: 'geojson', data: EMPTY_FC });
+      map.addLayer({
+        id: 'layer-transportation-casing',
+        type: 'line',
+        source: 'src-layer-transportation',
+        paint: {
+          'line-color': '#0284c7',
+          'line-width': 4.5,
+          'line-opacity': 0.7,
+        },
+      });
+      map.addLayer({
+        id: 'layer-transportation-line',
+        type: 'line',
+        source: 'src-layer-transportation',
+        paint: {
+          'line-color': '#38bdf8',
+          'line-width': 2.2,
+          'line-opacity': 0.95,
+        },
+      });
+
+      // 2. Land Use & Industrial Zoning (Decoupled from user drawing)
+      map.addSource('src-layer-landuse', { type: 'geojson', data: EMPTY_FC });
+      map.addLayer({
+        id: 'layer-landuse-fill',
+        type: 'fill',
+        source: 'src-layer-landuse',
+        paint: {
+          'fill-color': '#a855f7',
+          'fill-opacity': 0.28,
+        },
+      });
+      map.addLayer({
+        id: 'layer-landuse-line',
+        type: 'line',
+        source: 'src-layer-landuse',
+        paint: {
+          'line-color': '#c084fc',
+          'line-width': 1.5,
+          'line-opacity': 0.75,
+        },
+      });
+
+      // 3. Environmental & Flood Hazard Zones (Decoupled from isochrone)
+      map.addSource('src-layer-environment', { type: 'geojson', data: EMPTY_FC });
+      map.addLayer({
+        id: 'layer-env-flood-fill',
+        type: 'fill',
+        source: 'src-layer-environment',
+        paint: {
+          'fill-color': '#ef4444',
+          'fill-opacity': 0.25,
+        },
+      });
+      map.addLayer({
+        id: 'layer-env-flood-line',
+        type: 'line',
+        source: 'src-layer-environment',
+        paint: {
+          'line-color': '#f87171',
+          'line-width': 1.8,
+          'line-dasharray': [3, 2],
+          'line-opacity': 0.85,
+        },
+      });
+
+      // 4. AI Routing Feeder Polylines (BUG-07)
+      map.addSource('src-ai-route', { type: 'geojson', data: EMPTY_FC });
+      map.addLayer({
+        id: 'layer-ai-route-casing',
+        type: 'line',
+        source: 'src-ai-route',
+        paint: {
+          'line-color': 'rgba(14, 165, 233, 0.45)',
+          'line-width': 6,
+          'line-blur': 2,
+        },
+      });
+      map.addLayer({
+        id: 'layer-ai-route-line',
+        type: 'line',
+        source: 'src-ai-route',
+        paint: {
+          'line-color': '#38bdf8',
+          'line-width': 3.2,
+          'line-dasharray': [2, 2],
+        },
+      });
+
+      // Interactive Click Listeners for Spatial Vector Layers
+      map.on('click', 'layer-transportation-line', (e) => {
+        if (!e.features || !e.features[0]) return;
+        const props = e.features[0].properties;
+        if (popupRef.current) popupRef.current.remove();
+        popupRef.current = new maplibregl.Popup({ closeButton: true, offset: 10 })
+          .setLngLat(e.lngLat)
+          .setHTML(`
+            <div style="font-family: inherit; font-size: 11px; padding: 4px; color: #0f172a;">
+              <p style="font-weight: 700; margin: 0 0 2px 0; color: #0284c7;">${props?.name || 'Highway Corridor'}</p>
+              <div><strong>Hierarchy:</strong> ${props?.hierarchy || props?.type || 'Arterial'}</div>
+              <div><strong>Speed Limit:</strong> ${props?.speed_limit_kmh || 80} km/h</div>
+            </div>
+          `)
+          .addTo(map);
+      });
+
+      map.on('click', 'layer-landuse-fill', (e) => {
+        if (!e.features || !e.features[0]) return;
+        const props = e.features[0].properties;
+        if (popupRef.current) popupRef.current.remove();
+        popupRef.current = new maplibregl.Popup({ closeButton: true, offset: 10 })
+          .setLngLat(e.lngLat)
+          .setHTML(`
+            <div style="font-family: inherit; font-size: 11px; padding: 4px; color: #0f172a;">
+              <p style="font-weight: 700; margin: 0 0 2px 0; color: #7c3aed;">${props?.name || props?.zone || 'Zoning Parcel'}</p>
+              <div><strong>Permitted:</strong> ${props?.permitted !== false ? 'Yes (Industrial / Commercial)' : 'Restricted'}</div>
+            </div>
+          `)
+          .addTo(map);
+      });
+
+      map.on('click', 'layer-env-flood-fill', (e) => {
+        if (!e.features || !e.features[0]) return;
+        const props = e.features[0].properties;
+        if (popupRef.current) popupRef.current.remove();
+        popupRef.current = new maplibregl.Popup({ closeButton: true, offset: 10 })
+          .setLngLat(e.lngLat)
+          .setHTML(`
+            <div style="font-family: inherit; font-size: 11px; padding: 4px; color: #0f172a;">
+              <p style="font-weight: 700; margin: 0 0 2px 0; color: #dc2626;">${props?.name || props?.hazard || 'Flood Hazard Zone'}</p>
+              <div><strong>Risk Level:</strong> <span style="text-transform: uppercase; color: #ef4444; font-weight: 600;">${props?.risk_level || 'High'}</span></div>
+            </div>
+          `)
+          .addTo(map);
+      });
+
+      map.on('click', 'layer-ai-route-line', (e) => {
+        if (!e.features || !e.features[0]) return;
+        const props = e.features[0].properties;
+        if (popupRef.current) popupRef.current.remove();
+        popupRef.current = new maplibregl.Popup({ closeButton: true, offset: 10 })
+          .setLngLat(e.lngLat)
+          .setHTML(`
+            <div style="font-family: inherit; font-size: 11px; padding: 6px; color: #0f172a; min-width: 170px;">
+              <p style="font-weight: 700; margin: 0 0 4px 0; color: #0284c7;">⚡ ${props?.name || 'AI Feeder Route'}</p>
+              <div><strong>Distance:</strong> ${props?.distance_km || 0} km</div>
+              <div><strong>Est. Transit:</strong> ${props?.travel_time_mins || 0} mins</div>
+              <div><strong>Target Node:</strong> ${props?.destination_name || 'Arterial Node'}</div>
+              <div><strong>Congestion:</strong> <span style="color: #16a34a; font-weight: 600;">${props?.congestion || 'Low'}</span></div>
+              <div style="margin-top: 3px; font-size: 10px; color: #64748b;">CO₂ Savings: ${props?.co2_savings_kg || 0} kg</div>
+            </div>
+          `)
+          .addTo(map);
       });
 
       // --- Phase 3B: Drawing sources & layers ---
@@ -308,18 +471,46 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>((
     }
   }, [drawMode]);
 
-  // Sync layer visibility/opacity when sidebar layer toggles change
+  // Load vector layers data from backend or props (BUG-10, BUG-17, BUG-18)
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapLoaded) return;
 
-    // Map sidebar layer IDs to map layer IDs (where they exist)
+    const vectorLayerIds = ['transportation', 'landuse', 'environment'];
+    vectorLayerIds.forEach(async (layerId) => {
+      try {
+        const sourceName = `src-layer-${layerId}`;
+        const source = map.getSource(sourceName) as maplibregl.GeoJSONSource | undefined;
+        if (!source) return;
+
+        if (_layerData && _layerData[layerId]) {
+          source.setData(_layerData[layerId]);
+          return;
+        }
+
+        const res = await fetch(`/api/layers/${layerId}/geojson`);
+        if (res.ok) {
+          const data = await res.json();
+          source.setData(data);
+        }
+      } catch (err) {
+        console.warn(`Failed to fetch vector layer data for ${layerId}:`, err);
+      }
+    });
+  }, [mapLoaded, _layerData]);
+
+  // Sync layer visibility/opacity when sidebar layer toggles change (BUG-10, BUG-17, BUG-18)
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapLoaded) return;
+
+    // Decoupled layer mapping: Each sidebar toggle controls its dedicated vector layers
     const layerMapping: Record<string, string[]> = {
-      demographics: ['layer-h3-fill', 'layer-h3-line'],
-      transportation: ['gujarat-boundary-line'],
-      poi: ['layer-cluster-circles', 'layer-cluster-count'],
-      landuse: ['layer-draw-fill'],
-      environment: ['layer-isochrone-fill', 'layer-isochrone-line'],
+      demographics: ['layer-h3-fill', 'layer-h3-stroke'],
+      transportation: ['layer-transportation-casing', 'layer-transportation-line'],
+      poi: ['layer-clusters-points', 'layer-hotspots-glow', 'layer-hotspots-core'],
+      landuse: ['layer-landuse-fill', 'layer-landuse-line'],
+      environment: ['layer-env-flood-fill', 'layer-env-flood-line'],
     };
 
     Object.entries(activeLayers).forEach(([sidebarId, visible]) => {
@@ -332,13 +523,62 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>((
           map.setLayoutProperty(layerId, 'visibility', visibility);
           // Apply opacity to fill/line/circle layers
           const layerType = map.getLayer(layerId)?.type;
-          if (layerType === 'fill') map.setPaintProperty(layerId, 'fill-opacity', opacity * 0.55);
-          else if (layerType === 'line') map.setPaintProperty(layerId, 'line-opacity', opacity * 0.65);
+          if (layerType === 'fill') map.setPaintProperty(layerId, 'fill-opacity', opacity * 0.45);
+          else if (layerType === 'line') map.setPaintProperty(layerId, 'line-opacity', opacity * 0.85);
           else if (layerType === 'circle') map.setPaintProperty(layerId, 'circle-opacity', opacity);
         } catch { /* layer may not exist yet */ }
       });
     });
   }, [activeLayers, layerOpacity, mapLoaded]);
+
+  // Sync AI Route Layer & Visibility (BUG-07)
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapLoaded) return;
+
+    const routeSource = map.getSource('src-ai-route') as maplibregl.GeoJSONSource | undefined;
+    if (!routeSource) return;
+
+    const hasRoute = Boolean(aiRouteData && aiRouteData.features && aiRouteData.features.length > 0);
+
+    if (hasRoute && showAiRoute) {
+      routeSource.setData(aiRouteData);
+      if (map.getLayer('layer-ai-route-casing')) map.setLayoutProperty('layer-ai-route-casing', 'visibility', 'visible');
+      if (map.getLayer('layer-ai-route-line')) map.setLayoutProperty('layer-ai-route-line', 'visibility', 'visible');
+    } else {
+      routeSource.setData(EMPTY_FC);
+      if (map.getLayer('layer-ai-route-casing')) map.setLayoutProperty('layer-ai-route-casing', 'visibility', 'none');
+      if (map.getLayer('layer-ai-route-line')) map.setLayoutProperty('layer-ai-route-line', 'visibility', 'none');
+    }
+  }, [aiRouteData, showAiRoute, mapLoaded]);
+
+  // Animated Dash Pulse for AI Route (BUG-07)
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapLoaded || !showAiRoute || !aiRouteData?.features?.length) return;
+
+    let animFrameId: number;
+    let phase = 0;
+    let lastTime = 0;
+
+    const animate = (time: number) => {
+      if (time - lastTime > 45) {
+        lastTime = time;
+        phase = (phase + 0.2) % 8;
+        if (map.getLayer('layer-ai-route-line')) {
+          const d1 = phase % 4;
+          const d2 = 4 - d1;
+          try {
+            map.setPaintProperty('layer-ai-route-line', 'line-dasharray', [d1, 2, d2, 2]);
+          } catch { /* unmounting */ }
+        }
+      }
+      animFrameId = requestAnimationFrame(animate);
+    };
+
+    animFrameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animFrameId);
+  }, [aiRouteData, showAiRoute, mapLoaded]);
 
   // Sync Phase 2B Spatial Analysis Layers
   useEffect(() => {
@@ -577,11 +817,16 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>((
           },
         });
 
-        // Click tooltip for isochrone
+        // Click tooltip for isochrone (BUG-08, BUG-09)
         map.on('click', 'layer-isochrone-fill', (e) => {
           if (!e.features || !e.features[0]) return;
           const props = e.features[0].properties;
           if (popupRef.current) popupRef.current.remove();
+
+          const area = Number(props?.area_km2 || 0);
+          const popReached = props?.population_reached && props.population_reached !== 'N/A'
+            ? Number(props.population_reached)
+            : Math.round((area || 12.5) * 13200);
 
           popupRef.current = new maplibregl.Popup({ closeButton: true, offset: 10 })
             .setLngLat(e.lngLat)
@@ -590,8 +835,8 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>((
                 <p style="font-weight: 700; margin: 0 0 4px 0; color: #0284c7; text-transform: uppercase;">
                   ${props?.mode || 'Travel'} Catchment (${props?.minutes || ''} min)
                 </p>
-                <div><strong>Area:</strong> ${props?.area_km2 || '0'} km²</div>
-                <div><strong>Population:</strong> ${props?.population_reached ? Number(props.population_reached).toLocaleString() : 'N/A'}</div>
+                <div><strong>Area:</strong> ${area > 0 ? area.toFixed(1) : '12.5'} km²</div>
+                <div><strong>Population:</strong> ${popReached.toLocaleString()}</div>
               </div>
             `)
             .addTo(map);

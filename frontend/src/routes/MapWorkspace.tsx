@@ -160,6 +160,41 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     { id: 'environment', name: 'Environmental & flood risk', source: 'Central Water Commission', vintage: '2023', visible: true, opacity: 60 },
   ]);
 
+  // Phase 2: AI Routing State (BUG-07)
+  const [aiRouteData, setAiRouteData] = useState<any | null>(null);
+  const [showAiRoute, setShowAiRoute] = useState<boolean>(true);
+  const [isLoadingRoute, setIsLoadingRoute] = useState<boolean>(false);
+
+  // Fetch optimal AI feeder route when candidate location changes
+  useEffect(() => {
+    if (!selectedLocation) {
+      setAiRouteData(null);
+      return;
+    }
+
+    let isMounted = true;
+    const fetchRoute = async () => {
+      setIsLoadingRoute(true);
+      try {
+        const destType = (siteType === 'windmill' || siteType === 'renewables' || siteType === 'solar_farm')
+          ? 'substation'
+          : 'highway';
+        const res = await fetch(`/api/route?lat=${selectedLocation.lat}&lng=${selectedLocation.lng}&destination_type=${destType}`);
+        if (res.ok) {
+          const json = await res.json();
+          if (isMounted) setAiRouteData(json);
+        }
+      } catch (err) {
+        console.warn('Could not fetch AI feeder route:', err);
+      } finally {
+        if (isMounted) setIsLoadingRoute(false);
+      }
+    };
+
+    fetchRoute();
+    return () => { isMounted = false; };
+  }, [selectedLocation?.lat, selectedLocation?.lng, siteType]);
+
   // Phase 3B Drawing state
   const [drawMode, setDrawMode] = useState<DrawMode>('none');
   const [drawVertices, setDrawVertices] = useState<number[][]>([]);
@@ -381,6 +416,32 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
                   </button>
                 );
               })}
+
+              {/* Sprint 2 AI Routing Toggle (BUG-07) */}
+              {selectedLocation && (
+                <button
+                  onClick={() => setShowAiRoute((prev) => !prev)}
+                  disabled={isLoadingRoute}
+                  className={`h-7 px-3 text-xs font-semibold rounded-chip transition-all whitespace-nowrap shadow-xs flex items-center gap-1.5 border ${
+                    showAiRoute && aiRouteData?.features?.length
+                      ? 'bg-sky-500/20 text-sky-400 border-sky-400/50 ring-1 ring-sky-400/30'
+                      : 'bg-surface text-slate-500 border-slate-200 hover:bg-slate-100 hover:text-slate-700'
+                  }`}
+                  title={
+                    aiRouteData?.data?.properties
+                      ? `AI Route to ${aiRouteData.data.properties.destination_name} (${aiRouteData.data.properties.distance_km} km, ${aiRouteData.data.properties.travel_time_mins} min)`
+                      : 'Toggle AI Feeder Transit Route'
+                  }
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${isLoadingRoute ? 'bg-amber-400 animate-ping' : showAiRoute && aiRouteData?.features?.length ? 'bg-sky-400 animate-pulse' : 'bg-slate-400'}`} />
+                  <span>{isLoadingRoute ? 'Calculating...' : '⚡ AI Feeder Route'}</span>
+                  {aiRouteData?.data?.properties?.distance_km && !isLoadingRoute && (
+                    <span className="text-[10px] bg-sky-500/25 px-1 py-0.2 rounded font-mono font-bold text-sky-300">
+                      {aiRouteData.data.properties.distance_km}km
+                    </span>
+                  )}
+                </button>
+              )}
             </div>
 
             {/* Compare Selection Mode Active Banner */}
@@ -510,6 +571,8 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
               windAtlasData={windAtlasData}
               primeSpots={primeSpots}
               onSelectPrimeSpot={handleSelectPrimeSpot}
+              aiRouteData={aiRouteData}
+              showAiRoute={showAiRoute}
             />
           </div>
 
