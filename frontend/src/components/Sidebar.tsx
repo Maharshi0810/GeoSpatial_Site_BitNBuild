@@ -387,6 +387,49 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
             ) : scoreData ? (
               <>
+                {/* Facility Archetype Selector */}
+                <div className="flex flex-col gap-1.5 p-2.5 bg-canvas border border-slate-200 rounded-btn shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-700 uppercase tracking-wider">
+                      Evaluation Archetype
+                    </span>
+                    <span className="text-[10px] font-medium text-brand-700 bg-brand-50 px-1.5 py-0.2 rounded border border-brand-200">
+                      Active: {[
+                        { id: 'ev_charging', label: 'EV Charging' },
+                        { id: 'retail', label: 'Retail Store' },
+                        { id: 'warehouse', label: 'Warehouse' },
+                        { id: 'telecom', label: 'Telecom' },
+                        { id: 'windmill', label: 'Wind Turbine' },
+                        { id: 'solar', label: 'Solar Farm' },
+                      ].find(s => s.id === siteType)?.label || siteType}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-1">
+                    {[
+                      { id: 'ev_charging', label: 'EV Charging', icon: '⚡' },
+                      { id: 'retail', label: 'Retail Store', icon: '🛍️' },
+                      { id: 'warehouse', label: 'Warehouse', icon: '🏭' },
+                      { id: 'telecom', label: 'Telecom', icon: '📡' },
+                      { id: 'windmill', label: 'Wind Turbine', icon: '💨' },
+                      { id: 'solar', label: 'Solar Farm', icon: '☀️' },
+                    ].map((st) => (
+                      <button
+                        key={st.id}
+                        onClick={() => onSiteTypeChange(st.id)}
+                        className={`px-2 py-1.5 text-[11px] font-medium rounded-chip border transition-all flex items-center gap-1.5 justify-center ${
+                          siteType === st.id
+                            ? 'bg-brand-600 text-white border-brand-600 shadow-xs font-semibold'
+                            : 'bg-surface text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
+                        }`}
+                        title={`Evaluate using ${st.label} rule engine`}
+                      >
+                        <span className="text-xs">{st.icon}</span>
+                        <span className="truncate">{st.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Location Banner */}
                 <div className="flex items-start justify-between gap-2 pb-2 border-b border-slate-100">
                   <div className="flex flex-col gap-0.5 min-w-0">
@@ -416,9 +459,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       </span>
                       <span className="text-xs text-slate-500 font-mono">/ 100</span>
                     </div>
-                    {scoreData.percentile && (
+                    {scoreData.percentile !== undefined && (
                       <span className="text-[11px] font-medium text-slate-600">
-                        Top {100 - scoreData.percentile}% in metro
+                        {scoreData.score === 0 ? 'Disqualified location' : `Top ${100 - scoreData.percentile}% in metro`}
                       </span>
                     )}
                   </div>
@@ -426,8 +469,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {/* Progress Meter Bar */}
                   <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden p-0.5">
                     <div
-                      className="h-full bg-brand-600 rounded-full transition-all duration-300 ease-out"
-                      style={{ width: `${scoreData.score}%` }}
+                      className={`h-full rounded-full transition-all duration-300 ease-out ${
+                        scoreData.score === 0 ? 'bg-rose-500' : 'bg-brand-600'
+                      }`}
+                      style={{ width: `${Math.max(scoreData.score, scoreData.score === 0 ? 0 : 3)}%` }}
                     />
                   </div>
 
@@ -435,20 +480,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <div
                       className={`p-2.5 rounded-btn border flex items-start gap-2 ${
                         scoreData.score === 0
-                          ? 'bg-rose-50 border-rose-200 text-rose-800'
+                          ? 'bg-rose-50 border-rose-300 text-rose-900 shadow-xs'
                           : 'bg-amber-50 border-amber-200 text-amber-800'
                       }`}
                     >
                       <AlertCircle
                         className={`w-4 h-4 shrink-0 mt-0.5 ${
-                          scoreData.score === 0 ? 'text-rose-600' : 'text-amber-600'
+                          scoreData.score === 0 ? 'text-rose-600 animate-pulse' : 'text-amber-600'
                         }`}
                       />
                       <div className="flex flex-col gap-0.5">
-                        <span className="font-semibold text-xs">
-                          {scoreData.score === 0 ? 'Critical Limitation: Site Disqualified' : 'Score Restricted'}
+                        <span className="font-bold text-xs">
+                          {scoreData.score === 0 ? 'DISQUALIFIED: Limiting Parameter Constraint' : 'Score Restricted'}
                         </span>
-                        <span className="text-[11px] leading-tight opacity-95">{scoreData.cappedBy}</span>
+                        <span className="text-[11px] leading-snug">
+                          {scoreData.cappedBy}
+                        </span>
                       </div>
                     </div>
                   )}
@@ -493,18 +540,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         className="p-2.5 bg-surface border border-slate-200 rounded-chip flex flex-col gap-1 hover:border-slate-300 transition-colors"
                       >
                         <div className="flex items-center justify-between text-xs font-medium">
-                          <span className="text-ink">{factor.label}</span>
-                          <span className="font-mono text-slate-700">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="text-ink font-semibold truncate">{factor.label}</span>
+                            {factor.dataAvailable === false && (
+                              <span
+                                className="text-[9px] px-1.5 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200 shrink-0 font-normal"
+                                title="Localized survey data is not mapped for this coordinate; regional baseline estimate applied"
+                              >
+                                Regional Estimate
+                              </span>
+                            )}
+                          </div>
+                          <span className="font-mono font-bold text-slate-700 shrink-0 ml-1">
                             +{factor.contribution} pts
                           </span>
                         </div>
                         <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-brand-500 rounded-full"
+                            className={`h-full rounded-full transition-all duration-300 ${
+                              factor.normalized >= 0.7
+                                ? 'bg-emerald-500'
+                                : factor.normalized >= 0.4
+                                ? 'bg-brand-500'
+                                : 'bg-amber-500'
+                            }`}
                             style={{ width: `${factor.normalized * 100}%` }}
                           />
                         </div>
-                        <p className="text-[10px] text-slate-500 leading-snug">{factor.explanation}</p>
+                        <p className="text-[11px] text-slate-600 leading-snug">{factor.explanation}</p>
                       </div>
                     ))}
                   </div>

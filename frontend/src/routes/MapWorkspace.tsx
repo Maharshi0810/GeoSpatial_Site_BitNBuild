@@ -220,10 +220,20 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
   };
 
   const handleSelectBenchmark = (benchmark: BenchmarkSite) => {
+    let benchType = 'ev_charging';
+    const cat = (benchmark.category || '').toLowerCase();
+    const name = (benchmark.name || '').toLowerCase();
+    if (cat.includes('retail') || cat.includes('commercial')) benchType = 'retail';
+    else if (cat.includes('industrial') || cat.includes('freight') || cat.includes('auto') || name.includes('gidc') || name.includes('port')) benchType = 'warehouse';
+    else if (cat.includes('renew') || name.includes('wind') || name.includes('solar')) benchType = 'windmill';
+    else if (cat.includes('fintech') || cat.includes('smart')) benchType = 'ev_charging';
+    else if (cat.includes('telecom')) benchType = 'telecom';
+
+    setSiteType(benchType);
     setSelectedLocation({ lat: benchmark.lat, lng: benchmark.lng });
     setSelectedSiteName(benchmark.name);
     mapViewRef.current?.flyTo(benchmark.lng, benchmark.lat, 13.5);
-    loadScore(benchmark.lat, benchmark.lng, siteType);
+    loadScore(benchmark.lat, benchmark.lng, benchType, activeFilter);
     setActiveSidebarTab('score');
     if (isSidebarCollapsed) {
       setIsSidebarCollapsed(false);

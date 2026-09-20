@@ -7,12 +7,13 @@ import sampleAhmedabadData from './fixtures/sample-ahmedabad.json';
 export const FactorBreakdownSchema = z.object({
   factorId: z.string(),
   label: z.string(),
-  rawValue: z.number(),
-  unit: z.string(),
+  rawValue: z.union([z.number(), z.string()]).optional().nullable(),
+  unit: z.string().optional(),
   normalized: z.number().min(0).max(1),
   weight: z.number().min(0).max(1),
   contribution: z.number(),
   explanation: z.string(),
+  dataAvailable: z.boolean().optional(),
   geometryRef: z.string().optional(),
 });
 
@@ -95,12 +96,13 @@ class MockDataService {
             return {
               factorId: key,
               label: item.label || key,
-              rawValue: Math.round(scoreVal * 10),
-              unit: 'index',
+              rawValue: typeof item.raw_value === 'number' ? item.raw_value : Math.round(scoreVal * 10),
+              unit: item.unit || 'index',
               normalized: Number((scoreVal / 100).toFixed(2)),
-              weight: 0.2,
-              contribution: Number((scoreVal * 0.2).toFixed(1)),
-              explanation: `Computed ${item.label || key} readiness score of ${scoreVal}/100 based on Gujarat spatial data layers.`,
+              weight: typeof item.weight === 'number' ? item.weight : 0.2,
+              contribution: typeof item.contribution === 'number' ? item.contribution : Number((scoreVal * 0.2).toFixed(1)),
+              explanation: item.explanation || item.reason || `Spatial evaluation score of ${scoreVal}/100 based on physical layer indicators.`,
+              dataAvailable: item.data_available !== false,
             };
           });
 
@@ -110,32 +112,34 @@ class MockDataService {
             wbName ? `Site is situated inside ${wbName}. Ground construction is prohibited.` : null
           );
 
-          const constraints = [
-            {
-              id: 'water_body_exclusion',
-              label: 'Water body exclusion',
-              passed: !isDisqualified,
-              reason: isDisqualified
-                ? (disqReason || 'Site is situated within a water body. Ground construction is prohibited.')
-                : 'Site is situated on solid terrestrial terrain outside permanent water bodies.',
-            },
-            {
-              id: 'flood_zone',
-              label: 'Flood plain setback',
-              passed: !data.constraints?.in_flood_zone,
-              reason: data.constraints?.in_flood_zone
-                ? 'Candidate point falls within active flood risk zone.'
-                : 'Outside identified high-risk flood zones.',
-            },
-            {
-              id: 'arterial_proximity',
-              label: (siteType === 'renewables' || siteType === 'windmill') ? 'Logistics / grid corridor' : 'Arterial road access',
-              passed: (data.constraints?.min_road_distance_m ?? 0) <= ((siteType === 'renewables' || siteType === 'windmill') ? 30000 : 2500),
-              reason: (siteType === 'renewables' || siteType === 'windmill')
-                ? `Distance to regional transport / grid corridor is ${Math.round((data.constraints?.min_road_distance_m ?? 0) / 1000)} km.`
-                : `Distance to nearest mapped highway/road is ${Math.round(data.constraints?.min_road_distance_m ?? 0)} m.`,
-            },
-          ];
+          const constraints = Array.isArray(data.constraints_list) && data.constraints_list.length > 0
+            ? data.constraints_list
+            : [
+                {
+                  id: 'water_body_exclusion',
+                  label: 'Water body exclusion',
+                  passed: !isDisqualified,
+                  reason: isDisqualified
+                    ? (disqReason || 'Site is situated within a water body. Ground construction is prohibited.')
+                    : 'Site is situated on solid terrestrial terrain outside permanent water bodies.',
+                },
+                {
+                  id: 'flood_zone',
+                  label: 'Flood plain setback',
+                  passed: !data.constraints?.in_flood_zone,
+                  reason: data.constraints?.in_flood_zone
+                    ? 'Candidate point falls within active flood risk zone.'
+                    : 'Outside identified high-risk flood zones.',
+                },
+                {
+                  id: 'arterial_proximity',
+                  label: (siteType === 'renewables' || siteType === 'windmill' || siteType === 'solar') ? 'Logistics / grid corridor' : 'Arterial road access',
+                  passed: (data.constraints?.min_road_distance_m ?? 0) <= ((siteType === 'renewables' || siteType === 'windmill' || siteType === 'solar') ? 30000 : 2500),
+                  reason: (siteType === 'renewables' || siteType === 'windmill' || siteType === 'solar')
+                    ? `Distance to regional transport / grid corridor is ${Math.round((data.constraints?.min_road_distance_m ?? 0) / 1000)} km.`
+                    : `Distance to nearest mapped highway/road is ${Math.round(data.constraints?.min_road_distance_m ?? 0)} m.`,
+                },
+              ];
 
           return ScoreResponseSchema.parse({
             locationName: wbName ? `${wbName} (${lat.toFixed(4)}, ${lng.toFixed(4)})` : `Site at ${lat.toFixed(4)}, ${lng.toFixed(4)}`,

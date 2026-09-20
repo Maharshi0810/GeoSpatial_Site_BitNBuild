@@ -3,268 +3,658 @@
   "features": [
     {
       "type": "Feature",
+      "properties": {
+        "name": "SG Highway Commercial Belt",
+        "zone_name": "SG Highway Commercial Belt",
+        "zone": "commercial",
+        "zone_type": "commercial"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
           [
             [
-              72.5,
-              23.02
+              72.505,
+              23.01
             ],
             [
-              72.53,
-              23.02
+              72.515,
+              23.07
             ],
             [
-              72.53,
-              23.08
+              72.535,
+              23.13
             ],
             [
-              72.5,
-              23.08
+              72.545,
+              23.125
             ],
             [
-              72.5,
-              23.02
+              72.525,
+              23.065
+            ],
+            [
+              72.515,
+              23.005
+            ],
+            [
+              72.505,
+              23.01
             ]
           ]
         ]
-      },
-      "properties": {
-        "zone_name": "SG Highway Commercial Corridor",
-        "zone_type": "commercial",
-        "area_sq_km": 2.16,
-        "building_density": 209,
-        "max_floor_area_ratio": 2.7,
-        "permitted": true
       }
     },
     {
       "type": "Feature",
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              72.56,
-              23.02
-            ],
-            [
-              72.59,
-              23.02
-            ],
-            [
-              72.59,
-              23.05
-            ],
-            [
-              72.56,
-              23.05
-            ],
-            [
-              72.56,
-              23.02
-            ]
-          ]
-        ]
-      },
       "properties": {
+        "name": "Ashram Road Central Business District",
         "zone_name": "Ashram Road Central Business District",
-        "zone_type": "commercial",
-        "area_sq_km": 5.77,
-        "building_density": 301,
-        "max_floor_area_ratio": 3.0,
-        "permitted": true
-      }
-    },
-    {
-      "type": "Feature",
+        "zone": "commercial",
+        "zone_type": "commercial"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
           [
             [
-              72.35,
-              22.97
+              72.565,
+              23.015
             ],
             [
-              72.42,
-              22.97
+              72.57,
+              23.055
             ],
             [
-              72.42,
-              23.01
+              72.578,
+              23.052
             ],
             [
-              72.35,
-              23.01
+              72.573,
+              23.012
             ],
             [
-              72.35,
-              22.97
+              72.565,
+              23.015
             ]
           ]
         ]
-      },
-      "properties": {
-        "zone_name": "Sanand Industrial Cluster GIDC",
-        "zone_type": "industrial",
-        "area_sq_km": 5.26,
-        "building_density": 307,
-        "max_floor_area_ratio": 1.5,
-        "permitted": false
       }
     },
     {
       "type": "Feature",
+      "properties": {
+        "name": "GIFT City International Financial Services Centre",
+        "zone_name": "GIFT City International Financial Services Centre",
+        "zone": "commercial",
+        "zone_type": "commercial"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
           [
             [
-              72.65,
-              23.06
+              72.675,
+              23.15
+            ],
+            [
+              72.69,
+              23.17
             ],
             [
               72.7,
+              23.165
+            ],
+            [
+              72.685,
+              23.145
+            ],
+            [
+              72.675,
+              23.15
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Surat Ring Road Textile & Commercial Zone",
+        "zone_name": "Surat Ring Road Textile & Commercial Zone",
+        "zone": "commercial",
+        "zone_type": "commercial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.825,
+              21.18
+            ],
+            [
+              72.865,
+              21.215
+            ],
+            [
+              72.875,
+              21.205
+            ],
+            [
+              72.835,
+              21.17
+            ],
+            [
+              72.825,
+              21.18
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Alkapuri Commercial District (Vadodara)",
+        "zone_name": "Alkapuri Commercial District (Vadodara)",
+        "zone": "commercial",
+        "zone_type": "commercial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.165,
+              22.305
+            ],
+            [
+              73.18,
+              22.32
+            ],
+            [
+              73.188,
+              22.315
+            ],
+            [
+              73.173,
+              22.3
+            ],
+            [
+              73.165,
+              22.305
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Kalawad Road & 150ft Ring Commercial Hub (Rajkot)",
+        "zone_name": "Kalawad Road & 150ft Ring Commercial Hub (Rajkot)",
+        "zone": "commercial",
+        "zone_type": "commercial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              70.75,
+              22.275
+            ],
+            [
+              70.785,
+              22.305
+            ],
+            [
+              70.795,
+              22.298
+            ],
+            [
+              70.76,
+              22.268
+            ],
+            [
+              70.75,
+              22.275
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sanand Industrial GIDC Auto Cluster",
+        "zone_name": "Sanand Industrial GIDC Auto Cluster",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.36,
+              22.97
+            ],
+            [
+              72.375,
+              23.01
+            ],
+            [
+              72.41,
+              23.0
+            ],
+            [
+              72.395,
+              22.96
+            ],
+            [
+              72.36,
+              22.97
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Naroda & Vatva GIDC Manufacturing Cluster",
+        "zone_name": "Naroda & Vatva GIDC Manufacturing Cluster",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.645,
+              22.97
+            ],
+            [
+              72.665,
+              23.07
+            ],
+            [
+              72.69,
               23.06
             ],
             [
-              72.7,
-              23.1
+              72.67,
+              22.96
             ],
             [
-              72.65,
-              23.1
-            ],
-            [
-              72.65,
-              23.06
+              72.645,
+              22.97
             ]
           ]
         ]
-      },
-      "properties": {
-        "zone_name": "Naroda GIDC Manufacturing Area",
-        "zone_type": "industrial",
-        "area_sq_km": 5.03,
-        "building_density": 158,
-        "max_floor_area_ratio": 1.4,
-        "permitted": false
       }
     },
     {
       "type": "Feature",
+      "properties": {
+        "name": "Makarpura GIDC Industrial Corridor (Vadodara)",
+        "zone_name": "Makarpura GIDC Industrial Corridor (Vadodara)",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
       "geometry": {
         "type": "Polygon",
         "coordinates": [
           [
             [
-              72.45,
-              22.99
+              73.185,
+              22.23
             ],
             [
-              72.5,
-              22.99
-            ],
-            [
-              72.5,
-              23.03
-            ],
-            [
-              72.45,
-              23.03
-            ],
-            [
-              72.45,
-              22.99
-            ]
-          ]
-        ]
-      },
-      "properties": {
-        "zone_name": "South Bopal Urban Residential Zone",
-        "zone_type": "residential",
-        "area_sq_km": 4.28,
-        "building_density": 176,
-        "max_floor_area_ratio": 2.0,
-        "permitted": false
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              72.81,
-              21.16
-            ],
-            [
-              72.85,
-              21.16
-            ],
-            [
-              72.85,
-              21.2
-            ],
-            [
-              72.81,
-              21.2
-            ],
-            [
-              72.81,
-              21.16
-            ]
-          ]
-        ]
-      },
-      "properties": {
-        "zone_name": "Surat Ring Road Commercial Area",
-        "zone_type": "commercial",
-        "area_sq_km": 3.13,
-        "building_density": 272,
-        "max_floor_area_ratio": 2.8,
-        "permitted": true
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              73.17,
-              22.25
+              73.2,
+              22.26
             ],
             [
               73.22,
               22.25
             ],
             [
-              73.22,
-              22.29
+              73.205,
+              22.22
             ],
             [
-              73.17,
-              22.29
-            ],
-            [
-              73.17,
-              22.25
+              73.185,
+              22.23
             ]
           ]
         ]
-      },
+      }
+    },
+    {
+      "type": "Feature",
       "properties": {
-        "zone_name": "Makarpura GIDC Industrial Corridor",
-        "zone_type": "industrial",
-        "area_sq_km": 5.28,
-        "building_density": 103,
-        "max_floor_area_ratio": 1.6,
-        "permitted": false
+        "name": "Ankleshwar Chemical Industrial GIDC",
+        "zone_name": "Ankleshwar Chemical Industrial GIDC",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.99,
+              21.61
+            ],
+            [
+              73.01,
+              21.65
+            ],
+            [
+              73.04,
+              21.64
+            ],
+            [
+              73.02,
+              21.6
+            ],
+            [
+              72.99,
+              21.61
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Dahej PCPIR Petrochemical & Port SEZ",
+        "zone_name": "Dahej PCPIR Petrochemical & Port SEZ",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.56,
+              21.68
+            ],
+            [
+              72.58,
+              21.73
+            ],
+            [
+              72.62,
+              21.72
+            ],
+            [
+              72.6,
+              21.67
+            ],
+            [
+              72.56,
+              21.68
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Vapi Mega Industrial GIDC",
+        "zone_name": "Vapi Mega Industrial GIDC",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.89,
+              20.35
+            ],
+            [
+              72.915,
+              20.39
+            ],
+            [
+              72.94,
+              20.38
+            ],
+            [
+              72.915,
+              20.34
+            ],
+            [
+              72.89,
+              20.35
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Metoda GIDC Auto & Engineering Estate (Rajkot)",
+        "zone_name": "Metoda GIDC Auto & Engineering Estate (Rajkot)",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              70.69,
+              22.23
+            ],
+            [
+              70.715,
+              22.26
+            ],
+            [
+              70.735,
+              22.25
+            ],
+            [
+              70.71,
+              22.22
+            ],
+            [
+              70.69,
+              22.23
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Morbi Ceramic Industrial Cluster",
+        "zone_name": "Morbi Ceramic Industrial Cluster",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              70.81,
+              22.79
+            ],
+            [
+              70.835,
+              22.845
+            ],
+            [
+              70.88,
+              22.835
+            ],
+            [
+              70.855,
+              22.78
+            ],
+            [
+              70.81,
+              22.79
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Mundra Port & Special Economic Zone",
+        "zone_name": "Mundra Port & Special Economic Zone",
+        "zone": "logistics",
+        "zone_type": "logistics"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              69.68,
+              22.81
+            ],
+            [
+              69.71,
+              22.87
+            ],
+            [
+              69.76,
+              22.86
+            ],
+            [
+              69.73,
+              22.8
+            ],
+            [
+              69.68,
+              22.81
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Dholera Special Investment Region (SIR)",
+        "zone_name": "Dholera Special Investment Region (SIR)",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.16,
+              22.21
+            ],
+            [
+              72.2,
+              22.28
+            ],
+            [
+              72.26,
+              22.26
+            ],
+            [
+              72.22,
+              22.19
+            ],
+            [
+              72.16,
+              22.21
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Halol Automobile GIDC Corridor",
+        "zone_name": "Halol Automobile GIDC Corridor",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.45,
+              22.48
+            ],
+            [
+              73.475,
+              22.52
+            ],
+            [
+              73.51,
+              22.51
+            ],
+            [
+              73.485,
+              22.47
+            ],
+            [
+              73.45,
+              22.48
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Chitra GIDC Industrial Area (Bhavnagar)",
+        "zone_name": "Chitra GIDC Industrial Area (Bhavnagar)",
+        "zone": "industrial",
+        "zone_type": "industrial"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              72.09,
+              21.73
+            ],
+            [
+              72.11,
+              21.76
+            ],
+            [
+              72.13,
+              21.75
+            ],
+            [
+              72.11,
+              21.72
+            ],
+            [
+              72.09,
+              21.73
+            ]
+          ]
+        ]
       }
     }
   ]
