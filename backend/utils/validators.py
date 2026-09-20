@@ -11,7 +11,7 @@ class WeightConfig(BaseModel):
 class ScoreRequest(BaseModel):
     lat: float = Field(..., description="Latitude of candidate site")
     lng: float = Field(..., description="Longitude of candidate site")
-    site_type: Optional[str] = Field("ev_charging", description="Facility archetype: ev_charging, retail, warehouse, renewables, telecom")
+    site_type: Optional[str] = Field("ev_charging", description="Facility archetype: ev_charging, retail, warehouse, renewables, windmill, solar, telecom")
     sub_filter: Optional[str] = Field(None, description="Optional facility sub-profile filter")
     weights: Optional[WeightConfig] = None
 
@@ -22,5 +22,5 @@ class SiteItem(BaseModel):
 
 class CompareRequest(BaseModel):
     sites: List[SiteItem] = Field(..., min_length=2, max_length=10)
-    site_type: Optional[str] = Field("ev_charging", description="Facility archetype for comparison")
+    site_type: Optional[str] = Field("ev_charging", description="Facility archetype: ev_charging, retail, warehouse, renewables, windmill, solar, telecom")
     weights: Optional[WeightConfig] = None

@@ -10,8 +10,26 @@ except ImportError:
 FLOOD_HIGH_PENALTY = 35.0
 FLOOD_MEDIUM_PENALTY = 15.0
 FLOOD_LOW_PENALTY = 5.0
-MAX_ACCEPTABLE_ROAD_DIST_M = 3000.0  # Sites further than 3km from road incur penalty
+MAX_ACCEPTABLE_ROAD_DIST_M = 3000.0  # Default fallback for unrecognized types
 ROAD_DISTANCE_PENALTY = 25.0
+
+# Archetype-specific road distance thresholds (meters)
+# Research-backed: EV must be on-road, warehouse can be further out
+ROAD_DISTANCE_THRESHOLDS = {
+    "ev_charging": 1500.0,     # Must be very close to roads (highway stops)
+    "retail": 2000.0,          # Accessible by foot + vehicle
+    "warehouse": 8000.0,       # Can be on outskirts, near highways not city roads
+    "telecom": 15000.0,        # Only needs periodic maintenance crew access
+}
+
+# Flood penalty multipliers per archetype
+# Warehouses hold inventory = higher damage risk; telecom towers are elevated
+FLOOD_PENALTY_MULTIPLIER = {
+    "ev_charging": 1.0,
+    "retail": 1.2,             # Customer safety concern
+    "warehouse": 1.5,          # Inventory damage = catastrophic loss
+    "telecom": 0.8,            # Towers are elevated structures, less flood impact
+}
 
 
 def check_point_in_geojson_geometry(lat: float, lng: float, geometry: Dict[str, Any]) -> bool:
@@ -33,10 +51,18 @@ def check_point_in_geojson_geometry(lat: float, lng: float, geometry: Dict[str, 
     return False
 
 
-def flood_zone_check(lat: float, lng: float, environment_layer: Dict[str, Any]) -> Tuple[float, str]:
-    """Check if the candidate point intersects flood zone hazards."""
+def flood_zone_check(
+    lat: float,
+    lng: float,
+    environment_layer: Dict[str, Any],
+    site_type: str = "ev_charging"
+) -> Tuple[float, str]:
+    """Check if the candidate point intersects flood zone hazards.
+    Applies archetype-specific penalty multipliers."""
     if not environment_layer or not environment_layer.get("features"):
         return 0.0, "none"
+
+    multiplier = FLOOD_PENALTY_MULTIPLIER.get(site_type, 1.0)
 
     for feature in environment_layer.get("features", []):
         geom = feature.get("geometry", {})
@@ -45,11 +71,11 @@ def flood_zone_check(lat: float, lng: float, environment_layer: Dict[str, Any]) 
                 props = feature.get("properties", {})
                 risk = props.get("risk_level", "medium").lower()
                 if risk == "high":
-                    return FLOOD_HIGH_PENALTY, "high"
+                    return round(FLOOD_HIGH_PENALTY * multiplier, 1), "high"
                 elif risk == "medium":
-                    return FLOOD_MEDIUM_PENALTY, "medium"
+                    return round(FLOOD_MEDIUM_PENALTY * multiplier, 1), "medium"
                 else:
-                    return FLOOD_LOW_PENALTY, "low"
+                    return round(FLOOD_LOW_PENALTY * multiplier, 1), "low"
 
     return 0.0, "none"
 
@@ -85,12 +111,14 @@ def min_road_distance_check(
     if min_dist_m == float("inf"):
         return 0.0, 200.0
 
-    is_renewables = site_type in ("renewables", "windmill", "wind_farm", "solar_wind")
+    is_renewables = site_type in ("renewables", "windmill", "wind_farm", "solar_wind", "solar", "solar_farm")
     if is_renewables:
-        # Wind farms are distributed across regional plains; highway access is viable up to 30km
+        # Renewables are distributed across regional plains; highway access is viable up to 30km
         penalty = 10.0 if min_dist_m > 30000.0 else 0.0
     else:
-        penalty = ROAD_DISTANCE_PENALTY if min_dist_m > MAX_ACCEPTABLE_ROAD_DIST_M else 0.0
+        # Use archetype-specific road distance threshold
+        threshold = ROAD_DISTANCE_THRESHOLDS.get(site_type, MAX_ACCEPTABLE_ROAD_DIST_M)
+        penalty = ROAD_DISTANCE_PENALTY if min_dist_m > threshold else 0.0
 
     return penalty, min_dist_m
 
@@ -192,7 +220,7 @@ def apply_all_constraints(
     # Check water body hard limiting parameter
     is_water, wb_name, wb_type, wb_reason = water_body_check(lat, lng, layers)
 
-    flood_penalty, flood_risk = flood_zone_check(lat, lng, env_layer)
+    flood_penalty, flood_risk = flood_zone_check(lat, lng, env_layer, site_type=site_type)
     road_penalty, road_dist_m = min_road_distance_check(lat, lng, trans_layer, site_type=site_type)
 
     if is_water:
