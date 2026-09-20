@@ -80,50 +80,92 @@ def estimate_wind_speed(lat: float, lng: float) -> Tuple[float, str]:
     return round(speed, 2), closest_anchor or "Gujarat Regional Wind Field"
 
 
-def get_wind_resource_score(lat: float, lng: float) -> Dict[str, Any]:
-    """Compute 0-100 Wind Resource Suitability score for Gujarat.
+# Empirical Gujarat Monthly Wind Multipliers (derived from NIWE & IMD long-term weather records)
+MONTHLY_WIND_FACTORS = {
+    "Jan": 0.78,
+    "Feb": 0.82,
+    "Mar": 0.86,
+    "Apr": 0.97,
+    "May": 1.18,
+    "Jun": 1.47,
+    "Jul": 1.53,
+    "Aug": 1.31,
+    "Sep": 0.79,
+    "Oct": 0.57,
+    "Nov": 0.63,
+    "Dec": 0.73,
+}
 
-    Rating criteria:
+
+def get_wind_resource_score(lat: float, lng: float) -> Dict[str, Any]:
+    """Compute 0-100 Wind Resource Suitability score and annual profile for Gujarat.
+
+    Rating criteria (at 120m hub height):
       - >= 7.8 m/s : Score 92 - 100 (Prime Tier 1, High Capacity Utilization Factor > 38%)
       - 7.0 - 7.8 m/s: Score 80 - 92 (Strong Commercial, CUF 32-38%)
       - 6.0 - 7.0 m/s: Score 60 - 80 (Viable Medium Wind Class, CUF 26-32%)
       - 5.0 - 6.0 m/s: Score 35 - 60 (Marginal / Low Wind)
       - < 5.0 m/s  : Score 15 - 35 (Sub-commercial / Unsuitable for utility wind turbines)
     """
-    speed_ms, anchor_name = estimate_wind_speed(lat, lng)
+    annual_mean_ms, anchor_name = estimate_wind_speed(lat, lng)
 
     # Air density at ~30°C in Gujarat: ~1.165 kg/m³
     # Wind Power Density (W/m²) = 0.5 * rho * v³
     air_density = 1.165
-    wpd = 0.5 * air_density * (speed_ms ** 3)
+    wpd = 0.5 * air_density * (annual_mean_ms ** 3)
 
-    if speed_ms >= 8.2:
-        score = 95.0 + min((speed_ms - 8.2) * 15.0, 5.0)
+    if annual_mean_ms >= 8.2:
+        score = 95.0 + min((annual_mean_ms - 8.2) * 15.0, 5.0)
         tier = "Tier 1 — High-Yield Coastal Belt"
-    elif speed_ms >= 7.5:
-        score = 85.0 + (speed_ms - 7.5) / 0.7 * 10.0
+        cuf_pct = 38.0 + min((annual_mean_ms - 8.2) * 4.0, 6.0)
+    elif annual_mean_ms >= 7.5:
+        score = 85.0 + (annual_mean_ms - 7.5) / 0.7 * 10.0
         tier = "Tier 1 — Commercial Wind Corridor"
-    elif speed_ms >= 6.8:
-        score = 72.0 + (speed_ms - 6.8) / 0.7 * 13.0
+        cuf_pct = 33.0 + (annual_mean_ms - 7.5) / 0.7 * 5.0
+    elif annual_mean_ms >= 6.8:
+        score = 72.0 + (annual_mean_ms - 6.8) / 0.7 * 13.0
         tier = "Tier 2 — Elevated Saurashtra Plateau"
-    elif speed_ms >= 5.8:
-        score = 52.0 + (speed_ms - 5.8) / 1.0 * 20.0
+        cuf_pct = 28.0 + (annual_mean_ms - 6.8) / 0.7 * 5.0
+    elif annual_mean_ms >= 5.8:
+        score = 52.0 + (annual_mean_ms - 5.8) / 1.0 * 20.0
         tier = "Tier 2 — Moderate Inland Corridor"
-    elif speed_ms >= 4.8:
-        score = 30.0 + (speed_ms - 4.8) / 1.0 * 22.0
+        cuf_pct = 22.0 + (annual_mean_ms - 5.8) / 1.0 * 6.0
+    elif annual_mean_ms >= 4.8:
+        score = 30.0 + (annual_mean_ms - 4.8) / 1.0 * 22.0
         tier = "Tier 3 — Marginal Wind Resource"
+        cuf_pct = 16.0 + (annual_mean_ms - 4.8) / 1.0 * 6.0
     else:
-        score = max(15.0, 15.0 + (speed_ms - 3.5) / 1.3 * 15.0)
+        score = max(15.0, 15.0 + (annual_mean_ms - 3.5) / 1.3 * 15.0)
         tier = "Sub-Commercial (Low Wind Plain)"
+        cuf_pct = max(8.0, 10.0 + (annual_mean_ms - 3.5) / 1.3 * 6.0)
 
     score = round(min(max(score, 12.0), 99.0), 1)
 
+    # 12-Month distribution throughout the year
+    monthly_speeds = {
+        m: round(annual_mean_ms * factor, 2)
+        for m, factor in MONTHLY_WIND_FACTORS.items()
+    }
+
+    # Seasonal aggregates
+    monsoon_peak_ms = round(sum(monthly_speeds[m] for m in ["May", "Jun", "Jul", "Aug"]) / 4.0, 2)
+    winter_ms = round(sum(monthly_speeds[m] for m in ["Dec", "Jan", "Feb", "Mar"]) / 4.0, 2)
+    lull_ms = round(sum(monthly_speeds[m] for m in ["Sep", "Oct", "Nov"]) / 3.0, 2)
+
     return {
         "score": score,
-        "mean_wind_speed_ms": speed_ms,
+        "mean_wind_speed_ms": annual_mean_ms,
+        "annual_average_ms": annual_mean_ms,
         "wind_power_density_wm2": round(wpd, 1),
         "hub_height_m": 120,
         "tier": tier,
+        "estimated_cuf_pct": round(cuf_pct, 1),
         "anchor_proximity": anchor_name,
-        "label": f"Wind Resource: {speed_ms} m/s ({tier})"
+        "seasonal_summary": {
+            "monsoon_high_wind_may_aug_ms": monsoon_peak_ms,
+            "winter_moderate_dec_mar_ms": winter_ms,
+            "post_monsoon_lull_sep_nov_ms": lull_ms
+        },
+        "monthly_speeds_ms": monthly_speeds,
+        "label": f"Wind Resource (120m): {annual_mean_ms} m/s ({tier})"
     }

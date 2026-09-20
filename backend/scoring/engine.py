@@ -413,10 +413,14 @@ class SiteReadinessScorer:
         if is_renewables:
             wind_info = get_wind_resource_score(lat, lng)
             resp["renewable_resource"] = {
+                "annual_average_ms": wind_info.get("annual_average_ms", wind_info["mean_wind_speed_ms"]),
                 "mean_wind_speed_ms": wind_info["mean_wind_speed_ms"],
                 "wind_power_density_wm2": wind_info["wind_power_density_wm2"],
                 "hub_height_m": wind_info["hub_height_m"],
                 "wind_tier": wind_info["tier"],
+                "estimated_cuf_pct": wind_info.get("estimated_cuf_pct"),
+                "seasonal_summary": wind_info.get("seasonal_summary"),
+                "monthly_speeds_ms": wind_info.get("monthly_speeds_ms"),
                 "anchor_proximity": wind_info["anchor_proximity"]
             }
 
