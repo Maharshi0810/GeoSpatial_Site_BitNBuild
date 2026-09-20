@@ -33,6 +33,46 @@ export interface MapWorkspaceProps {
   onSiteTypeChange?: (type: string) => void;
 }
 
+export const FILTER_CHIPS_BY_ARCHETYPE: Record<string, { id: string; label: string; tooltip: string }[]> = {
+  ev_charging: [
+    { id: 'fast_dc', label: '⚡ Fast DC (≥150kW)', tooltip: 'Prioritize high-capacity fast charging grid nodes' },
+    { id: 'power_50kw', label: '🔌 ≥ 50 kW Grid', tooltip: 'Verify 50kW+ feeder line availability' },
+    { id: 'grid_capacity', label: '⚡ Substation ≤ 2km', tooltip: 'Proximity to GETCO electrical sub-stations' },
+    { id: 'highway_access', label: '🛣️ Highway Access', tooltip: 'Within 500m of NH/SH arterial corridors' },
+  ],
+  windmill: [
+    { id: 'wind_7ms', label: '💨 Wind ≥ 7 m/s', tooltip: 'High-yield wind corridor (Tier 1 wind speed)' },
+    { id: 'hub_120m', label: '🏗️ 120m Hub Height', tooltip: 'Optimal elevation and clear aerodynamic fetch' },
+    { id: 'grid_66kv', label: '⚡ Grid ≥ 66kV', tooltip: 'Near 66kV/220kV renewable evacuation substation' },
+    { id: 'low_roughness', label: '🌾 Low Terrain Roughness', tooltip: 'Open plains and coastal scrubland' },
+  ],
+  solar: [
+    { id: 'ghi_high', label: '☀️ GHI ≥ 5.5 kWh/m²', tooltip: 'High global horizontal solar irradiance' },
+    { id: 'wasteland', label: '🏜️ Flat Non-Arable', tooltip: 'Slope < 3% on government/revenue wasteland' },
+    { id: 'substation_near', label: '⚡ Substation ≤ 3km', tooltip: 'Direct pooling substation connectivity' },
+    { id: 'low_flood', label: '🛡️ Low Flood Hazard', tooltip: 'Outside 100-year monsoon inundation basins' },
+  ],
+  warehouse: [
+    { id: 'freight_corridor', label: '🚛 NH/SH Freight Corridor', tooltip: 'Direct heavy commercial truck access' },
+    { id: 'gidc_estate', label: '🏭 GIDC Industrial Estate', tooltip: 'Within or adjoining approved industrial zones' },
+    { id: 'port_connectivity', label: '🚢 Port / Logistics Hub', tooltip: 'Expressway access to Mundra, Kandla, or Hazira' },
+    { id: 'wide_road', label: '🛣️ 4-Lane Arterial Road', tooltip: 'Road width >= 30m for multi-axle trailers' },
+  ],
+  telecom: [
+    { id: 'pop_density', label: '👥 Pop Density ≥ 5k/km²', tooltip: 'High cellular subscriber demand zone' },
+    { id: 'high_ground', label: '📡 Topographic Elevation', tooltip: 'High line-of-sight propagation profile' },
+    { id: 'fiber_backhaul', label: '🌐 Fiber POP ≤ 1km', tooltip: 'Proximity to optical fiber transmission backbone' },
+    { id: 'stable_grid', label: '⚡ Commercial Power 24x7', tooltip: 'Dedicated industrial/commercial feeder line' },
+  ],
+  retail: [
+    { id: 'high_footfall', label: '🚶 High Pedestrian Footfall', tooltip: 'Commercial high street and transit nodes' },
+    { id: 'urban_arterial', label: '🚗 Urban Arterial Visibility', tooltip: 'Direct street frontage on main thoroughfares' },
+    { id: 'transit_proximity', label: '🚇 BRTS / Metro ≤ 500m', tooltip: 'Proximity to public transit stations' },
+    { id: 'consumer_density', label: '🏙️ High-Income Density', tooltip: 'Affluent residential catchment areas' },
+  ],
+};
+
+
 export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
   siteType: propSiteType,
   onSiteTypeChange: propOnSiteTypeChange,
@@ -88,6 +128,16 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isPickingForCompare]);
+
+  // Synchronize filter chips and reset prime spot state when facility archetype changes (BUG-04, BUG-06)
+  useEffect(() => {
+    // Reset selected prime spot when changing archetypes
+    setSelectedPrimeSpotId(null);
+
+    // Synchronize active filter chip to first chip of new archetype
+    const chips = FILTER_CHIPS_BY_ARCHETYPE[siteType] || FILTER_CHIPS_BY_ARCHETYPE.ev_charging;
+    setActiveFilter(chips[0]?.id || '');
+  }, [siteType]);
 
   // Spatial Analysis Mode
   const [analysisMode, setAnalysisMode] = useState<AnalysisMode>('points');
@@ -225,7 +275,8 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     const name = (benchmark.name || '').toLowerCase();
     if (cat.includes('retail') || cat.includes('commercial')) benchType = 'retail';
     else if (cat.includes('industrial') || cat.includes('freight') || cat.includes('auto') || name.includes('gidc') || name.includes('port')) benchType = 'warehouse';
-    else if (cat.includes('renew') || name.includes('wind') || name.includes('solar')) benchType = 'windmill';
+    else if (name.includes('solar') || cat.includes('solar')) benchType = 'solar';
+    else if (cat.includes('renew') || name.includes('wind')) benchType = 'windmill';
     else if (cat.includes('fintech') || cat.includes('smart')) benchType = 'ev_charging';
     else if (cat.includes('telecom')) benchType = 'telecom';
 
@@ -267,12 +318,7 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     }
   };
 
-  const filterChips = [
-    { id: 'fast_dc', label: 'Fast DC' },
-    { id: 'power_50kw', label: '≥ 50 kW' },
-    { id: 'grid_capacity', label: 'Grid capacity' },
-    { id: 'highway_access', label: 'Highway access' },
-  ];
+  const currentFilterChips = FILTER_CHIPS_BY_ARCHETYPE[siteType] || FILTER_CHIPS_BY_ARCHETYPE.ev_charging;
 
   return (
     <div className="flex-1 flex flex-col relative overflow-hidden bg-canvas">
@@ -291,7 +337,7 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
                 setSelectedSiteName(loc.name);
                 mapViewRef.current?.flyTo(loc.lng, loc.lat, 13.5);
                 loadScore(loc.lat, loc.lng, siteType);
-                if (isPickingForCompare || activeSidebarTab === 'compare') {
+                if (isPickingForCompare) {
                   mockDataService.fetchScoreForLocation(loc.lat, loc.lng, siteType, activeFilter).then((data) => {
                     addSiteFromScore(data);
                     setCompareNotification(`✓ Added "${data.locationName || loc.name}" (${data.score}/100) to comparison!`);
@@ -307,9 +353,9 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
               }}
             />
 
-            {/* Horizontal Filter Row */}
-            <div className="flex items-center gap-1.5 overflow-x-auto py-0.5">
-              {filterChips.map((chip) => {
+            {/* Horizontal Filter Row (Dynamically adapts to active archetype) */}
+            <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 scrollbar-none">
+              {currentFilterChips.map((chip) => {
                 const isActive = activeFilter === chip.id;
                 return (
                   <button
@@ -321,16 +367,16 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
                         loadScore(selectedLocation.lat, selectedLocation.lng, siteType, nextFilter);
                       }
                     }}
-                    className={`h-7 px-3 text-xs font-medium rounded-chip transition-colors whitespace-nowrap shadow-xs flex items-center gap-1.5 ${
+                    className={`h-7 px-3 text-xs font-medium rounded-chip transition-all whitespace-nowrap shadow-xs flex items-center gap-1.5 ${
                       isActive
-                        ? 'bg-brand-600 text-surface font-semibold'
-                        : 'bg-surface text-slate-700 border border-slate-200 hover:bg-slate-100'
+                        ? 'bg-brand-600 text-surface font-semibold ring-1 ring-brand-400'
+                        : 'bg-surface text-slate-700 border border-slate-200 hover:bg-slate-100 hover:border-slate-300'
                     }`}
-                    title={isActive ? 'Filter applied to scoring model (click to clear)' : 'Apply filter to scoring model'}
+                    title={chip.tooltip}
                   >
                     <span>{chip.label}</span>
                     {isActive && (
-                      <span className="text-[10px] bg-white/20 px-1 py-0.2 rounded font-mono">✓ Active</span>
+                      <span className="text-[10px] bg-white/25 px-1 py-0.2 rounded font-mono font-bold">✓ Active</span>
                     )}
                   </button>
                 );
@@ -405,8 +451,8 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
                   return;
                 }
 
-                // If in picking mode OR active tab is Compare:
-                if (isPickingForCompare || activeSidebarTab === 'compare') {
+                // If explicitly in candidate picking mode for comparison (BUG-15):
+                if (isPickingForCompare) {
                   setSelectedLocation(coords);
                   const candidateName = `Candidate Site (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})`;
                   setSelectedSiteName(candidateName);
