@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { CandidateSite, ScoreResponse } from '@/mocks/mockDataService';
+import { reverseGeocode, isCoordinateString } from '@/services/geocodingService';
 
 export interface EvaluatedSiteComparison {
   id: string;
@@ -25,7 +26,22 @@ export function useCompareApi() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const addSiteFromScore = useCallback((scoreData: ScoreResponse) => {
+  const addSiteFromScore = useCallback((scoreData: ScoreResponse, overrideName?: string) => {
+    const rawName = overrideName || scoreData.locationName;
+    const initialName = (!isCoordinateString(rawName))
+      ? rawName!
+      : `Evaluating Location...`;
+
+    const siteId = `site-${Date.now()}`;
+    const newSite: CandidateSite = {
+      id: siteId,
+      name: initialName,
+      lat: scoreData.coordinates.lat,
+      lng: scoreData.coordinates.lng,
+      siteType: scoreData.siteType || 'ev_charging',
+      score: scoreData.score,
+    };
+
     setCandidateSites((prev) => {
       // Check if coordinate already added
       const exists = prev.some(
@@ -35,17 +51,16 @@ export function useCompareApi() {
       );
       if (exists) return prev;
       if (prev.length >= 6) return prev; // Limit to 6 candidates
-
-      const newSite: CandidateSite = {
-        id: `site-${Date.now()}`,
-        name: scoreData.locationName || `Site (${scoreData.coordinates.lat.toFixed(4)}, ${scoreData.coordinates.lng.toFixed(4)})`,
-        lat: scoreData.coordinates.lat,
-        lng: scoreData.coordinates.lng,
-        siteType: scoreData.siteType || 'ev_charging',
-        score: scoreData.score,
-      };
       return [...prev, newSite];
     });
+
+    if (isCoordinateString(rawName)) {
+      reverseGeocode(scoreData.coordinates.lat, scoreData.coordinates.lng).then((geo) => {
+        setCandidateSites((prev) =>
+          prev.map((s) => (s.id === siteId ? { ...s, name: geo.name } : s))
+        );
+      });
+    }
   }, []);
 
   const removeSite = useCallback((id: string) => {

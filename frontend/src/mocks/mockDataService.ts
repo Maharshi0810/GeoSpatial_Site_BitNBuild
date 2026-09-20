@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import sampleScoreData from './fixtures/sample-score.json';
 import sampleAhmedabadData from './fixtures/sample-ahmedabad.json';
+import { reverseGeocode, isCoordinateString } from '@/services/geocodingService';
 
 // --- Zod Schemas for Type Safety & Boundary Validation ---
 
@@ -74,8 +75,22 @@ class MockDataService {
     lat: number,
     lng: number,
     siteType: string = 'ev_charging',
-    subFilter?: string
+    subFilter?: string,
+    knownLocationName?: string
   ): Promise<ScoreResponse> {
+    // Resolve human-friendly location name
+    let resolvedName = (knownLocationName && !isCoordinateString(knownLocationName))
+      ? knownLocationName
+      : '';
+    if (!resolvedName) {
+      try {
+        const geo = await reverseGeocode(lat, lng);
+        resolvedName = geo.name;
+      } catch {
+        resolvedName = `Site (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+      }
+    }
+
     try {
       const response = await fetch('/api/score', {
         method: 'POST',
@@ -142,7 +157,7 @@ class MockDataService {
               ];
 
           return ScoreResponseSchema.parse({
-            locationName: wbName ? `${wbName} (${lat.toFixed(4)}, ${lng.toFixed(4)})` : `Site at ${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+            locationName: wbName ? `${wbName} (${resolvedName})` : resolvedName,
             coordinates: { lat, lng },
             siteType,
             score: isDisqualified ? 0 : Math.round(data.score),
@@ -186,7 +201,7 @@ class MockDataService {
       cappedBy: isMockWaterLake ? 'Water body exclusion: Construction physically prohibited' : sampleScoreData.cappedBy,
       siteType,
       coordinates: { lat, lng },
-      locationName: isMockWaterLake ? `Water Body at ${lat.toFixed(4)}, ${lng.toFixed(4)}` : `Site at ${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+      locationName: isMockWaterLake ? `Water Body near ${resolvedName}` : resolvedName,
     };
 
     const validated = ScoreResponseSchema.parse(rawData);

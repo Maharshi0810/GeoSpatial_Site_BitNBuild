@@ -9,6 +9,7 @@ Features:
   - In-memory LRU caching to eliminate rate-limiting and redundant network latency
 """
 
+import os
 import re
 import urllib.parse
 import urllib.request
@@ -18,8 +19,13 @@ from fastapi import APIRouter, Query
 
 router = APIRouter(prefix="", tags=["Search"])
 
-# In-memory geocode cache
+# In-memory geocode cache & reverse geocode cache
 _SEARCH_CACHE: Dict[str, List[Dict[str, Any]]] = {}
+_REVERSE_CACHE: Dict[str, Dict[str, Any]] = {}
+_TALUKAS_CACHE: Optional[List[Any]] = None
+_DISTRICTS_CACHE: Optional[List[Any]] = None
+
+DATA_DIR = os.getenv("DATA_DIR", os.path.join(os.path.dirname(__file__), "..", "..", "data"))
 
 # Gujarat State Geographic Bounding Box
 GUJARAT_BBOX = {
@@ -370,6 +376,174 @@ GUJARAT_GAZETTEER: List[Dict[str, Any]] = [
 
 COORD_REGEX = re.compile(r"^[-+]?([1-8]?\d(?:\.\d+)?|90(?:\.0+)?)[,\s]+[-+]?(180(?:\.0+)?|(?:1[0-7]\d|[1-9]?\d)(?:\.\d+)?)$")
 
+def _init_spatial_talukas():
+    """Lazily load and index Gujarat Taluka and District boundaries."""
+    global _TALUKAS_CACHE, _DISTRICTS_CACHE
+    if _TALUKAS_CACHE is not None:
+        return
+    _TALUKAS_CACHE = []
+    _DISTRICTS_CACHE = []
+    try:
+        from shapely.geometry import shape
+        from shapely.prepared import prep
+        talukas_file = os.path.join(DATA_DIR, "gujarat_talukas.geojson")
+        if os.path.exists(talukas_file):
+            with open(talukas_file, "r", encoding="utf-8") as f:
+                gj = json.load(f)
+            for feat in gj.get("features", []):
+                geom = feat.get("geometry")
+                if geom:
+                    poly = prep(shape(geom))
+                    t_name = feat.get("properties", {}).get("NAME_3") or ""
+                    d_name = feat.get("properties", {}).get("NAME_2") or ""
+                    _TALUKAS_CACHE.append((poly, t_name, d_name))
+
+        districts_file = os.path.join(DATA_DIR, "gujarat_districts.geojson")
+        if os.path.exists(districts_file):
+            with open(districts_file, "r", encoding="utf-8") as f:
+                gj = json.load(f)
+            for feat in gj.get("features", []):
+                geom = feat.get("geometry")
+                if geom:
+                    poly = prep(shape(geom))
+                    d_name = feat.get("properties", {}).get("district") or ""
+                    _DISTRICTS_CACHE.append((poly, d_name))
+    except Exception:
+        pass
+
+
+def reverse_lookup_local(lat: float, lng: float) -> Dict[str, Any]:
+    """Fast (0ms) local spatial reverse lookup using gazetteer, talukas, and districts."""
+    # 1. Proximity to curated landmarks / gazetteer (~600m)
+    for g in GUJARAT_GAZETTEER:
+        if abs(g["lat"] - lat) < 0.006 and abs(g["lng"] - lng) < 0.006:
+            return {
+                "name": g["name"],
+                "subTitle": g.get("subTitle") or f"{g.get('district', 'Gujarat')}, India",
+                "district": g.get("district") or "Gujarat",
+            }
+
+    # 2. Point-in-polygon on Gujarat Talukas
+    _init_spatial_talukas()
+    try:
+        from shapely.geometry import Point
+        pt = Point(lng, lat)
+        if _TALUKAS_CACHE:
+            for poly, taluk, dist in _TALUKAS_CACHE:
+                if poly.contains(pt):
+                    taluk_clean = taluk.strip()
+                    dist_clean = dist.strip()
+                    if taluk_clean and dist_clean and taluk_clean.lower() != dist_clean.lower():
+                        name = f"{taluk_clean}, {dist_clean}"
+                    elif taluk_clean:
+                        name = f"{taluk_clean} Taluka, Gujarat"
+                    else:
+                        name = f"{dist_clean}, Gujarat"
+                    return {
+                        "name": name,
+                        "subTitle": f"{dist_clean} District, Gujarat",
+                        "district": dist_clean or "Gujarat",
+                    }
+        if _DISTRICTS_CACHE:
+            for poly, dist in _DISTRICTS_CACHE:
+                if poly.contains(pt):
+                    dist_clean = dist.strip()
+                    return {
+                        "name": f"{dist_clean} Region",
+                        "subTitle": f"{dist_clean} District, Gujarat",
+                        "district": dist_clean,
+                    }
+    except Exception:
+        pass
+
+    return {
+        "name": f"Location ({lat:.4f}, {lng:.4f})",
+        "subTitle": "Gujarat, India",
+        "district": "Gujarat",
+    }
+
+
+def fetch_nominatim_reverse(lat: float, lng: float) -> Optional[Dict[str, Any]]:
+    """Query OpenStreetMap Nominatim reverse geocoder strictly for human-readable place names."""
+    params = urllib.parse.urlencode({
+        "format": "json",
+        "lat": lat,
+        "lon": lng,
+        "addressdetails": "1",
+        "zoom": "17",
+    })
+    url = f"https://nominatim.openstreetmap.org/reverse?{params}"
+    req = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": "GeoVistaSiteReadiness/2.0 (team@geovista.app; dakshthakkar42@gmail.com)",
+            "Accept-Language": "en",
+        }
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=1.8) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            address = data.get("address", {})
+            road = address.get("road") or address.get("pedestrian") or address.get("street") or address.get("industrial")
+            neighbourhood = address.get("neighbourhood") or address.get("suburb") or address.get("residential")
+            village = address.get("village") or address.get("hamlet") or address.get("town") or address.get("city")
+            county = address.get("county") or ""
+            district = address.get("state_district") or address.get("district") or ""
+            state = address.get("state") or "Gujarat"
+
+            # Clean county if it contains "Taluka" or "Taluk"
+            clean_county = re.sub(r"\s+Taluk(a)?$", "", county, flags=re.IGNORECASE).strip()
+
+            # Compose natural name
+            place_parts = [p for p in [road or neighbourhood or village or clean_county] if p]
+            area_parts = [p for p in [district or clean_county or state] if p]
+
+            if place_parts and area_parts and place_parts[0].lower() != area_parts[0].lower():
+                name = f"{place_parts[0]}, {area_parts[0]}"
+            elif place_parts:
+                name = f"{place_parts[0]}, Gujarat"
+            elif area_parts:
+                name = f"{area_parts[0]}, Gujarat"
+            else:
+                name = None
+
+            if name:
+                display_name = data.get("display_name", "")
+                sub_title = f"{district or state}, Gujarat, India" if district else display_name
+                return {
+                    "name": name,
+                    "subTitle": sub_title,
+                    "district": district or "Gujarat",
+                }
+    except Exception:
+        pass
+    return None
+
+
+def reverse_geocode_point(lat: float, lng: float) -> Dict[str, Any]:
+    """Retrieve human-friendly location name for coordinate with multi-layer fallback & caching."""
+    cache_key = f"{lat:.4f},{lng:.4f}"
+    if cache_key in _REVERSE_CACHE:
+        return _REVERSE_CACHE[cache_key]
+
+    # Try high-precision Nominatim reverse first
+    result = fetch_nominatim_reverse(lat, lng)
+
+    # Fallback to local polygon/gazetteer matching
+    if not result:
+        result = reverse_lookup_local(lat, lng)
+
+    final_res = {
+        "name": result.get("name") or f"Location ({lat:.4f}, {lng:.4f})",
+        "subTitle": result.get("subTitle") or f"Gujarat ({lat:.4f}° N, {lng:.4f}° E)",
+        "district": result.get("district") or "Gujarat",
+        "lat": lat,
+        "lng": lng,
+    }
+    _REVERSE_CACHE[cache_key] = final_res
+    return final_res
+
+
 def parse_coordinates(query: str) -> Optional[Dict[str, Any]]:
     m = COORD_REGEX.match(query.strip())
     if m:
@@ -379,15 +553,15 @@ def parse_coordinates(query: str) -> Optional[Dict[str, Any]]:
                 lat = float(parts[0])
                 lng = float(parts[1])
                 if -90 <= lat <= 90 and -180 <= lng <= 180:
-                    in_guj = is_within_gujarat(lat, lng)
+                    geo = reverse_geocode_point(lat, lng)
                     return {
-                        "id": "coord-custom",
-                        "name": f"Coordinates: {lat:.4f}° N, {lng:.4f}° E",
-                        "subTitle": "Direct GPS Coordinates" + (" (Gujarat)" if in_guj else ""),
+                        "id": f"coord-{lat:.4f}-{lng:.4f}",
+                        "name": geo["name"],
+                        "subTitle": f"GPS: {lat:.4f}° N, {lng:.4f}° E • {geo.get('subTitle', 'Gujarat')}",
                         "lat": lat,
                         "lng": lng,
                         "category": "coordinate",
-                        "district": "Custom Point",
+                        "district": geo.get("district", "Gujarat"),
                     }
         except Exception:
             return None
@@ -563,4 +737,18 @@ async def search_locations(
         "query": query,
         "count": len(final_results),
         "results": final_results
+    }
+
+
+@router.get("/reverse-geocode")
+@router.get("/search/reverse")
+async def reverse_geocode_api(
+    lat: float = Query(..., description="Latitude coordinate"),
+    lng: float = Query(..., description="Longitude coordinate"),
+) -> Dict[str, Any]:
+    """Reverse geocode coordinate into human-readable place, ward, or taluk name in Gujarat."""
+    result = reverse_geocode_point(lat, lng)
+    return {
+        "status": "ok",
+        "data": result
     }

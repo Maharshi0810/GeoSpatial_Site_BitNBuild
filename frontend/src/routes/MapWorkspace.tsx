@@ -27,6 +27,7 @@ import { useWindAtlas } from '@/hooks/useWindAtlas';
 import { WindLegend } from '@/components/WindLegend';
 import { WindPrimeSpotsBar, PrimeSpotItem } from '@/components/WindPrimeSpotsBar';
 import type { FeatureCollection } from 'geojson';
+import { reverseGeocode, isCoordinateString } from '@/services/geocodingService';
 
 export interface MapWorkspaceProps {
   siteType?: string;
@@ -269,12 +270,26 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
     lat: number,
     lng: number,
     currentType: string = siteType,
-    subFilter: string = activeFilter
+    subFilter: string = activeFilter,
+    knownLocationName?: string
   ) => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await mockDataService.fetchScoreForLocation(lat, lng, currentType, subFilter);
+      let locName = knownLocationName;
+      if (!locName || isCoordinateString(locName)) {
+        try {
+          const geo = await reverseGeocode(lat, lng);
+          locName = geo.name;
+          setSelectedSiteName(locName);
+        } catch {
+          // ignore
+        }
+      }
+      const data = await mockDataService.fetchScoreForLocation(lat, lng, currentType, subFilter, locName);
+      if (locName && !isCoordinateString(locName)) {
+        data.locationName = locName;
+      }
       setScoreData(data);
     } catch {
       setError('Scoring service returned an error. Retry or pick another Gujarat location.');
@@ -345,7 +360,10 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
 
   const handleAddCurrentSite = () => {
     if (scoreData) {
-      addSiteFromScore(scoreData);
+      const nameToUse = (!isCoordinateString(selectedSiteName))
+        ? selectedSiteName
+        : scoreData.locationName;
+      addSiteFromScore(scoreData, nameToUse);
       setActiveSidebarTab('compare');
       if (isSidebarCollapsed) {
         setIsSidebarCollapsed(false);
@@ -371,11 +389,12 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
                 setSelectedLocation({ lat: loc.lat, lng: loc.lng });
                 setSelectedSiteName(loc.name);
                 mapViewRef.current?.flyTo(loc.lng, loc.lat, 13.5);
-                loadScore(loc.lat, loc.lng, siteType);
+                loadScore(loc.lat, loc.lng, siteType, activeFilter, loc.name);
                 if (isPickingForCompare) {
-                  mockDataService.fetchScoreForLocation(loc.lat, loc.lng, siteType, activeFilter).then((data) => {
+                  mockDataService.fetchScoreForLocation(loc.lat, loc.lng, siteType, activeFilter, loc.name).then((data) => {
+                    data.locationName = loc.name;
                     addSiteFromScore(data);
-                    setCompareNotification(`✓ Added "${data.locationName || loc.name}" (${data.score}/100) to comparison!`);
+                    setCompareNotification(`✓ Added "${loc.name}" (${data.score}/100) to comparison!`);
                     setTimeout(() => setCompareNotification(null), 3500);
                   });
                   setIsPickingForCompare(false);
@@ -515,15 +534,19 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
                 // If explicitly in candidate picking mode for comparison (BUG-15):
                 if (isPickingForCompare) {
                   setSelectedLocation(coords);
-                  const candidateName = `Candidate Site (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})`;
-                  setSelectedSiteName(candidateName);
                   setIsLoading(true);
-                  mockDataService.fetchScoreForLocation(coords.lat, coords.lng, siteType, activeFilter)
-                    .then((data) => {
-                      setScoreData(data);
-                      addSiteFromScore(data);
-                      setCompareNotification(`✓ Added "${data.locationName || candidateName}" (${data.score}/100) to comparison!`);
-                      setTimeout(() => setCompareNotification(null), 3500);
+                  reverseGeocode(coords.lat, coords.lng)
+                    .then((geo) => {
+                      const candidateName = geo.name;
+                      setSelectedSiteName(candidateName);
+                      return mockDataService.fetchScoreForLocation(coords.lat, coords.lng, siteType, activeFilter, candidateName)
+                        .then((data) => {
+                          data.locationName = candidateName;
+                          setScoreData(data);
+                          addSiteFromScore(data);
+                          setCompareNotification(`✓ Added "${candidateName}" (${data.score}/100) to comparison!`);
+                          setTimeout(() => setCompareNotification(null), 3500);
+                        });
                     })
                     .catch(() => {
                       setError('Failed to score selected candidate location.');
@@ -537,8 +560,14 @@ export const MapWorkspace: React.FC<MapWorkspaceProps> = ({
 
                 // Default behavior: Select location and load readiness score
                 setSelectedLocation(coords);
-                setSelectedSiteName(`Custom Site (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})`);
-                loadScore(coords.lat, coords.lng, siteType, activeFilter);
+                reverseGeocode(coords.lat, coords.lng)
+                  .then((geo) => {
+                    setSelectedSiteName(geo.name);
+                    loadScore(coords.lat, coords.lng, siteType, activeFilter, geo.name);
+                  })
+                  .catch(() => {
+                    loadScore(coords.lat, coords.lng, siteType, activeFilter);
+                  });
               }}
               onMapDblClick={(coords) => {
                 if (drawMode === 'polygon') {

@@ -3,6 +3,7 @@ import {
   Search, MapPin, X, Loader2, Navigation,
   Building2, Factory, Landmark, Anchor, Store, Compass,
 } from "lucide-react";
+import { reverseGeocode, isCoordinateString } from "@/services/geocodingService";
 
 export interface SearchResultItem {
   id: string;
@@ -101,6 +102,20 @@ export const SearchBar: React.FC<SearchBarProps> = ({ currentAddress = "SG Highw
   useEffect(() => {
     if (currentAddress && currentAddress !== lastPropAddressRef.current) {
       lastPropAddressRef.current = currentAddress;
+      if (isCoordinateString(currentAddress)) {
+        const m = currentAddress.match(/[-+]?\d+(\.\d+)?\s*,\s*[-+]?\d+(\.\d+)?/);
+        if (m) {
+          const parts = m[0].split(",");
+          const lat = parseFloat(parts[0]);
+          const lng = parseFloat(parts[1]);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            reverseGeocode(lat, lng).then((geo) => {
+              setQuery(geo.name);
+            });
+            return;
+          }
+        }
+      }
       setQuery(currentAddress);
     }
   }, [currentAddress]);
@@ -159,19 +174,38 @@ export const SearchBar: React.FC<SearchBarProps> = ({ currentAddress = "SG Highw
     })();
 
     if (coordDirect) {
-      const coordItem: SearchResultItem = {
-        id: `coord-${coordDirect.lat}-${coordDirect.lng}`,
-        name: `Coordinates: ${coordDirect.lat.toFixed(4)}° N, ${coordDirect.lng.toFixed(4)}° E`,
-        subTitle: `Direct GPS Coordinates (${coordDirect.lat.toFixed(4)}, ${coordDirect.lng.toFixed(4)})`,
-        lat: coordDirect.lat,
-        lng: coordDirect.lng,
-        category: "coordinate",
-        icon: Compass,
-      };
-      setSearchResults([coordItem]);
-      setSelectedIndex(0);
-      setIsSearching(false);
-      return [coordItem];
+      setIsSearching(true);
+      try {
+        const geo = await reverseGeocode(coordDirect.lat, coordDirect.lng);
+        const coordItem: SearchResultItem = {
+          id: `coord-${coordDirect.lat}-${coordDirect.lng}`,
+          name: geo.name,
+          subTitle: geo.subTitle || `GPS: ${coordDirect.lat.toFixed(4)}° N, ${coordDirect.lng.toFixed(4)}° E`,
+          lat: coordDirect.lat,
+          lng: coordDirect.lng,
+          category: "coordinate",
+          district: geo.district,
+          icon: Compass,
+        };
+        setSearchResults([coordItem]);
+        setSelectedIndex(0);
+        setIsSearching(false);
+        return [coordItem];
+      } catch {
+        const fallbackItem: SearchResultItem = {
+          id: `coord-${coordDirect.lat}-${coordDirect.lng}`,
+          name: `Site at ${coordDirect.lat.toFixed(4)}, ${coordDirect.lng.toFixed(4)}`,
+          subTitle: `GPS Coordinates (${coordDirect.lat.toFixed(4)}, ${coordDirect.lng.toFixed(4)})`,
+          lat: coordDirect.lat,
+          lng: coordDirect.lng,
+          category: "coordinate",
+          icon: Compass,
+        };
+        setSearchResults([fallbackItem]);
+        setSelectedIndex(0);
+        setIsSearching(false);
+        return [fallbackItem];
+      }
     }
 
     // 1. Instant local match across name, subtitle, and district
@@ -271,13 +305,17 @@ export const SearchBar: React.FC<SearchBarProps> = ({ currentAddress = "SG Highw
 
     // 1. Direct coordinate entry
     if (coordinateMatch) {
+      setIsSearching(true);
+      const geo = await reverseGeocode(coordinateMatch.lat, coordinateMatch.lng);
+      setIsSearching(false);
       handleSelect({
-        id: "coord-custom",
-        name: `Coordinates: ${coordinateMatch.lat.toFixed(4)}° N, ${coordinateMatch.lng.toFixed(4)}° E`,
-        subTitle: "Direct GPS Coordinates",
+        id: `coord-${coordinateMatch.lat}-${coordinateMatch.lng}`,
+        name: geo.name,
+        subTitle: geo.subTitle || `GPS: ${coordinateMatch.lat.toFixed(4)}° N, ${coordinateMatch.lng.toFixed(4)}° E`,
         lat: coordinateMatch.lat,
         lng: coordinateMatch.lng,
         category: "coordinate",
+        district: geo.district,
         icon: Compass,
       });
       return;
@@ -403,26 +441,28 @@ export const SearchBar: React.FC<SearchBarProps> = ({ currentAddress = "SG Highw
           {/* Coordinates Quick Jumper */}
           {coordinateMatch && (
             <div
-              onClick={() =>
+              onClick={async () => {
+                const geo = await reverseGeocode(coordinateMatch.lat, coordinateMatch.lng);
                 handleSelect({
-                  id: "coord-custom",
-                  name: `Coordinates: ${coordinateMatch.lat.toFixed(4)}° N, ${coordinateMatch.lng.toFixed(4)}° E`,
-                  subTitle: "Direct GPS Coordinates",
+                  id: `coord-${coordinateMatch.lat}-${coordinateMatch.lng}`,
+                  name: geo.name,
+                  subTitle: geo.subTitle || `GPS: ${coordinateMatch.lat.toFixed(4)}° N, ${coordinateMatch.lng.toFixed(4)}° E`,
                   lat: coordinateMatch.lat,
                   lng: coordinateMatch.lng,
                   category: "coordinate",
+                  district: geo.district,
                   icon: Compass,
-                })
-              }
+                });
+              }}
               className="p-2.5 bg-brand-50/80 dark:bg-brand-950/40 border-b border-brand-100 dark:border-brand-900/50 flex items-center justify-between cursor-pointer hover:bg-brand-100/70 transition-colors"
             >
               <div className="flex items-center gap-2">
                 <Compass className="w-4 h-4 text-brand-600 dark:text-brand-400" />
                 <div>
                   <span className="text-xs font-medium text-brand-900 dark:text-brand-200">
-                    Jump to Coordinates: {coordinateMatch.lat.toFixed(4)}, {coordinateMatch.lng.toFixed(4)}
+                    Evaluate Location at {coordinateMatch.lat.toFixed(4)}, {coordinateMatch.lng.toFixed(4)}
                   </span>
-                  <p className="text-[10px] text-slate-500">Press Enter or click to evaluate site</p>
+                  <p className="text-[10px] text-slate-500">Press Enter or click to resolve place & score site</p>
                 </div>
               </div>
               <span className="text-[10px] bg-brand-600 text-white px-2 py-0.5 rounded font-mono font-medium">
