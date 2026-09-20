@@ -1,4 +1,4 @@
-# 🗺️ GeoSpatial Site Readiness Analyzer
+# 🗺️ GeoVista
 
 > **AI-Powered multi-layer geospatial analysis platform for evaluating site readiness across Gujarat, India.**
 > Built for BitNBuild Internal Hackathon 2026.
@@ -7,7 +7,7 @@
 
 ## 📌 Project Overview
 
-**GeoSpatial Site Readiness Analyzer** is an AI-powered location intelligence and spatial analytics platform tailored for evaluating industrial, commercial, and retail site viability across Gujarat, India. By ingesting and cross-referencing multi-layer geospatial datasets—demographics, arterial highways, commercial competitor points of interest (POIs), municipal land-use parcels, and environmental flood hazards—the system provides decision-makers with instant site scoring, statistical clustering, and accessibility reach analytics.
+**GeoVista** is an AI-powered location intelligence and spatial analytics platform tailored for evaluating industrial, commercial, and retail site viability across Gujarat, India. By ingesting and cross-referencing multi-layer geospatial datasets—demographics, arterial highways, commercial competitor points of interest (POIs), municipal land-use parcels, and environmental flood hazards—the system provides decision-makers with instant site scoring, statistical clustering, and accessibility reach analytics.
 
 ### 🌟 Key Features
 - **Composite 5-Layer Site Scoring**: Real-time evaluation engine applying Gaussian distance decay, penalty thresholding (flood hazard zones, road setbacks), and configurable industry weights (EV Charging, Retail, Industrial, Warehouse).
