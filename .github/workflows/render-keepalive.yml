@@ -1,0 +1,41 @@
+name: Render Backend Keep-Alive
+
+on:
+  schedule:
+    # Run every 12 minutes to beat Render's 15-minute free tier inactivity sleep
+    - cron: '*/12 * * * *'
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Backend URL to ping (defaults to live Render endpoint)'
+        required: false
+        default: 'https://geospatial-site-bitnbuild.onrender.com'
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/render-keepalive.yml'
+
+jobs:
+  keep-alive:
+    name: Ping Render Backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Ping Backend Health Endpoint
+        env:
+          TARGET_URL: ${{ github.event.inputs.target_url || secrets.BACKEND_URL || 'https://geospatial-site-bitnbuild.onrender.com' }}
+        run: |
+          echo "Triggered by: ${{ github.event_name }}"
+          echo "Target URL: $TARGET_URL"
+          python scripts/keep_alive.py --url "$TARGET_URL" --timeout 90 --once
