@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState } from 'react';
+import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -88,6 +88,13 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
 export const App: React.FC = () => {
   const [siteType, setSiteType] = useState<string>('ev_charging');
+
+  useEffect(() => {
+    // Initial warmup ping to ensure Render backend is awake and ready
+    fetch('/api/health').catch(() => {
+      // Non-blocking background warmup
+    });
+  }, []);
 
   return (
     <BrowserRouter>
